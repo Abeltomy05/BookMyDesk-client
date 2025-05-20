@@ -101,7 +101,7 @@ export const clientService = {
     }
   },
 
- resetPassword: async (token: string, password: string): Promise<ApiResponse> => {
+  resetPassword: async (token: string, password: string): Promise<ApiResponse> => {
     try {
       const response = await authAxiosInstance.post('/reset-password', {
         token,
@@ -128,4 +128,22 @@ export const clientService = {
       };
     }
   },
+
+  handleGoogleLogin:  () => {
+       const role = "client";
+       window.location.href = `${import.meta.env.VITE_BACKEND_URL}/api/auth/google?role=${role}`;
+  },
+
+  getMe: async(): Promise<ApiResponse>=>{
+     try {
+      const response = await authAxiosInstance.get("/me");
+      return response.data
+     } catch (error) {
+      console.error('Error geting user data:', error);
+      return {
+        success: false,
+        message: 'User not found',
+      };
+     }
+  }
 };

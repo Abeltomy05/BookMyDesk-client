@@ -1,6 +1,7 @@
 import Home from "@/pages/client/home-page";
 import LoginPage from "@/pages/client/Login-page";
 import SignupPage from "@/pages/client/signup-page";
+import AuthCallback from "@/pages/shared/AuthCheck";
 import ForgotPasswordPage from "@/pages/shared/ForgotPassword";
 import NotFoundPage from "@/pages/shared/NotFoundPage";
 import ResetPasswordForm from "@/pages/shared/ResetPassword";
@@ -17,6 +18,7 @@ const ClientRoutes = () => {
         <Route path="/login" element={<NoAuthRoute element={<LoginPage/>}/>}/>
         <Route path="/forgot-password" element={<NoAuthRoute element={<ForgotPasswordPage/>}/>}/>
         <Route path="/reset-password/:token" element={<NoAuthRoute element={<ResetPasswordForm/>}/>}/>
+        <Route path="/auth-check/:role" element={<AuthCallback/>}/>
         
         <Route path="/home" element={<ProtectedRoute allowedRoles={["client"]} element={<Home/>} />}/>
        

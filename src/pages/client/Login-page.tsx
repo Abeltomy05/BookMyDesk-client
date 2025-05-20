@@ -81,6 +81,10 @@ const LoginPage: React.FC = () => {
     setShowPassword(!showPassword)
   }
 
+  const handleGoogleRedirect = async()=>{
+      clientService.handleGoogleLogin();
+  }
+
 
   return (
     <div className="relative flex flex-row h-screen overflow-hidden">
@@ -201,6 +205,7 @@ const LoginPage: React.FC = () => {
             {/* Google Login Button */}
             <button
               type="button"
+              onClick={handleGoogleRedirect}
               className="flex w-full items-center justify-center rounded-md border border-gray-300 bg-white py-2.5 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none transition-colors duration-200"
             >
               <svg
