@@ -18,9 +18,13 @@ const AuthCallback = () => {
         const res = await authAxiosInstance.get('/me');
         const user = res.data.data;
         setTimeout(()=>{
-        if (user.role === "client") dispatch(clientLogin(user));
-        else if (user.role === "vendor") dispatch(vendorLogin(user));
-        navigate("/home");
+        if (user.role === "client"){
+           dispatch(clientLogin(user));
+           navigate("/home");
+        }else if (user.role === "vendor"){
+           dispatch(vendorLogin(user));
+           navigate("/vendor/home");
+        }
         },1000)
       } catch (err) {
         console.error("Login failed", err);

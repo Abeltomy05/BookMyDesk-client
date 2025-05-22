@@ -161,11 +161,11 @@ const SignupPage: React.FC = () => {
   }
 
 
-  const closeOtpModal = () => {
-    setShowOtpModal(false)
-    setOtpValues(["", "", "", "", ""])
-    setTimerActive(false)
-  }
+  // const closeOtpModal = () => {
+  //   setShowOtpModal(false)
+  //   setOtpValues(["", "", "", "", ""])
+  //   setTimerActive(false)
+  // }
 
   const resendOtp = async () => {
     setIsOTPLoading(true)
@@ -226,12 +226,12 @@ const SignupPage: React.FC = () => {
                   <Lock size={18} className="text-white" />
                 </div>
               </div>
-              <button 
+              {/* <button 
                 onClick={closeOtpModal}
                 className="text-gray-500 hover:text-gray-700"
               >
                 <X size={20} />
-              </button>
+              </button> */}
             </div>
             
             <h3 className="text-center text-blue-800 font-bold mb-1">VERIFY YOUR ACCOUNT</h3>

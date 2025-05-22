@@ -1,34 +1,51 @@
-"use client"
-
 import type React from "react"
 import { useState } from "react"
-import { Eye, EyeOff } from "lucide-react"
 
 interface FloatingLabelInputProps {
   id: string
+  name: string
   type: string
   placeholder: string
   value: string
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  onBlur?: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => void
   error?: string
+  showPasswordToggle?: boolean
+  isPasswordVisible?: boolean
+  onTogglePassword?: () => void
 }
 
-const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({ id, type, placeholder, value, onChange, error }) => {
+const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({ 
+  id, 
+  name,
+  type, 
+  placeholder, 
+  value, 
+  onChange, 
+  onBlur,
+  error,
+  showPasswordToggle = false,
+  isPasswordVisible,
+  onTogglePassword
+}) => {
   const [isFocused, setIsFocused] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
 
   const handleFocus = () => setIsFocused(true)
-  const handleBlur = () => setIsFocused(value.length > 0)
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    setIsFocused(value.length > 0)
+    if (onBlur) onBlur(e)
+  }
 
-  const togglePasswordVisibility = () => setShowPassword(!showPassword)
-
-  const inputType = type === "password" ? (showPassword ? "text" : "password") : type
+  const inputType = showPasswordToggle && isPasswordVisible !== undefined 
+    ? (isPasswordVisible ? "text" : "password") 
+    : type
 
   return (
-    <div className="relative mb-6">
+    <div className="relative">
       <div className="relative">
         <input
           id={id}
+          name={name}
           type={inputType}
           value={value}
           onChange={onChange}
@@ -43,15 +60,6 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({ id, type, place
           `}
           placeholder={isFocused || value ? "" : placeholder}
         />
-        {type === "password" && (
-          <button
-            type="button"
-            onClick={togglePasswordVisibility}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
-          >
-            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-          </button>
-        )}
         {(isFocused || value) && (
           <span
             className={`

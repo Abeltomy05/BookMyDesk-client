@@ -1,10 +1,21 @@
-import { Routes } from "react-router-dom"
+import NotFoundPage from "@/pages/shared/NotFoundPage"
+import VendorHome from "@/pages/vendor/VendorHome"
+import VendorLogin from "@/pages/vendor/VendorLogin"
+import VendorSignup from "@/pages/vendor/VendorSignup"
+import { ProtectedRoute } from "@/utils/protected/ProtectedRoute"
+import { NoAuthRoute } from "@/utils/protected/PublicRoute"
+import { Route, Routes } from "react-router-dom"
 
 
 const VendorRoutes = () => {
   return (
     <Routes>
-        
+        <Route path="/signup" element={<NoAuthRoute element={<VendorSignup/>}/>}/>
+        <Route path="/login" element={<NoAuthRoute element={<VendorLogin/>}/>}/>
+
+        <Route path="/home" element={<ProtectedRoute allowedRoles={["vendor"]} element={<VendorHome/>} />}/>
+
+        <Route path="/*" element={<NotFoundPage/>}/>
     </Routes>
   )
 }

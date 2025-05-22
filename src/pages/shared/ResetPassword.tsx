@@ -77,6 +77,7 @@ const ResetPasswordForm: React.FC = () => {
       <form onSubmit={handleSubmit} className="space-y-6">
         <FloatingLabelInput
           id="password"
+          name="password"
           type="password"
           placeholder="New Password"
           value={password}
@@ -86,6 +87,7 @@ const ResetPasswordForm: React.FC = () => {
 
         <FloatingLabelInput
           id="confirmPassword"
+          name="confirmPassword"
           type="password"
           placeholder="Confirm Password"
           value={confirmPassword}

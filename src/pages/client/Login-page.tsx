@@ -53,8 +53,8 @@ const LoginPage: React.FC = () => {
     if (validateForm()) {
       setIsLoading(true)
       try {
-       const data = {...formData,role:"client"}
-       const response = await clientService.login(data)
+       const data = {...formData,role:"client"};
+       const response = await clientService.login(data);
         if(response.success){
           toast.success("Login successful!")
           setFormData({

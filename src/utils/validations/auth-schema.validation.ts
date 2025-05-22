@@ -37,7 +37,144 @@ export interface ResetPasswordValidationErrors {
   confirmPassword?: string;
 }
 
+//Vendor Signup
+export interface VendorFormData {
+  username: string
+  email: string
+  password: string
+  confirmPassword: string
+  phone: string
+  companyName: string
+  companyAddress: string
+  idProof: File | null
+}
 
+export interface VendorFormErrors {
+  username?: string
+  email?: string
+  password?: string
+  confirmPassword?: string
+  phone?: string
+  companyName?: string
+  companyAddress?: string
+  idProof?:  string
+}
+
+export interface VendorTouchedFields {
+  username: boolean
+  email: boolean
+  password: boolean
+  confirmPassword: boolean
+  phone: boolean
+  companyName: boolean
+  companyAddress: boolean
+  idProof?: boolean
+}
+
+//vendor
+export const validateVendorField = (
+  name: keyof VendorFormData, 
+  value: string | File | null,
+  formData?: VendorFormData
+): string | undefined => {
+  switch (name) {
+    case "username":
+      return !value || typeof value !== 'string' || !value.trim() ? "Username is required" : undefined
+      
+    case "email":
+      return !value || typeof value !== 'string' || !value.trim() 
+        ? "Email is required" 
+        : !/\S+@\S+\.\S+/.test(value) 
+          ? "Email is invalid" 
+          : undefined
+          
+    case "password":
+      if (!value || typeof value !== 'string') {
+        return "Password is required" 
+      } else if (value.length < 8) {
+        return "Password must be at least 8 characters long"
+      } else if (!/[A-Z]/.test(value)) {
+        return "Password must contain at least one uppercase letter"
+      } else if (!/[0-9]/.test(value)) {
+        return "Password must contain at least one digit"
+      } else if (!/[@$!%*?&]/.test(value)) {
+        return "Password must contain at least one special character"
+      }
+      return undefined
+      
+    case "confirmPassword":
+      return !value || typeof value !== 'string'
+        ? "Confirm password is required"
+        : formData && value !== formData.password 
+          ? "Passwords do not match" 
+          : undefined
+          
+    case "phone":
+      return !value || typeof value !== 'string' || !value.trim() 
+        ? "Phone number is required" 
+        : !/^\d{10,15}$/.test(value.replace(/\D/g, ''))
+          ? "Please enter a valid phone number"
+          : undefined
+          
+    case "companyName":
+      return !value || typeof value !== 'string' || !value.trim() ? "Company name is required" : undefined
+      
+    case "companyAddress":
+      return !value || typeof value !== 'string' || !value.trim() ? "Company address is required" : undefined
+      
+    case "idProof":
+      if (!value) {
+        return "ID proof is required"
+      } else if (value instanceof File) {
+        const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
+        if (!validTypes.includes(value.type)) {
+          return "Please upload a valid document (JPEG, PNG, or PDF)"
+        }
+        if (value.size > 5 * 1024 * 1024) { // 5MB
+          return "File size should be less than 5MB"
+        }
+      }
+      return undefined
+      
+    default:
+      return undefined
+  }
+}
+
+
+export const validateVendorSignupForm = (
+  formData: VendorFormData,
+  setErrors: React.Dispatch<React.SetStateAction<VendorFormErrors>>,
+  setTouched: React.Dispatch<React.SetStateAction<VendorTouchedFields>>,
+  validateField: ((name: keyof VendorFormData, value: string | File | null) => string | undefined) = 
+    (name, value) => validateVendorField(name, value, formData)
+): boolean => {
+  const newErrors: VendorFormErrors = {}
+  
+  // Mark all fields as touched
+  const allTouched: VendorTouchedFields = Object.keys(formData).reduce((acc, key) => {
+    acc[key as keyof VendorTouchedFields] = true
+    return acc
+  }, {} as VendorTouchedFields)
+  
+  setTouched(allTouched)
+  
+  // Validate each field
+  Object.keys(formData).forEach((key) => {
+    const fieldName = key as keyof VendorFormData
+    const error = validateField(fieldName, formData[fieldName])
+    if (error) {
+      newErrors[fieldName] = error
+    }
+  })
+  
+  setErrors(newErrors)
+  return Object.keys(newErrors).length === 0
+}
+
+
+
+//client
 export const validateSignupForm = (formData: FormData): ValidationErrors => {
   const errors: ValidationErrors = {};
 
