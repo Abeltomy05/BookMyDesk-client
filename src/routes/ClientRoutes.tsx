@@ -16,7 +16,7 @@ const ClientRoutes = () => {
 
         <Route path="/signup" element={<NoAuthRoute element={<SignupPage/>}/>}/>
         <Route path="/login" element={<NoAuthRoute element={<LoginPage/>}/>}/>
-        <Route path="/forgot-password" element={<NoAuthRoute element={<ForgotPasswordPage/>}/>}/>
+        <Route path="/forgot-password/:role" element={<NoAuthRoute element={<ForgotPasswordPage/>}/>}/>
         <Route path="/reset-password/:token" element={<NoAuthRoute element={<ResetPasswordForm/>}/>}/>
         <Route path="/auth-check/:role" element={<AuthCallback/>}/>
         

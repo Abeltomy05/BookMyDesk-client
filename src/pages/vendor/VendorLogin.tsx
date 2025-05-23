@@ -1,5 +1,6 @@
 import type React from "react"
 import { useEffect, useState } from "react"
+import { useLocation } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc"
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai"
 import vendorImage from "@/assets/vendor.jpg"
@@ -8,6 +9,7 @@ import { validateLoginForm } from "@/utils/validations/auth-schema.validation"
 import toast from "react-hot-toast"
 import { vendorService } from "@/services/vendorServices"
 import { vendorLogin } from "@/store/slices/vendor.slice"
+import { useNavigate } from "react-router-dom"
 
 const VendorLogin: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -16,6 +18,8 @@ const VendorLogin: React.FC = () => {
   })
 
   const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const location = useLocation();
   const [isVisible, setIsVisible] = useState(false);
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -29,6 +33,19 @@ const VendorLogin: React.FC = () => {
         setIsVisible(true);
       }, []);
 
+   useEffect(() => {
+  const params = new URLSearchParams(location.search);
+  const errorMessage = params.get("error");
+
+  if (errorMessage) {
+    toast.error(decodeURIComponent(errorMessage));
+     params.delete("error");
+    const newSearch = params.toString();
+    const newUrl = newSearch ? `${location.pathname}?${newSearch}` : location.pathname;
+
+    navigate(newUrl, { replace: true });
+  }
+}, [location.search, navigate]);    
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -90,6 +107,10 @@ const VendorLogin: React.FC = () => {
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword)
+  }
+
+    const handleForgotPageNavigate = ()=>{
+      navigate('/forgot-password/vendor');
   }
 
 return (
@@ -170,7 +191,7 @@ return (
 
             {/* Forgot Password Link */}
             <div className="text-right">
-              <a href="#" className="text-sm font-medium text-[#f69938] hover:text-[#e58828]">
+              <a onClick={handleForgotPageNavigate} className="text-sm font-medium text-[#f69938] hover:text-[#e58828]">
                 Forgot password?
               </a>
             </div>

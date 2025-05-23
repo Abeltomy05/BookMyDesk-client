@@ -4,12 +4,15 @@ import { motion } from "framer-motion"
 import img from '@/assets/desk1.jpg'
 import { clientService } from "@/services/clientServices"
 import toast from "react-hot-toast"
+import { useNavigate, useParams } from "react-router-dom"
 
 const ForgotPasswordPage: React.FC = () => {
-  const [email, setEmail] = useState<string>("")
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
-  const [isSubmitted, setIsSubmitted] = useState<boolean>(false)
-  const [error, setError] = useState<string | null>(null)
+  const { role } = useParams();
+  const navigate = useNavigate();
+  const [email, setEmail] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   const validateEmail = (email: string): boolean => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -42,6 +45,15 @@ const ForgotPasswordPage: React.FC = () => {
     }
   }
 
+  const handleNavigateLogin = ()=>{
+      if(role === "client"){
+         console.log(role)
+           navigate("/login")
+      }else if(role === "vendor"){
+        console.log(role)
+          navigate("/vendor/login")
+      }
+  }
   return (
     <div className="flex min-h-screen flex-col md:flex-row">
       {/* image */}
@@ -128,7 +140,7 @@ const ForgotPasswordPage: React.FC = () => {
               </form>
 
               <div className="mt-6 text-center">
-                <a href="/login" className="text-sm font-medium text-[#f69938] hover:text-[#e58828]">
+                <a onClick={handleNavigateLogin} className="text-sm font-medium text-[#f69938] hover:text-[#e58828]">
                   Back to login
                 </a>
               </div>

@@ -1,4 +1,5 @@
 import authAxiosInstance from "@/api/auth.axios";
+import { clientAxiosInstance } from "@/api/client.axios";
 
 interface ApiResponse {
   success: boolean;
@@ -85,8 +86,7 @@ export const clientService = {
   forgotPassword: async (email: string): Promise<ApiResponse> => {
     try {
       const response = await authAxiosInstance.post('/forgot-password', { 
-        email,
-        role: 'client'
+        email
       });
       return response.data;
     } catch (error: any) {
@@ -105,8 +105,7 @@ export const clientService = {
     try {
       const response = await authAxiosInstance.post('/reset-password', {
         token,
-        password,
-        role: 'client'
+        password
       });
       return response.data;
     } catch (error: any) {
@@ -143,6 +142,19 @@ export const clientService = {
       return {
         success: false,
         message: 'User not found',
+      };
+     }
+  },
+
+  logout: async():Promise<ApiResponse>=>{
+    try {
+      const response = await clientAxiosInstance.post("/logout");
+      return response.data
+     } catch (error) {
+      console.error('Error in logout:', error);
+      return {
+        success: false,
+        message: 'Logout Error',
       };
      }
   }

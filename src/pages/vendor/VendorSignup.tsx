@@ -297,6 +297,10 @@ const resendOtp = async () => {
     }
   }, [showOtpModal])
 
+     const handleGoogleRedirect = async()=>{
+         vendorService.handleGoogleLogin();
+     }
+
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen overflow-hidden relative">
@@ -517,6 +521,7 @@ const resendOtp = async () => {
             </div>
 
             <button
+              onClick={handleGoogleRedirect}
               type="button"
               className="w-full flex items-center justify-center py-3 px-4 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-[#f69938] focus:ring-opacity-50"
             >

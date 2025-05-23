@@ -214,6 +214,10 @@ const SignupPage: React.FC = () => {
     }
   }, [showOtpModal])
 
+   const handleGoogleRedirect = async()=>{
+       clientService.handleGoogleLogin();
+   } 
+
   return (
     <div className="flex flex-col-reverse md:flex-row h-screen overflow-hidden relative">
       {/* OTP Modal */}
@@ -452,6 +456,7 @@ const SignupPage: React.FC = () => {
 
             {/* Google Sign Up Button */}
             <button
+             onClick={handleGoogleRedirect}
               type="button"
               className="flex w-full items-center justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-xs md:text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none"
             >

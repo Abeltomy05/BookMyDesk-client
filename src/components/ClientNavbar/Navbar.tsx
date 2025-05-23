@@ -2,12 +2,14 @@ import type React from "react"
 import { useEffect, useRef, useState } from "react"
 import { useDispatch } from "react-redux"
 import { clientLogout } from "@/store/slices/client.slice";
-import { Bell,User, Settings, LogOut, Menu, MapPin} from "lucide-react"
+import { Bell,User, Settings, LogOut, Menu, MapPin, User2} from "lucide-react"
 import logo from "@/assets/BMS-logo.png"
 import defaultUser from "@/assets/default-user.png"
 import Sidebar from "./Sidebar";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
+import { clientService } from "@/services/clientServices";
+import toast from "react-hot-toast";
 
 const Navbar: React.FC = () => {
     const user = useSelector((state:RootState)=>state.client.client) 
@@ -18,8 +20,20 @@ const Navbar: React.FC = () => {
     const [isSticky, setIsSticky] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+
+
     const handleLogout = async()=>{
-        dispatch(clientLogout())
+      try {
+          const response = await clientService.logout();
+            if(response.success){
+              toast.success("Logout successful!");
+              dispatch(clientLogout());
+            }else{
+              toast.error(response.message || "Logout Error");
+            }
+      } catch (error) {
+        toast.error("Logout Error")
+      } 
     }
 
     const toggleDropdown = () => {
@@ -130,7 +144,7 @@ const Navbar: React.FC = () => {
           >
             <img
               src={ user && user?.avatar ? user.avatar : defaultUser}
-              alt={user?.username}
+              alt="User avatar"
               className="w-auto h-10 object-cover rounded-full border-3 border-[#f69938] hover:shadow-lg transform"
             />
           </div>

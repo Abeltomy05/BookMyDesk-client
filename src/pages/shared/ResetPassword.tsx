@@ -41,7 +41,11 @@ const ResetPasswordForm: React.FC = () => {
         if (response.success) {
            toast.success("Password reset successful!")
           setTimeout(() => {
-            navigate("/login")
+            if(response.data === "client"){
+              navigate("/login")
+            }else if(response.data === "vendor"){
+              navigate("/vendor/login")
+            }
           }, 1500)
         } else {
           toast.error(response.message || "Failed to reset password. Please try again.")

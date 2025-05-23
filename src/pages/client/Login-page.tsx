@@ -1,4 +1,6 @@
 import type React from "react"
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { useState, type FormEvent } from "react"
 import { Mail, Lock, Eye, EyeOff } from "lucide-react"
 import { toast } from "react-hot-toast"
@@ -9,6 +11,7 @@ import { clientService } from "@/services/clientServices"
 import { clientLogin } from "@/store/slices/client.slice"
 import { useDispatch } from "react-redux"
 import Loading from "@/components/Loading"
+import { useNavigate } from "react-router-dom"
 
 const LoginPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -17,6 +20,8 @@ const LoginPage: React.FC = () => {
   })
 
   const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const location = useLocation();
   // const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -24,6 +29,20 @@ const LoginPage: React.FC = () => {
     email?: string;
     password?: string;
   }>({})
+
+  useEffect(() => {
+  const params = new URLSearchParams(location.search);
+  const errorMessage = params.get("error");
+
+  if (errorMessage) {
+    toast.error(decodeURIComponent(errorMessage));
+     params.delete("error");
+    const newSearch = params.toString();
+    const newUrl = newSearch ? `${location.pathname}?${newSearch}` : location.pathname;
+
+    navigate(newUrl, { replace: true });
+  }
+}, [location.search, navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -85,6 +104,9 @@ const LoginPage: React.FC = () => {
       clientService.handleGoogleLogin();
   }
 
+  const handleForgotPageNavigate = ()=>{
+      navigate('/forgot-password/client');
+  }
 
   return (
     <div className="relative flex flex-row h-screen overflow-hidden">
@@ -150,7 +172,7 @@ const LoginPage: React.FC = () => {
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                   Password
                 </label>
-                <a href="/forgot-password" className="text-xs text-gray-600 hover:text-gray-800">
+                <a onClick={handleForgotPageNavigate} className="text-xs text-gray-600 hover:text-gray-800">
                   Forgot password?
                 </a>
               </div>

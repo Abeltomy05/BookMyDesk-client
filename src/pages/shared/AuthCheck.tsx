@@ -17,6 +17,7 @@ const AuthCallback = () => {
         setIsLoading(true)
         const res = await authAxiosInstance.get('/me');
         const user = res.data.data;
+        console.log(user)
         setTimeout(()=>{
         if (user.role === "client"){
            dispatch(clientLogin(user));

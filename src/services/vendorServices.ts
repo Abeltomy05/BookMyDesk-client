@@ -1,4 +1,5 @@
 import authAxiosInstance from "@/api/auth.axios";
+import { vendorAxiosInstance } from "@/api/vendor.axios";
 
 interface ApiResponse {
   success: boolean;
@@ -91,5 +92,19 @@ handleGoogleLogin:  () => {
     const role = "vendor";
     window.location.href = `${import.meta.env.VITE_BACKEND_URL}/api/auth/google?role=${role}`;
 },  
+
+ logout: async():Promise<ApiResponse>=>{
+    try {
+      const response = await vendorAxiosInstance.post("/logout");
+      return response.data
+     } catch (error) {
+      console.error('Error in logout:', error);
+      return {
+        success: false,
+        message: 'Logout Error',
+      };
+     }
+  }
+
 
 }
