@@ -25,12 +25,22 @@ const SignupPage: React.FC = () => {
   const [otpValues, setOtpValues] = useState<string[]>(["", "", "", ""])
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [isOTPLoading, setIsOTPLoading] = useState<boolean>(false)
+  const [isAnimated, setIsAnimated] = useState<boolean>(false);
   
 
   const [timeLeft, setTimeLeft] = useState<number>(60) 
   const [timerActive, setTimerActive] = useState<boolean>(false)
 
   const otpInputRefs: React.RefObject<HTMLInputElement | null>[] = Array(4).fill(0).map(() => useRef<HTMLInputElement>(null))
+
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsAnimated(true);
+    }, 50);
+    return () => clearTimeout(timer);
+  }, []);
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -222,8 +232,10 @@ const SignupPage: React.FC = () => {
     <div className="flex flex-col-reverse md:flex-row h-screen overflow-hidden relative">
       {/* OTP Modal */}
       {showOtpModal && (
-       <div className="fixed inset-0 bg-black/60 backdrop-blur-md backdrop-saturate-150 z-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm mx-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md backdrop-saturate-150 z-50 flex items-center justify-center">
+          <div className={`bg-white rounded-lg shadow-lg p-6 w-full max-w-sm mx-4 transition-all duration-500 ease-[cubic-bezier(0.25,0.8,0.25,1)] ${
+            showOtpModal ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-4'
+          }`}>
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center justify-center w-full">
                 <div className="rounded-full bg-black p-2 mr-2">
@@ -250,8 +262,7 @@ const SignupPage: React.FC = () => {
                   value={digit}
                   onChange={(e) => handleOtpChange(index, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(index, e)}
-                  className="w-10 h-10 text-center border border-gray-300 rounded-md bg-gray-100 text-gray-800"
-                />
+                  className="w-10 h-10 text-center border border-gray-300 rounded-md bg-gray-100 text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all duration-150"                />
               ))}
             </div>
             
@@ -262,7 +273,7 @@ const SignupPage: React.FC = () => {
                 <button 
                   onClick={resendOtp}
                   disabled={isOTPLoading}
-                  className="text-[#f69938] hover:text-[#de851e] font-medium"
+                 className="text-[#f69938] hover:text-[#de851e] font-medium transition-colors duration-150"
                 >
                   {isOTPLoading ? "Resending..." : "Resend OTP"}
                 </button>
@@ -272,7 +283,7 @@ const SignupPage: React.FC = () => {
             <button
               onClick={verifyOtp}
               disabled={isLoading}
-              className="w-full py-3 bg-[#f69938] text-white rounded-md hover:bg-[#de851e] transition-colors"
+              className="w-full py-3 bg-[#f69938] text-white rounded-md hover:bg-[#de851e] focus:outline-none focus:ring-2 focus:ring-[#de851e]/50 focus:ring-offset-2 transition-all duration-150 disabled:opacity-70 disabled:cursor-not-allowed active:transform active:scale-[0.99]"
             >
               {isLoading ? "Verifying..." : "Verify OTP"}
             </button>
@@ -281,16 +292,22 @@ const SignupPage: React.FC = () => {
       )}
 
       {/* Signup Form Section */}
-      <div className="w-full md:w-2/5 flex flex-col justify-center overflow-y-auto px-4 md:px-6 py-6 md:py-0">
+        <div className={`w-full md:w-2/5 flex flex-col justify-center overflow-y-auto px-4 md:px-6 py-6 md:py-0 transition-all duration-600 ease-[cubic-bezier(0.25,0.8,0.25,1)] delay-150 ${
+            isAnimated ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+          }`}>    
         <div className="w-full max-w-md mx-auto">
-          <div className="text-center mb-6">
-            <h1 className="text-xl md:text-2xl font-bold tracking-tight">Sign Up</h1>
+        <div className={`text-center mb-6 transition-all duration-500 ease-[cubic-bezier(0.25,0.8,0.25,1)] delay-300 ${
+            isAnimated ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+            }`}>    
+          <h1 className="text-xl md:text-2xl font-bold tracking-tight">Sign Up</h1>
             <p className="mt-1 text-xs md:text-sm text-gray-600">
               Join our platform to connect with flexible workspaces.
             </p>
           </div>
 
-          <div className="space-y-4">
+           <div className={`space-y-4 transition-all duration-500 ease-[cubic-bezier(0.25,0.8,0.25,1)] delay-450 ${
+            isAnimated ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+          }`}>
             <div className="space-y-3">
               {/* Username Input */}
               <div className="space-y-1">
@@ -458,7 +475,7 @@ const SignupPage: React.FC = () => {
             <button
              onClick={handleGoogleRedirect}
               type="button"
-              className="flex w-full items-center justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-xs md:text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none"
+              className="flex w-full items-center justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-xs md:text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500/20 transition-all duration-150 active:transform active:scale-[0.99]"
             >
               <svg
                 className="mr-2 h-4 w-4"
@@ -479,7 +496,7 @@ const SignupPage: React.FC = () => {
             {/* Login Link */}
             <p className="mt-4 text-center text-xs text-gray-600">
               Already have an account?{" "}
-              <a href='/login' className="font-medium text-[#f69938] hover:underline">
+              <a href='/login' className="font-medium text-[#f69938] hover:underline transition-colors duration-150">
                 Login
               </a>
             </p>
@@ -488,12 +505,16 @@ const SignupPage: React.FC = () => {
       </div>
 
       {/* Image Section */}
-      <div className="w-full h-32 md:h-full md:w-3/5 bg-gray-100">
-        <div className="h-full">
+        <div className={`w-full h-32 md:h-full md:w-3/5 bg-gray-100 transition-all duration-700 ease-[cubic-bezier(0.25,0.8,0.25,1)] ${
+        isAnimated ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
+      }`}>
+        <div className="h-full overflow-hidden">
           <img
             src={img}
             alt="Workspace illustration"
-            className="h-full w-full object-cover"
+            className={`h-full w-full object-cover transition-transform duration-1000 ease-[cubic-bezier(0.25,0.8,0.25,1)] ${
+              isAnimated ? 'scale-100' : 'scale-110'
+            }`}
           />
         </div>
       </div>

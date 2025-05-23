@@ -23,8 +23,8 @@ export const NoAuthRoute = ({ element }: NoAuthRouteProps) => {
 	if (session && session.role) {
 		const roleRedirects: Record<string, string> = {
 			client: "/home",
-			vendor: "/vendor/dashboard",
-			admin: "/admin/dashboard",
+			vendor: "/vendor/home",
+			admin: "/admin/home",
 		};
 		return <Navigate to={roleRedirects[session.role] || "/unauthorized"} />;
 	}
