@@ -4,7 +4,6 @@ import { Mail, Lock, Eye, EyeOff } from "lucide-react"
 import { toast } from "react-hot-toast"
 import img from '@/assets/admin.jpg'
 import { validateLoginForm } from "@/utils/validations/auth-schema.validation"
-import { clientService } from "@/services/clientServices"
 import { useDispatch } from "react-redux"
 import Loading from "@/components/Loading"
 import { adminLogin } from "@/store/slices/admin.slice";

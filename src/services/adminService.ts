@@ -26,5 +26,18 @@ export const adminService = {
         message: 'Invalid email or password',
       };
     }
-    }
+    },
+
+    logout: async():Promise<ApiResponse>=>{
+       try {
+         const response = await adminAxiosInstance.post("/logout");
+         return response.data
+        } catch (error) {
+         console.error('Error in logout:', error);
+         return {
+           success: false,
+           message: 'Logout Error',
+         };
+     } 
+    },
 }
