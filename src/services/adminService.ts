@@ -93,7 +93,7 @@ export const adminService = {
         try {
           const response = await adminAxiosInstance.get("/getAllUsers", {
                           params: {
-                            userType: role,
+                            role,
                             page,
                             limit,
                             search,

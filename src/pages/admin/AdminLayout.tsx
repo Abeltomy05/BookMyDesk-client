@@ -25,7 +25,7 @@ import { useNavigate, useLocation } from "react-router-dom"
 
 const sidebarItems = [
   { icon: Home, label: "Dashboard", route: "/admin/home" },
-  { icon: Users, label: "Users", route: "/admin/users" },
+  { icon: Users, label: "Clients", route: "/admin/users" },
   { icon: ShoppingBag, label: "Vendors", route: "/admin/vendors" },
   { icon: Briefcase, label: "Buildings & Spaces", route: "/admin/buildings" },
   { icon: Calendar, label: "Bookings", route: "/admin/bookings" },

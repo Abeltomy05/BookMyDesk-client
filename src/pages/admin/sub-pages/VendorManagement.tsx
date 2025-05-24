@@ -1,85 +1,106 @@
 
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
-import { Search, MoreVertical, User, Building2, Eye } from "lucide-react"
+import { Search, MoreVertical, User, Building2, Eye, ChevronLeft, ChevronRight } from "lucide-react"
+import { adminService } from "@/services/adminService"
+import toast from "react-hot-toast"
 
 
 type VendorStatus = "approved" | "rejected" | "pending" | "blocked"
 
 interface VendorData {
-  id: string
+  _id: string
   username: string
   companyName: string
   status: VendorStatus
-  profilePic?: string
+  avatar?: string
 }
 
 
-const sampleVendors: VendorData[] = [
-  {
-    id: "1",
-    username: "johnsmith",
-    companyName: "Smith Enterprises",
-    status: "approved",
-    profilePic: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    id: "2",
-    username: "sarahwilliams",
-    companyName: "Williams & Co",
-    status: "pending",
-  },
-  {
-    id: "3",
-    username: "michaeljohnson",
-    companyName: "Johnson Solutions",
-    status: "rejected",
-    profilePic: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    id: "4",
-    username: "emilydavis",
-    companyName: "Davis Technologies",
-    status: "approved",
-    profilePic: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    id: "5",
-    username: "davidbrown",
-    companyName: "Brown Industries",
-    status: "blocked",
-  },
-]
 
 export default function VendorManagement() {
-  const [vendors, setVendors] = useState<VendorData[]>(sampleVendors)
-  const [filteredVendors, setFilteredVendors] = useState<VendorData[]>(sampleVendors)
+  const [vendors, setVendors] = useState<VendorData[]>([])
+  const [loading, setLoading] = useState(false)
   const [activeFilter, setActiveFilter] = useState<"all" | VendorStatus>("all")
   const [searchQuery, setSearchQuery] = useState("")
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(0)
+  const [error, setError] = useState<string | null>(null)
+
+  const itemsPerPage = 5
+
+   const fetchVendors = async (page: number = 1, search: string = "") => {
+     setLoading(true)
+     setError(null)
+
+     try {
+      const response = await adminService.getAllUsers({role: "vendor", page, limit: itemsPerPage, search});
+      if(response.success){
+         let filteredVendors = response.users as VendorData[];
+
+         if (activeFilter !== "all") {
+          filteredVendors = filteredVendors.filter(vendor => vendor.status === activeFilter)
+        }
+
+        setVendors(filteredVendors)
+        setTotalPages(response.totalPages)
+        setCurrentPage(response.currentPage)
+      }else{
+        setError("Failed to fetch vendors")
+        setVendors([])
+        setTotalPages(0)
+      }
+     } catch (error) {
+       setError("An error occurred while fetching vendors")
+      setVendors([])
+      setTotalPages(0)
+     }finally{
+        setLoading(false);
+     }
+   }
 
   useEffect(() => {
-    let result = vendors
+    fetchVendors(1, searchQuery)
+    setCurrentPage(1)
+  }, [activeFilter])
 
-    if (activeFilter !== "all") {
-      result = result.filter((vendor) => vendor.status === activeFilter)
+
+   useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      fetchVendors(1, searchQuery)
+      setCurrentPage(1)
+    }, 500)
+    return () => clearTimeout(debounceTimer)
+  }, [searchQuery])
+
+
+ const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      fetchVendors(page, searchQuery)
     }
+  }
 
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase()
-      result = result.filter(
-        (vendor) => vendor.username.toLowerCase().includes(query) || vendor.companyName.toLowerCase().includes(query),
+  const changeVendorStatus = async(vendorId: string, newStatus: VendorStatus) => {
+  try {
+    const response = await adminService.updateUserStatus("vendor", vendorId, newStatus)
+    if (response.success) {
+      setVendors((prevVendors) =>
+        prevVendors.map((vendor) =>
+          vendor._id === vendorId ? { ...vendor, status: newStatus } : vendor
+        )
       )
+      toast.success(`Vendor status updated to ${newStatus}`)
+    } else {
+      setError(response.message || "Failed to update vendor status")
+      toast.error(response.message || "Failed to update vendor status")
     }
-
-    setFilteredVendors(result)
-  }, [vendors, activeFilter, searchQuery])
-
-  const changeVendorStatus = (vendorId: string, newStatus: VendorStatus) => {
-    setVendors((prevVendors) =>
-      prevVendors.map((vendor) => (vendor.id === vendorId ? { ...vendor, status: newStatus } : vendor)),
-    )
+  } catch (err) {
+    console.error("Status update failed", err)
+    setError("An error occurred while updating vendor status")
+  } finally {
     setActiveDropdown(null)
+  }
   }
 
   const containerVariants = {
@@ -160,9 +181,18 @@ export default function VendorManagement() {
         </div>
       </motion.div>
 
+       {error && (
+        <motion.div 
+          className="bg-red-900/30 border border-red-500/30 text-red-400 px-4 py-3 rounded-lg mb-6"
+          variants={itemVariants}
+        >
+          {error}
+        </motion.div>
+      )}
+
       {/* Vendor List */}
       <motion.div
-        className="bg-gray-900 rounded-xl overflow-hidden shadow-[0_0_15px_rgba(246,153,56,0.15)]"
+        className="bg-gray-900 rounded-xl overflow-hidden shadow-[0_0_15px_rgba(246,153,56,0.15)] min-h-[400px]"
         variants={itemVariants}
       >
         {/* Table Header */}
@@ -173,11 +203,18 @@ export default function VendorManagement() {
           <div className="col-span-4 md:col-span-1 text-right">Actions</div>
         </div>
 
+         {loading && (
+          <div className="p-8 text-center text-gray-400">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#f69938] mx-auto"></div>
+            <p className="mt-2">Loading vendors...</p>
+          </div>
+        )}
+
         {/* Vendor Rows */}
-        {filteredVendors.length > 0 ? (
-          filteredVendors.map((vendor) => (
+        {!loading && vendors.length > 0 ? (
+           vendors.map((vendor) => (
             <motion.div
-              key={vendor.id}
+              key={vendor._id}
               className="grid grid-cols-12 p-4 border-b border-gray-800 items-center hover:bg-gray-800/50 transition-colors"
               variants={itemVariants}
               whileHover={{ scale: 1.005 }}
@@ -185,9 +222,9 @@ export default function VendorManagement() {
               {/* Vendor with Avatar */}
               <div className="col-span-4 md:col-span-3 flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center overflow-hidden">
-                  {vendor.profilePic ? (
+                  {vendor.avatar ? (
                     <img
-                      src={vendor.profilePic || "/placeholder.svg"}
+                      src={vendor.avatar}
                       alt={vendor.username}
                       className="w-full h-full object-cover"
                     />
@@ -214,16 +251,16 @@ export default function VendorManagement() {
               </div>
 
               {/* Actions */}
-              <div className="col-span-4 md:col-span-1 text-right relative">
+             <div className="col-span-4 md:col-span-1 text-right relative">
                 <button
-                  onClick={() => setActiveDropdown(activeDropdown === vendor.id ? null : vendor.id)}
+                  onClick={() => setActiveDropdown(activeDropdown === vendor._id ? null : vendor._id)}
                   className="p-2 hover:bg-gray-700 rounded-full transition-colors"
                 >
                   <MoreVertical size={18} className="text-gray-400" />
                 </button>
 
                 {/* Dropdown Menu */}
-                {activeDropdown === vendor.id && (
+                {activeDropdown === vendor._id && (
                   <motion.div
                     className="absolute right-0 mt-2 w-56 bg-gray-800 rounded-lg shadow-lg border border-gray-700 z-10"
                     initial={{ opacity: 0, y: -10 }}
@@ -237,12 +274,12 @@ export default function VendorManagement() {
 
                     <div className="px-4 py-2 text-xs text-gray-400 border-t border-gray-700">Change Status</div>
 
-                    {(["approved", "rejected", "pending", "blocked"] as const)
+                      {(["approved", "rejected", "pending", "blocked"] as const)
                       .filter((status) => status !== vendor.status)
                       .map((status) => (
                         <button
                           key={status}
-                          onClick={() => changeVendorStatus(vendor.id, status)}
+                          onClick={() => changeVendorStatus(vendor._id, status)}
                           className="w-full text-left px-4 py-2 hover:bg-gray-700 text-sm capitalize"
                         >
                           {status}
@@ -253,10 +290,80 @@ export default function VendorManagement() {
               </div>
             </motion.div>
           ))
-        ) : (
+        ) : !loading ? (
           <div className="p-8 text-center text-gray-400">No vendors found matching your criteria</div>
-        )}
+        ) : null}
       </motion.div>
+
+         {/* Pagination */}
+      {!loading && totalPages > 1 && (
+        <motion.div 
+          className="flex items-center justify-between mt-6"
+          variants={itemVariants}
+        >
+          <div className="text-sm text-gray-400">
+            Page {currentPage} of {totalPages}
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                currentPage === 1
+                  ? "bg-gray-800 text-gray-500 cursor-not-allowed"
+                  : "bg-gray-800 text-white hover:bg-gray-700"
+              }`}
+            >
+              <ChevronLeft size={16} className="mr-1" />
+              Previous
+            </button>
+
+            {/* Page Numbers */}
+            <div className="flex space-x-1">
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                let pageNum
+                if (totalPages <= 5) {
+                  pageNum = i + 1
+                } else if (currentPage <= 3) {
+                  pageNum = i + 1
+                } else if (currentPage >= totalPages - 2) {
+                  pageNum = totalPages - 4 + i
+                } else {
+                  pageNum = currentPage - 2 + i
+                }
+
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => handlePageChange(pageNum)}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      currentPage === pageNum
+                        ? "bg-[#f69938] text-black"
+                        : "bg-gray-800 text-white hover:bg-gray-700"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                )
+              })}
+            </div>
+
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                currentPage === totalPages
+                  ? "bg-gray-800 text-gray-500 cursor-not-allowed"
+                  : "bg-gray-800 text-white hover:bg-gray-700"
+              }`}
+            >
+              Next
+              <ChevronRight size={16} className="ml-1" />
+            </button>
+          </div>
+        </motion.div>
+      )}
     </motion.div>
   )
 }

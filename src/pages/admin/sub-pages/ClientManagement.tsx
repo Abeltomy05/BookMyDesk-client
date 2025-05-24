@@ -33,8 +33,9 @@ export default function ClientManagement() {
 
   const fetchUsers = async (page: number = 1, search: string = "") => {
        setLoading(true);
+       setError(null)
        try{
-           const response = await adminService.getAllUsers({page, limit: itemsPerPage, search});
+           const response = await adminService.getAllUsers({role:"client", page, limit: itemsPerPage, search});
            if(response.success){
             let filteredUsers = response.users as ClientData[];
               if (activeFilter !== "all") {
