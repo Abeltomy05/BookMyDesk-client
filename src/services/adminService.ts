@@ -13,6 +13,49 @@ export interface LoginData {
   role:string;
 }
 
+type ClientStatus = "active" | "blocked"
+type VendorStatus = "pending" | "approved" | "rejected" | "blocked";
+
+interface GetUsersParams {
+  role?: "client" | "vendor";
+  page?: number;
+  limit?: number;
+  search?: string;
+}
+
+interface VendorData {
+  _id: string;
+  username: string;
+  email: string;
+  phone: string;
+  status: VendorStatus
+  avatar?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  companyName?: string;
+  companyAddress?: string;
+  banner?: string;
+  description?: string;
+}
+
+interface ClientData {
+  _id: string
+  username: string
+  email: string
+  phone: string
+  status: ClientStatus
+  avatar?: string
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+interface GetAllUsersResponse {
+  success: boolean;
+  users: ClientData[] | VendorData[];
+  totalPages: number;
+  currentPage: number;
+}
+
 export const adminService = {
     login: async (data: LoginData): Promise<ApiResponse> => {
        try {
@@ -40,4 +83,54 @@ export const adminService = {
          };
      } 
     },
+
+    getAllUsers: async({
+      role,
+      page=1,
+      limit=5,
+      search=""
+    }:GetUsersParams): Promise<GetAllUsersResponse>=>{
+        try {
+          const response = await adminAxiosInstance.get("/getAllUsers", {
+                          params: {
+                            userType: role,
+                            page,
+                            limit,
+                            search,
+                          },
+                        });
+           return response.data;             
+        } catch (error:any) {
+          console.error('Error fetching users:', error);
+          return {
+            success: false,
+            users: [],
+            totalPages: 0,
+            currentPage: 0,
+          };
+        }
+    },
+
+    updateUserStatus: async (
+      userType: "client" | "vendor",
+      userId: string,
+      status: ClientStatus | VendorStatus
+    ): Promise<ApiResponse> => {
+      try {
+        const response = await adminAxiosInstance.post("/update-user-status", {
+          userType,
+          userId,
+          status,
+        });
+        return response.data;
+      } catch (error:any) {
+        console.error("Error updating user status:", error);
+        return {
+          success: false,
+          message: error.response?.data?.message || "Failed to update user status",
+        };
+      }
+    },
+
+
 }
