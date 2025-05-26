@@ -1,6 +1,5 @@
 import type React from "react"
 import { useState, useEffect, useRef } from "react"
-import space from "@/assets/find-space.jpg"
 
 const FindNearestSection: React.FC = () => {
   const sectionRef = useRef<HTMLElement>(null)
@@ -47,7 +46,7 @@ const FindNearestSection: React.FC = () => {
             `}
           >
             <img 
-              src={space} 
+              src="https://res.cloudinary.com/dnivctodr/image/upload/v1748162270/find-space_g6rpkb.jpg" 
               alt="Find nearest coworking space" 
               className="max-w-full h-auto border rounded-2xl" 
             />

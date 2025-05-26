@@ -4,7 +4,6 @@ import { useLocation } from "react-router-dom";
 import { useState, type FormEvent } from "react"
 import { Mail, Lock, Eye, EyeOff } from "lucide-react"
 import { toast } from "react-hot-toast"
-import img from '@/assets/co-working.jpg'
 import { validateLoginForm } from "@/utils/validations/auth-schema.validation"
 import { clientService } from "@/services/clientServices"
 import { clientLogin } from "@/store/slices/client.slice"
@@ -132,7 +131,7 @@ const LoginPage: React.FC = () => {
       }`}>
         <div className="h-full overflow-hidden">
           <img
-            src={img}
+            src="https://res.cloudinary.com/dnivctodr/image/upload/v1748161418/co-working_hpbbei.jpg"
             alt="Workspace illustration"
             className={`h-full w-full object-cover transition-transform duration-1000 ease-[cubic-bezier(0.25,0.8,0.25,1)] ${
               isAnimated ? 'scale-100' : 'scale-110'

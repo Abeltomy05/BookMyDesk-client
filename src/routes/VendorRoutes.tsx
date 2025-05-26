@@ -1,5 +1,5 @@
 import NotFoundPage from "@/pages/shared/NotFoundPage"
-import VendorHome from "@/pages/vendor/VendorHome"
+import VendorDashboard from "@/pages/vendor/VendorHome"
 import VendorLogin from "@/pages/vendor/VendorLogin"
 import VendorSignup from "@/pages/vendor/VendorSignup"
 import { ProtectedRoute } from "@/utils/protected/ProtectedRoute"
@@ -13,7 +13,7 @@ const VendorRoutes = () => {
         <Route path="/signup" element={<NoAuthRoute element={<VendorSignup/>}/>}/>
         <Route path="/login" element={<NoAuthRoute element={<VendorLogin/>}/>}/>
 
-        <Route path="/home" element={<ProtectedRoute allowedRoles={["vendor"]} element={<VendorHome/>} />}/>
+        <Route path="/home" element={<ProtectedRoute allowedRoles={["vendor"]} element={<VendorDashboard/>} />}/>
 
         <Route path="/*" element={<NotFoundPage/>}/>
     </Routes>

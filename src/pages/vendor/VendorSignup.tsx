@@ -4,7 +4,6 @@ import { Eye, EyeOff, Lock, Upload } from "lucide-react"
 import FloatingLabelInput from "@/components/Floating-label"
 import { validateVendorField, validateVendorSignupForm } from "@/utils/validations/auth-schema.validation"
 import type {VendorFormData,VendorFormErrors,VendorTouchedFields} from '@/utils/validations/auth-schema.validation'
-import img from "@/assets/vendor.jpg"
 import toast from "react-hot-toast"
 import { vendorService } from "@/services/vendorServices"
 import { useNavigate } from "react-router-dom"
@@ -565,7 +564,7 @@ const resendOtp = async () => {
         }`}
       >
         <div className="h-full w-full relative">
-          <img src={img} alt="Vendor Signup" className="w-full h-full object-cover" />
+          <img src="https://res.cloudinary.com/dnivctodr/image/upload/v1748162344/vendor_mjprxu.jpg" alt="Vendor Signup" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-black/30 flex flex-col justify-center items-center text-white p-8">
             <h2 className="text-6xl font-bold mb-4 text-center">Grow Your Business With Us</h2>
             <p className="text-xl max-w-lg text-center">

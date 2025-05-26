@@ -2,7 +2,6 @@ import type React from "react"
 import { useState, useEffect, type FormEvent } from "react"
 import { Mail, Lock, Eye, EyeOff } from "lucide-react"
 import { toast } from "react-hot-toast"
-import img from '@/assets/admin.jpg'
 import { validateLoginForm } from "@/utils/validations/auth-schema.validation"
 import { useDispatch } from "react-redux"
 import Loading from "@/components/Loading"
@@ -103,7 +102,7 @@ const AdminLoginPage: React.FC = () => {
       }`}>
         <div className="h-full overflow-hidden">
           <img
-            src={img}
+            src="https://res.cloudinary.com/dnivctodr/image/upload/v1748161118/admin_wyzn1x.jpg"
             alt="Workspace illustration"
             className={`h-full w-full object-cover transition-transform duration-1000 ease-[cubic-bezier(0.25,0.8,0.25,1)] ${
               isAnimated ? 'scale-100' : 'scale-110'

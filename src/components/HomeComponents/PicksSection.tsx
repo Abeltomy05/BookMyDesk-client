@@ -1,10 +1,5 @@
 import type React from "react"
 import { useState, useEffect, useRef } from "react"
-import beach from "@/assets/topPicks/beach.avif"
-import bizzare from "@/assets/topPicks/bizzare.avif"
-import coliving from "@/assets/topPicks/coliving.avif"
-import top10 from "@/assets/topPicks/top10.avif"
-import trending from "@/assets/topPicks/trending.avif"
 
 interface PickCardProps {
   title: string
@@ -114,11 +109,11 @@ return (
         </h2>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <PickCard title="Coliving" image={coliving} size="large" delay={0} />
-          <PickCard title="Top 10" image={top10}  delay={150} />
-          <PickCard title="Near the Beach" image={beach} delay={300} />
-          <PickCard title="Trending" image={trending} delay={450} />
-          <PickCard title="Top 10 Bizarre Spaces" image={bizzare}  delay={600} />
+          <PickCard title="Coliving" image="https://res.cloudinary.com/dnivctodr/image/upload/v1748162545/coliving_boaois.avif" size="large" delay={0} />
+          <PickCard title="Top 10" image="https://res.cloudinary.com/dnivctodr/image/upload/v1748162557/top10_hstwag.avif"  delay={150} />
+          <PickCard title="Near the Beach" image="https://res.cloudinary.com/dnivctodr/image/upload/v1748162531/beach_mitv35.avif" delay={300} />
+          <PickCard title="Trending" image="https://res.cloudinary.com/dnivctodr/image/upload/v1748162567/trending_hn5lem.avif" delay={450} />
+          <PickCard title="Top 10 Bizarre Spaces" image="https://res.cloudinary.com/dnivctodr/image/upload/v1748162538/bizzare_qarkrc.avif"  delay={600} />
         </div>
       </div>
     </section>

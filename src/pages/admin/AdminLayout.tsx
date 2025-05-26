@@ -21,12 +21,14 @@ import { adminService } from "@/services/adminService"
 import { adminLogout } from "@/store/slices/admin.slice"
 import { useDispatch } from "react-redux"
 import { useNavigate, useLocation } from "react-router-dom"
+import { ShieldCheck } from "lucide-react"
 
 
 const sidebarItems = [
   { icon: Home, label: "Dashboard", route: "/admin/home" },
   { icon: Users, label: "Clients", route: "/admin/users" },
   { icon: ShoppingBag, label: "Vendors", route: "/admin/vendors" },
+  { icon: ShieldCheck, label: "Vendor Verification", route: "/admin/vendor-verification" },
   { icon: Briefcase, label: "Buildings & Spaces", route: "/admin/buildings" },
   { icon: Calendar, label: "Bookings", route: "/admin/bookings" },
   { icon: DollarSign, label: "Revenue Report", route: "/admin/revenue" },

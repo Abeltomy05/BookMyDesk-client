@@ -35,7 +35,7 @@ export default function VendorManagement() {
      setError(null)
 
      try {
-      const response = await adminService.getAllUsers({role: "vendor", page, limit: itemsPerPage, search});
+      const response = await adminService.getAllUsers({role: "vendor", page, limit: itemsPerPage, search, excludeStatus: "pending"});
       if(response.success){
          let filteredVendors = response.users as VendorData[];
 
@@ -165,7 +165,7 @@ export default function VendorManagement() {
 
         {/* Filter Tabs */}
         <div className="flex flex-wrap space-x-1 bg-gray-900 p-1 rounded-lg">
-          {(["all", "approved", "rejected", "pending", "blocked"] as const).map((filter) => (
+          {(["all", "approved", "rejected", "blocked"] as const).map((filter) => (
             <button
               key={filter}
               onClick={() => setActiveFilter(filter)}
@@ -198,7 +198,7 @@ export default function VendorManagement() {
         {/* Table Header */}
         <div className="grid grid-cols-12 bg-gray-800 p-4 font-medium text-sm text-gray-300">
           <div className="col-span-4 md:col-span-3">Vendor</div>
-          <div className="col-span-4 md:col-span-6 hidden md:block">Company</div>
+          <div className="col-span-4 md:col-span-6 hidden md:block">Company Name</div>
           <div className="col-span-4 md:col-span-2">Status</div>
           <div className="col-span-4 md:col-span-1 text-right">Actions</div>
         </div>
@@ -274,7 +274,7 @@ export default function VendorManagement() {
 
                     <div className="px-4 py-2 text-xs text-gray-400 border-t border-gray-700">Change Status</div>
 
-                      {(["approved", "rejected", "pending", "blocked"] as const)
+                      {(["approved", "rejected", "blocked"] as const)
                       .filter((status) => status !== vendor.status)
                       .map((status) => (
                         <button

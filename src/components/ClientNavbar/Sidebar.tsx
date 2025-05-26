@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from "react";
 import { Home, ShoppingBag, Calendar, FileText, Wallet, MessageSquare, Settings, X } from "lucide-react";
-import logo from "@/assets/BMS-logo.png";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -60,7 +59,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800">
           <div className="flex items-center ml-5">
             <img
-              src={logo}
+              src="https://res.cloudinary.com/dnivctodr/image/upload/v1748161273/BMS-logo_hcz5ww.png"
               alt="BookMyDesk"
               className="h-15"
             />

@@ -1,7 +1,6 @@
 import type React from "react"
 import { useState, type FormEvent } from "react"
 import { motion } from "framer-motion"
-import img from '@/assets/desk1.jpg'
 import { clientService } from "@/services/clientServices"
 import toast from "react-hot-toast"
 import { useNavigate, useParams } from "react-router-dom"
@@ -60,7 +59,7 @@ const ForgotPasswordPage: React.FC = () => {
       <div className="hidden md:block md:w-[60%]">
         <div className="h-full w-full bg-gray-100">
           <img
-            src={img}
+            src="https://res.cloudinary.com/dnivctodr/image/upload/v1748162013/desk1_s2jcu9.jpg"
             alt="Reset password illustration"
             className="h-full w-full object-cover"
           />

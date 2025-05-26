@@ -3,13 +3,13 @@ import { useEffect, useState } from "react"
 import { useLocation } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc"
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai"
-import vendorImage from "@/assets/vendor.jpg"
 import { useDispatch } from "react-redux"
 import { validateLoginForm } from "@/utils/validations/auth-schema.validation"
 import toast from "react-hot-toast"
 import { vendorService } from "@/services/vendorServices"
 import { vendorLogin } from "@/store/slices/vendor.slice"
 import { useNavigate } from "react-router-dom"
+import Loading from "@/components/Loading";
 
 const VendorLogin: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -115,6 +115,16 @@ const VendorLogin: React.FC = () => {
 
 return (
     <div className={`flex flex-col md:flex-row h-screen opacity-0 transition-opacity duration-1000 ease-in ${isVisible ? "opacity-100" : ""}`}>
+
+      {isLoading && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="w-75 h-75">
+            <Loading/>
+          </div>
+        </div>
+      )}
+
+
       {/* Left side - Image (60%) */}
      <div
         className={`w-full md:w-3/5 bg-gray-100 transition-opacity duration-1000 ease-in-out ${
@@ -122,7 +132,7 @@ return (
         }`}
       >
         <div className="h-full w-full relative">
-          <img src={vendorImage} alt="Vendor Signup" className="w-full h-full object-cover" />
+          <img src="https://res.cloudinary.com/dnivctodr/image/upload/v1748162344/vendor_mjprxu.jpg" alt="Vendor Signup" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-black/30 flex flex-col justify-center items-center text-white p-8">
             <h2 className="text-6xl font-bold mb-4 text-center">Grow Your Business With Us</h2>
             <p className="text-xl max-w-lg text-center">

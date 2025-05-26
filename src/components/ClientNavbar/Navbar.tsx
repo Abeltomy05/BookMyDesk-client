@@ -2,9 +2,7 @@ import type React from "react"
 import { useEffect, useRef, useState } from "react"
 import { useDispatch } from "react-redux"
 import { clientLogout } from "@/store/slices/client.slice";
-import { Bell,User, Settings, LogOut, Menu, MapPin, User2} from "lucide-react"
-import logo from "@/assets/BMS-logo.png"
-import defaultUser from "@/assets/default-user.png"
+import { Bell,User, Settings, LogOut, Menu, MapPin} from "lucide-react"
 import Sidebar from "./Sidebar";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
@@ -95,7 +93,7 @@ const Navbar: React.FC = () => {
         </button>
         <div className={isSticky ? "mt-3" : "mt-2"}>
           <img
-            src={logo}
+            src="https://res.cloudinary.com/dnivctodr/image/upload/v1748161273/BMS-logo_hcz5ww.png"
             alt="BookMyDesk Logo"
             className={`${isSticky ? "h-12" : "h-18"} object-contain transition-all duration-300`}
           />
@@ -143,7 +141,7 @@ const Navbar: React.FC = () => {
             onClick={toggleDropdown}
           >
             <img
-              src={ user && user?.avatar ? user.avatar : defaultUser}
+              src={ user && user?.avatar ? user.avatar : "https://res.cloudinary.com/dnivctodr/image/upload/v1748161444/default-user_rbydkc.png"}
               alt="User avatar"
               className="w-auto h-10 object-cover rounded-full border-3 border-[#f69938] hover:shadow-lg transform"
             />

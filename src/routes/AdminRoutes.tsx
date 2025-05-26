@@ -7,6 +7,7 @@ import { ProtectedRoute } from '@/utils/protected/ProtectedRoute'
 import { NoAuthRoute } from '@/utils/protected/PublicRoute'
 import { Route, Routes } from 'react-router-dom'
 import ClientManagement from '@/pages/admin/sub-pages/ClientManagement'
+import VendorVerification from '@/pages/admin/sub-pages/VendorVerification'
 
 const AdminRoutes = () => {
   return (
@@ -18,6 +19,7 @@ const AdminRoutes = () => {
          <Route path="/home" element={<ProtectedRoute allowedRoles={["admin"]}  element={<AdminLayout><Dashboard /></AdminLayout>} />}/>
          <Route path="/users" element={<ProtectedRoute allowedRoles={["admin"]}  element={<AdminLayout><ClientManagement /></AdminLayout>} />}/>
           <Route path="/vendors" element={<ProtectedRoute allowedRoles={["admin"]}  element={<AdminLayout><VendorManagement /></AdminLayout>} />}/>
+          <Route path="/vendor-verification" element={<ProtectedRoute allowedRoles={["admin"]}  element={<AdminLayout><VendorVerification /></AdminLayout>} />}/>
     </Routes>
   )
 }

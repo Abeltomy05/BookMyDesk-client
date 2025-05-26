@@ -1,7 +1,6 @@
 import type React from "react"
 import { useState } from "react"
 import FloatingLabelInput from "@/components/Floating-label"
-import img from "@/assets/desk3.jpg"
 import { validateResetPasswordForm, type ResetPasswordValidationErrors } from "@/utils/validations/auth-schema.validation"
 import { useParams,useNavigate  } from "react-router-dom"
 import { clientService } from "@/services/clientServices"
@@ -64,7 +63,7 @@ const ResetPasswordForm: React.FC = () => {
          <div className="hidden md:block md:w-[60%]">
             <div className="h-full w-full bg-gray-100">
                 <img
-                src={img}
+                src="https://res.cloudinary.com/dnivctodr/image/upload/v1748162030/desk3_w1jkqb.jpg"
                 alt="Reset password illustration"
                 className="h-full w-full object-cover"
                 />

@@ -1,4 +1,4 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import type{ JSX } from "react";
 import { getActiveSession } from "../helpers/getActiveSession"; 
@@ -12,10 +12,26 @@ export const ProtectedRoute = ({
 	element,
 	allowedRoles,
 }: ProtectedRouteProps) => {
+	const location = useLocation();
 	const session = useSelector(getActiveSession);
   console.log('the session',session)
 
-	if (!session) return <Navigate to="/login" />;
+
+  const path = location.pathname.toLowerCase();
+  let inferredRole: string | null = null;
+	if (path.startsWith("/vendor")) inferredRole = "vendor";
+	else if (path.startsWith("/admin")) inferredRole = "admin";
+	else inferredRole = "client";
+
+	console.log("inferredRole", inferredRole);
+	if (!session) {
+		const loginRedirects: Record<string, string> = {
+			client: "/login",
+			vendor: "/vendor/login",
+			admin: "/admin/login",
+		};
+		return <Navigate to={loginRedirects[inferredRole]} />;
+	}
 
 	const role = session.role;
 

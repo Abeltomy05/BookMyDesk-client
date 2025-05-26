@@ -21,6 +21,7 @@ interface GetUsersParams {
   page?: number;
   limit?: number;
   search?: string;
+  excludeStatus?: string | string[];
 }
 
 interface VendorData {
@@ -36,6 +37,7 @@ interface VendorData {
   companyAddress?: string;
   banner?: string;
   description?: string;
+  idProof?: string;
 }
 
 interface ClientData {
@@ -55,6 +57,7 @@ interface GetAllUsersResponse {
   totalPages: number;
   currentPage: number;
 }
+
 
 export const adminService = {
     login: async (data: LoginData): Promise<ApiResponse> => {
@@ -88,7 +91,8 @@ export const adminService = {
       role,
       page=1,
       limit=5,
-      search=""
+      search="",
+      excludeStatus
     }:GetUsersParams): Promise<GetAllUsersResponse>=>{
         try {
           const response = await adminAxiosInstance.get("/getAllUsers", {
@@ -97,8 +101,10 @@ export const adminService = {
                             page,
                             limit,
                             search,
+                            excludeStatus
                           },
                         });
+           console.log(response.data);             
            return response.data;             
         } catch (error:any) {
           console.error('Error fetching users:', error);
@@ -131,6 +137,7 @@ export const adminService = {
         };
       }
     },
+
 
 
 }

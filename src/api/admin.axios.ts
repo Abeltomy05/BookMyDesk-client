@@ -2,12 +2,14 @@ import { adminLogout } from "@/store/slices/admin.slice";
 import { store } from "@/store/store";
 import axios from "axios";
 import toast from "react-hot-toast";
+import qs from "qs";
 
 
 const  BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 export const adminAxiosInstance = axios.create({
   baseURL:  `${BACKEND_URL}/api/_a/admin`,
-  withCredentials:true
+  withCredentials:true,
+  paramsSerializer: (params) => qs.stringify(params, { arrayFormat: "repeat" }),
 });
 
 let isRefreshing = false;

@@ -1,6 +1,5 @@
 import type React from "react"
 import { Search } from "lucide-react"
-import img from "@/assets/desk4.jpg"
 import { useState } from "react"
 
 const HeroSection: React.FC = () => {
@@ -8,7 +7,7 @@ const HeroSection: React.FC = () => {
   return (
     <section className="relative h-[750px] flex items-center bg-black">
       <div className="absolute inset-0 z-0">
-        <img src={img} alt="Coworking Space" className="w-full h-full object-cover opacity-70" />
+        <img src="https://res.cloudinary.com/dnivctodr/image/upload/v1748162039/desk4_rjya8d.jpg" alt="Coworking Space" className="w-full h-full object-cover opacity-70" />
         <div className="absolute inset-0 bg-black/60"></div>
       </div>
 
