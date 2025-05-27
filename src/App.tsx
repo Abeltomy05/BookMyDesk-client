@@ -11,7 +11,7 @@ function App() {
     <>
      <BrowserRouter>
         <Toaster
-        position='top-right' reverseOrder={false} toastOptions={{duration:2000, style:{  background: '#333',color: '#fff',borderRadius: '8px'}}}/>
+        position='top-center' reverseOrder={false} toastOptions={{duration:3000, style:{  background: '#333',color: '#fff',borderRadius: '8px'}}}/>
 
         <Routes>
           <Route path="/*" element={<ClientRoutes/>}/>

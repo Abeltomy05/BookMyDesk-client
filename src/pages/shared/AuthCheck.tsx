@@ -5,6 +5,7 @@ import { clientLogin } from "@/store/slices/client.slice";
 import { vendorLogin } from "@/store/slices/vendor.slice";
 import authAxiosInstance from "@/api/auth.axios";
 import Loading from "@/components/Loading";
+import toast from "react-hot-toast";
 
 const AuthCallback = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -17,14 +18,19 @@ const AuthCallback = () => {
         setIsLoading(true)
         const res = await authAxiosInstance.get('/me');
         const user = res.data.data;
-        console.log(user)
+        console.log("Google Login user details:",user)
         setTimeout(()=>{
         if (user.role === "client"){
            dispatch(clientLogin(user));
            navigate("/home");
         }else if (user.role === "vendor"){
-           dispatch(vendorLogin(user));
-           navigate("/vendor/home");
+          if (user.status === "pending") {
+             toast.error("Your vendor account has not yet been approved by the admin.");
+             navigate("/vendor/login");
+          }else{
+              dispatch(vendorLogin(user));
+              navigate("/vendor/home");
+          }
         }
         },1000)
       } catch (err) {
