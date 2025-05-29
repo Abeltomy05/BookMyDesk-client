@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react"
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts"
 import { motion } from "framer-motion"
 import { Users, ShoppingBag, Briefcase } from "react-feather"
+import { adminService } from "@/services/adminService"
 
 const chartData = [
   { name: "Jan", bookings: 65, revenue: 4000 },
@@ -51,13 +52,32 @@ const bookingsData = [
 ]
 
 const Dashboard: React.FC = () => {
-  const [isLoaded, setIsLoaded] = useState(false)
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [clientCount, setClientCount] = useState(0);
+  const [vendorCount, setVendorCount] = useState(0);
 
   useEffect(() => {
     setTimeout(() => {
       setIsLoaded(true)
     }, 100)
   }, [])
+
+  const getUserCount = async()=>{
+     try{
+      const response = await adminService.getUserCount();
+      if(response.success){
+        setClientCount(response.data.clients);
+        setVendorCount(response.data.vendors);
+      }else{
+        console.error("Failed to fetch user count:", response.message);
+      }
+     }catch(error){
+       console.error("Error fetching user count:", error)
+     }
+  }
+  useEffect(()=>{
+    getUserCount();
+  },[])
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: isLoaded ? 1 : 0 }} transition={{ duration: 0.5 }}>
@@ -77,7 +97,7 @@ const Dashboard: React.FC = () => {
             </div>
             <div>
               <p className="text-sm text-gray-400 font-medium">Total Clients</p>
-              <h3 className="text-2xl font-bold text-white">1,284</h3>
+              <h3 className="text-2xl font-bold text-white">{clientCount}</h3>
               <p className="text-xs text-cyan-400">+12% from last month</p>
             </div>
           </div>
@@ -95,7 +115,7 @@ const Dashboard: React.FC = () => {
             </div>
             <div>
               <p className="text-sm text-gray-400 font-medium">Total Vendors</p>
-              <h3 className="text-2xl font-bold text-white">342</h3>
+              <h3 className="text-2xl font-bold text-white">{vendorCount}</h3>
               <p className="text-xs text-cyan-400">+5% from last month</p>
             </div>
           </div>

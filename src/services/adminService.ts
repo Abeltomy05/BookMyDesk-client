@@ -120,13 +120,15 @@ export const adminService = {
     updateUserStatus: async (
       userType: "client" | "vendor",
       userId: string,
-      status: ClientStatus | VendorStatus
+      status: ClientStatus | VendorStatus,
+      reason?: string
     ): Promise<ApiResponse> => {
       try {
         const response = await adminAxiosInstance.post("/update-user-status", {
           userType,
           userId,
           status,
+          reason,
         });
         return response.data;
       } catch (error:any) {
@@ -138,6 +140,18 @@ export const adminService = {
       }
     },
 
-
+   getUserCount: async():Promise<ApiResponse>=>{
+    try{
+      const response = await adminAxiosInstance.get('/get-user-count');
+      return response.data;
+    }catch(error:any){
+      console.error("Error fetching user count:", error);
+      return {
+        success: false,
+        message: error.response?.data?.message || "Failed to fetch user count",
+        data: null
+      };
+    }
+   }
 
 }

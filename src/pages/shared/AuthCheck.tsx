@@ -27,7 +27,10 @@ const AuthCallback = () => {
           if (user.status === "pending") {
              toast.error("Your vendor account has not yet been approved by the admin.");
              navigate("/vendor/login");
-          }else{
+          }else if(user.status === "rejected") {
+            toast.error("Your vendor account has been rejected by the admin. Check your email for more details.");
+            navigate("/vendor/login");
+          }else{  
               dispatch(vendorLogin(user));
               navigate("/vendor/home");
           }

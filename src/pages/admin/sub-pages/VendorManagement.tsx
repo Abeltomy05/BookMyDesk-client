@@ -28,7 +28,7 @@ export default function VendorManagement() {
   const [totalPages, setTotalPages] = useState(0)
   const [error, setError] = useState<string | null>(null)
 
-  const itemsPerPage = 5
+  const itemsPerPage = 4
 
    const fetchVendors = async (page: number = 1, search: string = "") => {
      setLoading(true)
