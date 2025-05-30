@@ -131,7 +131,7 @@ const LoginPage: React.FC = () => {
       }`}>
         <div className="h-full overflow-hidden">
           <img
-            src="https://res.cloudinary.com/dnivctodr/image/upload/v1748161418/co-working_hpbbei.jpg"
+            src="https://res.cloudinary.com/dnivctodr/image/upload/v1748586258/login_omj1od.jpg"
             alt="Workspace illustration"
             className={`h-full w-full object-cover transition-transform duration-1000 ease-[cubic-bezier(0.25,0.8,0.25,1)] ${
               isAnimated ? 'scale-100' : 'scale-110'

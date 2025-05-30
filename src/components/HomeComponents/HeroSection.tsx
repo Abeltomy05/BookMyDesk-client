@@ -1,9 +1,21 @@
 import type React from "react"
 import { Search } from "lucide-react"
 import { useState } from "react"
+import type { RootState } from "@/store/store"
+import { useSelector } from "react-redux"
+import toast from "react-hot-toast"
 
 const HeroSection: React.FC = () => {
   const [isFocused, setIsFocused] = useState(false)
+  const user = useSelector((state:RootState)=>state.client.client) 
+
+  const handleSearch = () => {
+    if(!user){
+      toast("Please login to search for coworking spaces", {
+        icon: "🔍",
+      })
+    }
+  }
   return (
     <section className="relative h-[750px] flex items-center bg-black">
       <div className="absolute inset-0 z-0">
@@ -30,7 +42,10 @@ const HeroSection: React.FC = () => {
           onBlur={() => setIsFocused(false)}
         />
         <button className="bg-yellow-400 hover:bg-yellow-500 text-black rounded-full flex items-center justify-center overflow-hidden transition-all duration-300 ease-in-out group w-10 hover:w-24">
-          <div className="flex items-center justify-center px-3 py-2">
+          <div 
+          className="flex items-center justify-center px-3 py-2"
+           onClick={handleSearch}
+           >
             <Search size={18} className="flex-shrink-0" />
             <span className="w-0 overflow-hidden whitespace-nowrap opacity-0 group-hover:w-auto group-hover:opacity-100 group-hover:ml-2 transition-all duration-300">
               Search

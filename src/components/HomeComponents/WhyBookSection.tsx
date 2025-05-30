@@ -18,6 +18,12 @@ const Feature: React.FC<FeatureProps> = ({ icon, title, description }) => {
 }
 
 const WhyBookSection: React.FC = () => {
+  const handleLernMoreClick = () => {
+    window.scrollTo({
+      top: document.body.scrollHeight,
+      behavior: "smooth"
+    });
+  }
   return (
     <section className="py-16 bg-gray-50">
       <div className="container mx-auto px-6 md:px-12">
@@ -38,7 +44,10 @@ const WhyBookSection: React.FC = () => {
           />
         </div>
         <div className="flex justify-center mt-8">
-          <button className="border border-yellow-400 text-gray-800 px-6 py-2 rounded-full hover:bg-yellow-400 hover:text-black transition-colors">
+          <button 
+          className="border border-yellow-400 text-gray-800 px-6 py-2 rounded-full hover:bg-yellow-400 hover:text-black transition-colors"
+          onClick={handleLernMoreClick}
+          >
             Learn More
           </button>
         </div>

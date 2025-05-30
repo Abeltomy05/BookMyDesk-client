@@ -1,9 +1,13 @@
+import type { RootState } from "@/store/store"
 import type React from "react"
 import { useState, useEffect, useRef } from "react"
+import toast from "react-hot-toast"
+import { useSelector } from "react-redux"
 
 const FindNearestSection: React.FC = () => {
   const sectionRef = useRef<HTMLElement>(null)
   const [isVisible, setIsVisible] = useState(false)
+  const user = useSelector((state:RootState)=>state.client.client) 
   
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -26,6 +30,13 @@ const FindNearestSection: React.FC = () => {
       }
     }
   }, [])
+
+const handleFIndNearestClick = () => {
+   if(!user){
+    toast("Please login to find nearest coworking space.", {
+      icon: "🔍",})
+   }
+}
   
   return (
     <section 
@@ -65,7 +76,10 @@ const FindNearestSection: React.FC = () => {
               Discover flexible workspace solutions in your area, perfect for freelancers, startups, and remote workers
               looking for a productive environment.
             </p>
-            <button className="bg-yellow-400 hover:bg-yellow-500 text-black px-8 py-3 rounded-full font-medium transition-all duration-300 hover:scale-105">
+            <button 
+            className="bg-yellow-400 hover:bg-yellow-500 text-black px-8 py-3 rounded-full font-medium transition-all duration-300 hover:scale-105"
+            onClick={handleFIndNearestClick}
+            >
               Find Now
             </button>
           </div>

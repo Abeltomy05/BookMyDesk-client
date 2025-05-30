@@ -1,5 +1,8 @@
+import type { RootState } from "@/store/store"
 import type React from "react"
 import { useState, useEffect, useRef } from "react"
+import toast from "react-hot-toast"
+import { useSelector } from "react-redux"
 
 interface PickCardProps {
   title: string
@@ -12,6 +15,7 @@ interface PickCardProps {
 const PickCard: React.FC<PickCardProps> = ({ title, image, size = "small", color, delay=0 }) => {
    const [isVisible, setIsVisible] = useState(false)
    const cardRef = useRef<HTMLDivElement>(null)
+
 
  useEffect(() => {
     const observer = new IntersectionObserver(
@@ -63,6 +67,7 @@ return (
 }
 
 const PicksSection: React.FC = () => {
+    const user = useSelector((state:RootState)=>state.client.client) 
     const sectionRef = useRef<HTMLElement>(null)
     const [isSectionVisible, setIsSectionVisible] = useState(false)
 
@@ -89,6 +94,13 @@ const PicksSection: React.FC = () => {
     }
   }, []);
 
+  const handleCardClick = () => {
+    if(!user){
+    toast("Please login to find best spaces", {
+      icon: "🔍",})
+   }
+  };
+
 
 return (
  <section 
@@ -108,7 +120,10 @@ return (
           Our Picks For You
         </h2>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div 
+        className="grid grid-cols-2 md:grid-cols-4 gap-4"
+        onClick={handleCardClick}
+        >
           <PickCard title="Coliving" image="https://res.cloudinary.com/dnivctodr/image/upload/v1748162545/coliving_boaois.avif" size="large" delay={0} />
           <PickCard title="Top 10" image="https://res.cloudinary.com/dnivctodr/image/upload/v1748162557/top10_hstwag.avif"  delay={150} />
           <PickCard title="Near the Beach" image="https://res.cloudinary.com/dnivctodr/image/upload/v1748162531/beach_mitv35.avif" delay={300} />

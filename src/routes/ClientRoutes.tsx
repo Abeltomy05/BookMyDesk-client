@@ -3,6 +3,7 @@ import LoginPage from "@/pages/client/Login-page";
 import SignupPage from "@/pages/client/signup-page";
 import AuthCallback from "@/pages/shared/AuthCheck";
 import ForgotPasswordPage from "@/pages/shared/ForgotPassword";
+import LandingPage from "@/pages/shared/LandingPage";
 import NotFoundPage from "@/pages/shared/NotFoundPage";
 import ResetPasswordForm from "@/pages/shared/ResetPassword";
 import { ProtectedRoute } from "@/utils/protected/ProtectedRoute";
@@ -12,7 +13,7 @@ import { Route, Routes } from "react-router-dom";
 const ClientRoutes = () => {
   return (
     <Routes>
-        {/* <Route path="/" element={<ClientHome/>}/> */}
+        <Route path="/" element={<LandingPage/>}/>
 
         <Route path="/signup" element={<NoAuthRoute element={<SignupPage/>}/>}/>
         <Route path="/login" element={<NoAuthRoute element={<LoginPage/>}/>}/>
@@ -21,6 +22,8 @@ const ClientRoutes = () => {
         <Route path="/auth-check/:role" element={<AuthCallback/>}/>
         
         <Route path="/home" element={<ProtectedRoute allowedRoles={["client"]} element={<Home/>} />}/>
+
+
        
 
         <Route path="/*" element={<NotFoundPage/>}/>
