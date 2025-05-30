@@ -118,3 +118,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+.custom-focus-ring:focus,
+.custom-focus-ring:focus-within {
+  --tw-ring-color: #f69938;
+  box-shadow: 0 0 0 3px var(--tw-ring-color);
+}

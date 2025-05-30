@@ -23,8 +23,12 @@ const AuthCallback = () => {
         if (user.role === "client"){
            dispatch(clientLogin(user));
            navigate("/home");
+
         }else if (user.role === "vendor"){
-          if (user.status === "pending") {
+          if (!user.idProof) {
+            toast("Please upload your ID document to complete registration.");
+            navigate("/vendor/upload-doc");
+          }else if (user.status === "pending") {
              toast.error("Your vendor account has not yet been approved by the admin.");
              navigate("/vendor/login");
           }else if(user.status === "rejected") {

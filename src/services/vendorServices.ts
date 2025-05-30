@@ -93,6 +93,19 @@ handleGoogleLogin:  () => {
     window.location.href = `${import.meta.env.VITE_BACKEND_URL}/api/auth/google?role=${role}`;
 },  
 
+uploadIdProof: async (idProof: string): Promise<ApiResponse> => {
+    try {
+      const response = await vendorAxiosInstance.post('/upload-id-proof', { idProof });
+      return response.data;
+    } catch (error) {
+      console.error('Error uploading ID proof:', error);
+      return {
+        success: false,
+        message: 'Failed to upload ID proof',
+      };
+    }
+},
+
  logout: async():Promise<ApiResponse>=>{
     try {
       const response = await vendorAxiosInstance.post("/logout");
@@ -105,6 +118,8 @@ handleGoogleLogin:  () => {
       };
      }
   }
+
+  
 
 
 }
