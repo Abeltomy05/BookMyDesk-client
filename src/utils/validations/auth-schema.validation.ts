@@ -71,7 +71,6 @@ export interface VendorTouchedFields {
   idProof?: boolean
 }
 
-//vendor
 export const validateVendorField = (
   name: keyof VendorFormData, 
   value: string | File | null,

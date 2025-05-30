@@ -163,7 +163,7 @@ const Navbar: React.FC = () => {
 
               <div className="py-1">
                 <a
-                  href="#"
+                  href="/profile"
                   className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#f69938] transition-colors duration-150"
                 >
                   <User size={16} className="mr-3" />

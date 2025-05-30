@@ -146,6 +146,41 @@ export const clientService = {
      }
   },
 
+  updateProfile: async (data: any): Promise<ApiResponse> => {
+    try {
+      const response = await clientAxiosInstance.put("/update-profile", data);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      return {
+        success: false,
+        message: 'Failed to update profile',
+      };
+    }
+  },
+
+  updatePassword: async (currentPassword: string, newPassword: string): Promise<ApiResponse> => {
+    try {
+      const response = await clientAxiosInstance.put("/update-password", {
+        currentPassword,
+        newPassword
+      });
+      return response.data;
+    } catch (error:any) {
+      console.error('Error updating password:', error);
+      const message = error.response?.data?.message || 'Failed to update password';
+      return {
+        success: false,
+        message,
+      };
+    }
+  },
+
+
+
+
+
+
   logout: async():Promise<ApiResponse>=>{
     try {
       const response = await clientAxiosInstance.post("/logout");

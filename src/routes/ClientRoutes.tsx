@@ -1,3 +1,4 @@
+import ClientProfile from "@/pages/client/ClientProfile";
 import Home from "@/pages/client/home-page";
 import LoginPage from "@/pages/client/Login-page";
 import SignupPage from "@/pages/client/signup-page";
@@ -22,6 +23,7 @@ const ClientRoutes = () => {
         <Route path="/auth-check/:role" element={<AuthCallback/>}/>
         
         <Route path="/home" element={<ProtectedRoute allowedRoles={["client"]} element={<Home/>} />}/>
+        <Route path="/profile" element={<ProtectedRoute allowedRoles={["client"]} element={<ClientProfile/>} />}/>
 
 
        
