@@ -4,6 +4,7 @@ import { motion } from "framer-motion"
 import { Search, MoreVertical, User, Building2, Eye, ChevronLeft, ChevronRight } from "lucide-react"
 import { adminService } from "@/services/adminService"
 import toast from "react-hot-toast"
+import VendorDetails from "./VendorDetails"
 
 
 type VendorStatus = "approved" | "rejected" | "pending" | "blocked"
@@ -14,6 +15,11 @@ interface VendorData {
   companyName: string
   status: VendorStatus
   avatar?: string
+  email?: string
+  phone?: string
+  createdAt?: string
+  companyAddress?: string
+  description?: string
 }
 
 
@@ -27,6 +33,7 @@ export default function VendorManagement() {
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(0)
   const [error, setError] = useState<string | null>(null)
+  const [selectedVendor, setSelectedVendor] = useState<VendorData | null>(null)
 
   const itemsPerPage = 4
 
@@ -37,6 +44,7 @@ export default function VendorManagement() {
      try {
       const response = await adminService.getAllUsers({role: "vendor", page, limit: itemsPerPage, search, excludeStatus: "pending"});
       if(response.success){
+        console.log("Fetched vendors:", response.users)
          let filteredVendors = response.users as VendorData[];
 
          if (activeFilter !== "all") {
@@ -267,7 +275,13 @@ export default function VendorManagement() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0 }}
                   >
-                    <button className="w-full text-left px-4 py-2 hover:bg-gray-700 rounded-t-lg text-sm flex items-center gap-2">
+                    <button 
+                    className="w-full text-left px-4 py-2 hover:bg-gray-700 rounded-t-lg text-sm flex items-center gap-2"
+                    onClick={() => {
+                      setSelectedVendor(vendor)
+                      setActiveDropdown(null)
+                    }}
+                    >
                       <Eye size={16} />
                       <span>View Details</span>
                     </button>
@@ -363,6 +377,13 @@ export default function VendorManagement() {
             </button>
           </div>
         </motion.div>
+      )}
+      {/* Vendor Details Modal */}
+      {selectedVendor && (
+        <VendorDetails
+          vendor={selectedVendor as VendorDetails}
+          onClose={() => setSelectedVendor(null)}
+        />
       )}
     </motion.div>
   )
