@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
-import { Bell, Menu, X, Building2, Calendar, Star, User, MessageCircle, LogOut, Plus, Settings, MapPin, DollarSign, Users, Clock, Eye, Edit, TrendingUp, AlertCircle } from 'lucide-react';
+import React from 'react';
+import { motion,} from 'framer-motion';
+import {  Building2, Calendar, Plus, Settings, MapPin, DollarSign, Users,  Eye, Edit, TrendingUp, } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/store/store';
 import { vendorService } from '@/services/vendorServices';
 import { vendorLogout } from '@/store/slices/vendor.slice';
 import toast from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
+
+import VendorLayout from './VendorLayout';
 
 interface Building {
   id: string;
@@ -17,40 +19,12 @@ interface Building {
   image: string;
 }
 
-interface Booking {
-  id: string;
-  userName: string;
-  spaceType: string;
-  date: string;
-  time: string;
-  status: 'confirmed' | 'pending' | 'cancelled';
-}
 
-interface Notification {
-  id: string;
-  type: 'verification' | 'rejection' | 'issue';
-  message: string;
-  time: string;
-}
 
 const VendorDashboard: React.FC = () => {
   const user = useSelector((state:RootState)=>state.vendor.vendor) 
   const dispatch  = useDispatch();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [notificationCount] = useState(3);
-  const [scrolled, setScrolled] = useState(false);
 
-  // Scroll detection
-  useEffect(() => {
-    const handleScroll = () => {
-      const heroHeight = window.innerHeight;
-      const scrollPosition = window.scrollY;
-      setScrolled(scrollPosition > heroHeight - 100);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   const handleLogout = async()=>{
       try {
@@ -94,148 +68,9 @@ const VendorDashboard: React.FC = () => {
     }
   ];
 
-  const recentBookings: Booking[] = [
-    {
-      id: '1',
-      userName: 'John Doe',
-      spaceType: 'Private Office',
-      date: '2024-01-15',
-      time: '09:00 AM',
-      status: 'confirmed'
-    },
-    {
-      id: '2',
-      userName: 'Sarah Smith',
-      spaceType: 'Hot Desk',
-      date: '2024-01-16',
-      time: '10:30 AM',
-      status: 'pending'
-    },
-    {
-      id: '3',
-      userName: 'Mike Johnson',
-      spaceType: 'Meeting Room',
-      date: '2024-01-17',
-      time: '02:00 PM',
-      status: 'confirmed'
-    },
-    {
-      id: '4',
-      userName: 'Emily Davis',
-      spaceType: 'Hot Desk',
-      date: '2024-01-18',
-      time: '11:00 AM',
-      status: 'cancelled'
-    }
-  ];
 
-  const notifications: Notification[] = [
-    {
-      id: '1',
-      type: 'verification',
-      message: 'Building verification pending for Tech Hub Downtown',
-      time: '2 hours ago'
-    },
-    {
-      id: '2',
-      type: 'issue',
-      message: 'User reported AC issue in Creative Space Midtown',
-      time: '4 hours ago'
-    },
-    {
-      id: '3',
-      type: 'rejection',
-      message: 'Business Center listing rejected - missing documents',
-      time: '1 day ago'
-    }
-  ];
 
-  const sidebarItems = [
-    { icon: Building2, label: 'Manage Buildings', href: '#' },
-    { icon: Calendar, label: 'Bookings', href: '#' },
-    { icon: Star, label: 'Reviews & Ratings', href: '#' },
-    { icon: User, label: 'Profile', href: '#' },
-    { icon: MessageCircle, label: 'Chat', href: '#' }
-  ];
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'confirmed': return 'text-green-600 bg-green-100';
-      case 'pending': return 'text-yellow-600 bg-yellow-100';
-      case 'cancelled': return 'text-red-600 bg-red-100';
-      default: return 'text-gray-600 bg-gray-100';
-    }
-  };
-
-  const getNotificationIcon = (type: string) => {
-    switch (type) {
-      case 'verification': return <Clock className="w-4 h-4 text-[#f69938]" />;
-      case 'rejection': return <X className="w-4 h-4 text-red-500" />;
-      case 'issue': return <AlertCircle className="w-4 h-4 text-orange-500" />;
-      default: return <Bell className="w-4 h-4 text-gray-500" />;
-    }
-  };
-
-  // Animation variants
-  const sidebarVariants = {
-    open: {
-      x: 0,
-      transition: {
-        type: "spring",
-        stiffness: 300,
-        damping: 30
-      }
-    },
-    closed: {
-      x: "100%",
-      transition: {
-        type: "spring",
-        stiffness: 300,
-        damping: 30
-      }
-    }
-  };
-
-  const overlayVariants = {
-    open: {
-      opacity: 1,
-      transition: {
-        duration: 0.3
-      }
-    },
-    closed: {
-      opacity: 0,
-      transition: {
-        duration: 0.3
-      }
-    }
-  };
-
-  const menuItemVariants = {
-    open: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        y: { stiffness: 1000, velocity: -100 }
-      }
-    },
-    closed: {
-      y: 50,
-      opacity: 0,
-      transition: {
-        y: { stiffness: 1000 }
-      }
-    }
-  };
-
-  const containerVariants = {
-    open: {
-      transition: { staggerChildren: 0.07, delayChildren: 0.2 }
-    },
-    closed: {
-      transition: { staggerChildren: 0.05, staggerDirection: -1 }
-    }
-  };
 
   const cardVariants = {
     hidden: { 
@@ -290,94 +125,11 @@ const VendorDashboard: React.FC = () => {
   };
 
   return (
+    <VendorLayout
+      onLogout={handleLogout}
+      notificationCount={5}
+    >
     <div className="min-h-screen">
-      {/* Navbar */}
-      <motion.nav 
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        className={`fixed w-full top-0 z-50 transition-all duration-300 ${
-          scrolled 
-            ? 'bg-white shadow-lg border-b border-gray-200' 
-            : 'bg-transparent'
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <motion.div 
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
-              className="flex items-center"
-            >
-              <div className="flex-shrink-0 flex items-center">
-               <img
-                src="https://res.cloudinary.com/dnivctodr/image/upload/v1748161273/BMS-logo_hcz5ww.png"
-                alt="BookMyDesk Logo"
-                className='h-16'
-               />
-              </div>
-            </motion.div>
-
-            {/* Right side icons */}
-            <motion.div 
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
-              className="flex items-center space-x-4"
-            >
-              {/* Notification Icon */}
-              <motion.button 
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                className={`relative p-2 rounded-full transition-colors duration-200 ${
-                  scrolled 
-                    ? 'text-gray-600 hover:text-gray-900 hover:bg-gray-100' 
-                    : 'text-white hover:text-gray-200 hover:bg-white hover:bg-opacity-20'
-                }`}
-              >
-                <Bell className="w-6 h-6" />
-                {notificationCount > 0 && (
-                  <motion.span 
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                    className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
-                  >
-                    <motion.span
-                      animate={{ scale: [1, 1.2, 1] }}
-                      transition={{ repeat: Infinity, duration: 2 }}
-                    >
-                      {notificationCount}
-                    </motion.span>
-                  </motion.span>
-                )}
-              </motion.button>
-
-              {/* Menu Icon */}
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-                className={`p-2 rounded-full transition-colors duration-200 ${
-                  scrolled 
-                    ? 'text-gray-600 hover:text-gray-900 hover:bg-gray-100' 
-                    : 'text-white hover:text-gray-200 hover:bg-white hover:bg-opacity-20'
-                }`}
-              >
-                <motion.div
-                  animate={{ rotate: sidebarOpen ? 90 : 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <Menu className="w-6 h-6" />
-                </motion.div>
-              </motion.button>
-            </motion.div>
-          </div>
-        </div>
-      </motion.nav>
-
       {/* Hero Section */}
       <motion.section 
         variants={heroVariants}
@@ -458,113 +210,6 @@ const VendorDashboard: React.FC = () => {
           </motion.div>
         </motion.div>
       </motion.section>
-
-      {/* Sidebar Overlay */}
-      <AnimatePresence>
-        {sidebarOpen && (
-          <motion.div
-            initial="closed"
-            animate="open"
-            exit="closed"
-            variants={overlayVariants}
-            className="fixed inset-0 bg-grey bg-opacity-40 z-40"
-            onClick={() => setSidebarOpen(false)}
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Sidebar */}
-      <AnimatePresence>
-        {sidebarOpen && (
-          <motion.div
-            initial="closed"
-            animate="open"
-            exit="closed"
-            variants={sidebarVariants}
-            className="fixed top-0 right-0 h-full w-80 bg-white shadow-xl z-50"
-          >
-            <div className="flex flex-col h-full">
-              {/* Sidebar Header */}
-              <motion.div 
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="flex items-center justify-between p-6 border-b border-gray-200"
-              >
-                <h2 className="text-lg font-semibold text-gray-900">Menu</h2>
-                <motion.button
-                  whileHover={{ scale: 1.1, rotate: 90 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setSidebarOpen(false)}
-                  className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors duration-200"
-                >
-                  <X className="w-5 h-5" />
-                </motion.button>
-              </motion.div>
-
-              {/* Sidebar Content */}
-              <div className="flex-1 py-6">
-                <motion.nav 
-                  variants={containerVariants}
-                  initial="closed"
-                  animate="open"
-                  className="space-y-2 px-6"
-                >
-                  {sidebarItems.map((item, index) => (
-                    <motion.a
-                      key={index}
-                      variants={menuItemVariants}
-                      whileHover={{ 
-                        x: 10,
-                        backgroundColor: "rgba(246, 153, 56, 0.1)",
-                        transition: { duration: 0.2 }
-                      }}
-                      whileTap={{ scale: 0.98 }}
-                      href={item.href}
-                      className="flex items-center px-4 py-3 text-gray-700 hover:text-[#f69938] rounded-lg transition-all duration-200 group"
-                    >
-                      <motion.div
-                        whileHover={{ scale: 1.2, rotate: 5 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <item.icon className="w-5 h-5 mr-3" />
-                      </motion.div>
-                      <span className="font-medium">{item.label}</span>
-                    </motion.a>
-                  ))}
-                </motion.nav>
-              </div>
-
-              {/* Sidebar Footer */}
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="border-t border-gray-200 p-6"
-              >
-                <motion.button 
-                  whileHover={{ 
-                    x: 10,
-                    backgroundColor: "rgba(239, 68, 68, 0.1)",
-                    transition: { duration: 0.2 }
-                  }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={handleLogout}
-                  className="flex items-center w-full px-4 py-3 text-red-600 rounded-lg transition-all duration-200 group"
-                >
-                  <motion.div
-                    whileHover={{ scale: 1.2, rotate: -5 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <LogOut className="w-5 h-5 mr-3" />
-                  </motion.div>
-                  <span className="font-medium">Logout</span>
-                </motion.button>
-              </motion.div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Main Content */}
       <main className="bg-gray-50 pb-8">
@@ -676,122 +321,7 @@ const VendorDashboard: React.FC = () => {
             </motion.div>
           </motion.div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Recent Activity */}
-            <motion.div 
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
-              className="lg:col-span-2"
-            >
-              <motion.div 
-                whileHover={{ boxShadow: "0 10px 25px rgba(0,0,0,0.1)" }}
-                transition={{ duration: 0.3 }}
-                className="bg-white rounded-xl shadow-sm border border-gray-200"
-              >
-                <div className="p-6 border-b border-gray-200">
-                  <h2 className="text-xl font-bold text-gray-900">Recent Bookings</h2>
-                </div>
-                <div className="p-6">
-                  <motion.div 
-                    variants={staggerContainer}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true }}
-                    className="space-y-4"
-                  >
-                    {recentBookings.map((booking, index) => (
-                      <motion.div
-                        key={booking.id}
-                        variants={cardVariants}
-                        whileHover={{ 
-                          x: 5,
-                          backgroundColor: "rgba(243, 244, 246, 0.8)",
-                          transition: { duration: 0.2 }
-                        }}
-                        className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer"
-                      >
-                        <div className="flex items-center space-x-4">
-                          <motion.div 
-                            whileHover={{ scale: 1.1 }}
-                            className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center"
-                          >
-                            <User className="w-5 h-5 text-[#f69938]" />
-                          </motion.div>
-                          <div>
-                            <p className="font-medium text-gray-900">{booking.userName}</p>
-                            <p className="text-sm text-gray-600">{booking.spaceType}</p>
-                            <p className="text-sm text-gray-500">{booking.date} at {booking.time}</p>
-                          </div>
-                        </div>
-                        <motion.span 
-                          initial={{ scale: 0 }}
-                          whileInView={{ scale: 1 }}
-                          viewport={{ once: true }}
-                          transition={{ delay: 0.1 + index * 0.05 }}
-                          className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(booking.status)}`}
-                        >
-                          {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
-                        </motion.span>
-                      </motion.div>
-                    ))}
-                  </motion.div>
-                </div>
-              </motion.div>
-            </motion.div>
 
-            {/* Notifications */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.4 }}
-            >
-              <motion.div 
-                whileHover={{ boxShadow: "0 10px 25px rgba(0,0,0,0.1)" }}
-                transition={{ duration: 0.3 }}
-                className="bg-white rounded-xl shadow-sm border border-gray-200"
-              >
-                <div className="p-6 border-b border-gray-200">
-                  <h2 className="text-xl font-bold text-gray-900">Notifications</h2>
-                </div>
-                <div className="p-6">
-                  <motion.div 
-                    variants={staggerContainer}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true }}
-                    className="space-y-4"
-                  >
-                    {notifications.map((notification, index) => (
-                      <motion.div
-                        key={notification.id}
-                        variants={cardVariants}
-                        whileHover={{ 
-                          x: 5,
-                          backgroundColor: "rgba(243, 244, 246, 0.8)",
-                          transition: { duration: 0.2 }
-                        }}
-                        className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg cursor-pointer"
-                      >
-                        <motion.div 
-                          whileHover={{ scale: 1.2 }}
-                          className="flex-shrink-0 mt-1"
-                        >
-                          {getNotificationIcon(notification.type)}
-                        </motion.div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm text-gray-900">{notification.message}</p>
-                          <p className="text-xs text-gray-500 mt-1">{notification.time}</p>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </motion.div>
-                </div>
-              </motion.div>
-            </motion.div>
-          </div>
 
           {/* Your Buildings */}
           <motion.div 
@@ -899,6 +429,7 @@ const VendorDashboard: React.FC = () => {
         </div>
       </main>
     </div>
+    </VendorLayout>
   );
 };
 

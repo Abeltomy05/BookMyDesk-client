@@ -1,6 +1,6 @@
 import type React from "react"
 import { useState } from "react"
-import FloatingLabelInput from "@/components/Floating-label"
+import FloatingLabelInput from "@/components/ui/Floating-label"
 import { validateResetPasswordForm, type ResetPasswordValidationErrors } from "@/utils/validations/auth-schema.validation"
 import { useParams,useNavigate  } from "react-router-dom"
 import { clientService } from "@/services/clientServices"

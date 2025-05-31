@@ -1,4 +1,5 @@
 import NotFoundPage from "@/pages/shared/NotFoundPage"
+import VendorProfile from "@/pages/vendor/ProfilePage"
 import IdProofUpload from "@/pages/vendor/UploadDoc"
 import VendorDashboard from "@/pages/vendor/VendorHome"
 import VendorLogin from "@/pages/vendor/VendorLogin"
@@ -16,6 +17,7 @@ const VendorRoutes = () => {
         <Route path="/upload-doc" element={<NoAuthRoute element={<IdProofUpload/>}/>}/>
 
         <Route path="/home" element={<ProtectedRoute allowedRoles={["vendor"]} element={<VendorDashboard/>} />}/>
+        <Route path="/profile" element={<ProtectedRoute allowedRoles={["vendor"]} element={<VendorProfile/>} />}/>
 
         <Route path="/*" element={<NotFoundPage/>}/>
     </Routes>

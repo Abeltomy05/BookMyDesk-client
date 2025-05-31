@@ -9,7 +9,7 @@ import toast from "react-hot-toast"
 import { vendorService } from "@/services/vendorServices"
 import { vendorLogin } from "@/store/slices/vendor.slice"
 import { useNavigate } from "react-router-dom"
-import Loading from "@/components/Loading";
+import Loading from "@/components/Loadings/Loading";
 
 const VendorLogin: React.FC = () => {
   const [formData, setFormData] = useState({

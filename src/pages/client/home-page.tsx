@@ -1,11 +1,11 @@
 import FindNearestSection from "@/components/HomeComponents/FindNearestSection"
 import Footer from "@/components/HomeComponents/Footer"
 import HeroSection from "@/components/HomeComponents/HeroSection"
-import Navbar from "@/components/ClientNavbar/Navbar"
 import PicksSection from "@/components/HomeComponents/PicksSection"
 import WhyBookSection from "@/components/HomeComponents/WhyBookSection"
-import Loading from "@/components/Loading"
+import Loading from "@/components/Loadings/Loading"
 import { useState, useEffect } from "react"
+import PageNavbar from "@/components/Navbars & Sidebars/ClientNavbar"
 
 const Home = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -15,7 +15,7 @@ const Home = () => {
     // Trigger animation after component mounts
     const timer = setTimeout(() => {
       setIsVisible(true);
-    }, 100);
+    }, 50);
 
     return () => clearTimeout(timer);
   }, []);
@@ -32,7 +32,7 @@ const Home = () => {
           </div>
         </div>
       )}
-      <Navbar />
+      <PageNavbar />
       <HeroSection />
       <PicksSection />
       <WhyBookSection />

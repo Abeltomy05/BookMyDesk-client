@@ -1,7 +1,7 @@
 import Footer from "@/components/HomeComponents/Footer"
 import HeroSection from "@/components/HomeComponents/HeroSection"
 import WhyBookSection from "@/components/HomeComponents/WhyBookSection"
-import Loading from "@/components/Loading"
+import Loading from "@/components/Loadings/Loading"
 import { useState, useEffect } from "react"
 import LandingNavbar from "@/components/LandingPageComponents/LandingNavbar"
 import FindNearestSection from "@/components/HomeComponents/FindNearestSection"

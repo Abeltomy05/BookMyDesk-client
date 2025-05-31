@@ -4,6 +4,7 @@ import { Save, Eye, EyeOff, Upload } from "lucide-react"
 import { clientValidateProfileForm, validatePasswordForm, type ClientProfileErrors, type PasswordErrors } from "@/utils/validations/profile-update.validation"
 import toast, { Toaster } from "react-hot-toast"
 import { clientService } from "@/services/clientServices"
+import PageNavbar from "@/components/Navbars & Sidebars/ClientNavbar"
 
 interface UserProfile {
   username: string
@@ -188,7 +189,10 @@ const handlePasswordValidation = () => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-4 md:p-6 bg-gray-50 min-h-screen">
+    <>
+        <PageNavbar/>
+        
+        <div className="max-w-6xl mx-auto p-4 md:p-6 bg-gray-50 min-h-screen">
       <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6 text-center">Profile Settings</h1>
 
       {/* Banner Section - Full Width */}
@@ -395,6 +399,8 @@ const handlePasswordValidation = () => {
         </div>
       </div>
     </div>
+    </>
+
   );
 }
 

@@ -8,7 +8,7 @@ import { validateLoginForm } from "@/utils/validations/auth-schema.validation"
 import { clientService } from "@/services/clientServices"
 import { clientLogin } from "@/store/slices/client.slice"
 import { useDispatch } from "react-redux"
-import Loading from "@/components/Loading"
+import Loading from "@/components/Loadings/Loading"
 import { useNavigate } from "react-router-dom"
 
 const LoginPage: React.FC = () => {

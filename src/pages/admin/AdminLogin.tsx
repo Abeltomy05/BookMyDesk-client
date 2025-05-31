@@ -4,7 +4,7 @@ import { Mail, Lock, Eye, EyeOff } from "lucide-react"
 import { toast } from "react-hot-toast"
 import { validateLoginForm } from "@/utils/validations/auth-schema.validation"
 import { useDispatch } from "react-redux"
-import Loading from "@/components/Loading"
+import Loading from "@/components/Loadings/Loading"
 import { adminLogin } from "@/store/slices/admin.slice";
 import { adminService } from "@/services/adminService"
 

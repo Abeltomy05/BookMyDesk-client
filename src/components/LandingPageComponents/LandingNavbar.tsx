@@ -1,7 +1,7 @@
 import type React from "react"
 import { useEffect, useState } from "react"
 import { Menu } from "lucide-react"
-import Sidebar from "../ClientNavbar/Sidebar"
+import Sidebar from "../Navbars & Sidebars/ClientSidebar"
 import { useNavigate } from "react-router-dom"
 
 const LandingNavbar: React.FC = () => {

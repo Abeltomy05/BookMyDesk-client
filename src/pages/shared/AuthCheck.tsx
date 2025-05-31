@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { clientLogin } from "@/store/slices/client.slice";
 import { vendorLogin } from "@/store/slices/vendor.slice";
 import authAxiosInstance from "@/api/auth.axios";
-import Loading from "@/components/Loading";
+import Loading from "@/components/Loadings/Loading";
 import toast from "react-hot-toast";
 
 const AuthCallback = () => {

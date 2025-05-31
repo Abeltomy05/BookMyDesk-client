@@ -1,7 +1,7 @@
 import type React from "react"
 import { useState, useEffect, useRef } from "react"
 import { Eye, EyeOff, Lock, Upload } from "lucide-react"
-import FloatingLabelInput from "@/components/Floating-label"
+import FloatingLabelInput from "@/components/ui/Floating-label"
 import { validateVendorField, validateVendorSignupForm } from "@/utils/validations/auth-schema.validation"
 import type {VendorFormData,VendorFormErrors,VendorTouchedFields} from '@/utils/validations/auth-schema.validation'
 import toast from "react-hot-toast"
