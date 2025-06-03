@@ -3,12 +3,8 @@ import { motion,} from 'framer-motion';
 import {  Building2, Calendar, Plus, Settings, MapPin, DollarSign, Users,  Eye, Edit, TrendingUp, } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/store/store';
-import { vendorService } from '@/services/vendorServices';
-import { vendorLogout } from '@/store/slices/vendor.slice';
-import toast from 'react-hot-toast';
-import { useDispatch } from 'react-redux';
 
-import VendorLayout from './VendorLayout';
+import VendorLayout from '../VendorLayout';
 
 interface Building {
   id: string;
@@ -23,22 +19,7 @@ interface Building {
 
 const VendorDashboard: React.FC = () => {
   const user = useSelector((state:RootState)=>state.vendor.vendor) 
-  const dispatch  = useDispatch();
 
-
-  const handleLogout = async()=>{
-      try {
-          const response = await vendorService.logout();
-            if(response.success){
-              toast.success("Logout successful!");
-              dispatch(vendorLogout());
-            }else{
-              toast.error(response.message || "Logout Error");
-            }
-      } catch (error) {
-        toast.error("Logout Error")
-   }
- }
 
   // Sample data
   const buildings: Building[] = [
@@ -126,7 +107,6 @@ const VendorDashboard: React.FC = () => {
 
   return (
     <VendorLayout
-      onLogout={handleLogout}
       notificationCount={5}
     >
     <div className="min-h-screen">

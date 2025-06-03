@@ -146,6 +146,19 @@ export const clientService = {
      }
   },
 
+  getSingleUser: async (): Promise<ApiResponse> => {
+   try {
+      const response = await clientAxiosInstance.get("/get-user-data");
+      return response.data
+     } catch (error) {
+      console.error('Error geting user data:', error);
+      return {
+        success: false,
+        message: 'User not found',
+      };
+     }
+  },
+
   updateProfile: async (data: any): Promise<ApiResponse> => {
     try {
       const response = await clientAxiosInstance.put("/update-profile", data);

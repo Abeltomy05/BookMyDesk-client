@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Bell, Menu } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface VendorNavbarProps {
   onMenuClick: () => void;
@@ -17,6 +18,8 @@ const VendorNavbar: React.FC<VendorNavbarProps> = ({
   backgroundClass
 }) => {
 
+  const navigate = useNavigate();
+
   return (
     <motion.nav
       initial={{ y: -100 }}
@@ -33,7 +36,8 @@ const VendorNavbar: React.FC<VendorNavbarProps> = ({
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
-            className="flex items-center"
+            className="flex items-center cursor-pointer"
+            onClick={() => navigate('/vendor/home')}
           >
             <img src={logoUrl} alt="BookMyDesk Logo" className="h-16" />
           </motion.div>

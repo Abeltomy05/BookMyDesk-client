@@ -2,7 +2,7 @@ import type React from "react"
 import { useState, useRef, type ChangeEvent, useEffect } from "react"
 import { Save, Eye, EyeOff, Upload } from "lucide-react"
 import { clientValidateProfileForm, validatePasswordForm, type ClientProfileErrors, type PasswordErrors } from "@/utils/validations/profile-update.validation"
-import toast, { Toaster } from "react-hot-toast"
+import toast from "react-hot-toast"
 import { clientService } from "@/services/clientServices"
 import PageNavbar from "@/components/Navbars & Sidebars/ClientNavbar"
 
@@ -50,7 +50,7 @@ const ClientProfile: React.FC = () => {
 
 const fetchProfileData = async () => {
     try{
-       const response = await clientService.getMe();
+       const response = await clientService.getSingleUser();
        console.log("Profile data fetched:", response.data);
        setProfile({
         username: response.data.username,
