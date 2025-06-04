@@ -74,11 +74,12 @@ export const clientService = {
       const response = await authAxiosInstance.post('/login', data);
       console.log(response.data);
       return response.data;
-    } catch (error) {
+    } catch (error:any) {
       console.error('Error logging in:', error);
+      const message = error.response?.data?.message || "Something went wrong. Please try again.";
       return {
         success: false,
-        message: 'Invalid email or password',
+        message,
       };
     }
   },
