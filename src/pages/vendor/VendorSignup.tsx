@@ -8,6 +8,7 @@ import toast from "react-hot-toast"
 import { vendorService } from "@/services/vendorServices"
 import { useNavigate } from "react-router-dom"
 import { uploadImageCloudinary } from "@/utils/cloudinary/cloudinary"
+import Loading from "@/components/Loadings/Loading"
 
 const VendorSignup = () => {
   const [formData, setFormData] = useState<VendorFormData>({
@@ -191,8 +192,8 @@ const resendOtp = async () => {
       
       if (response.success) {
         toast.success("OTP verified successfully!")
-        setShowOtpModal(false)
          await completeSignup()
+         setShowOtpModal(false)
       } else {
         toast.error(response.message || "Invalid OTP. Please try again.")
       }
@@ -303,6 +304,15 @@ const resendOtp = async () => {
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen overflow-hidden relative">
+
+      {/* {loading && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="w-75 h-75">
+            <Loading/>
+          </div>
+        </div>
+      )} */}
+
         {/* OTP Modal */}
         {showOtpModal && (
        <div className="fixed inset-0 bg-black/60 backdrop-blur-md backdrop-saturate-150 z-50 flex items-center justify-center">
