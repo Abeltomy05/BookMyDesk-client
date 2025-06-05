@@ -14,10 +14,10 @@ interface VendorDetails {
   avatar?: string
   banner?: string
   companyName: string
-  companyAddress: string
+  companyAddress?: string
   description?: string
   status: "pending" | "approved" | "blocked" | "rejected"
-  createdAt: string
+  createdAt?: string
   totalRevenue?: number
   totalBuildings?: number
   totalBookings?: number
@@ -32,8 +32,8 @@ interface VendorDetailsProps {
 const VendorDetails: React.FC<VendorDetailsProps> = ({ vendor,onClose }) => {
   // Default vendor data for demonstration
   const defaultVendor: VendorDetails = {
-    _id: "1",
-    username: "john_workspace",
+    _id: "",
+    username: "",
     email: "john@workspace.com",
     phone: "+1 (555) 123-4567",
     companyName: "Workspace Solutions Inc.",
@@ -106,7 +106,7 @@ const VendorDetails: React.FC<VendorDetailsProps> = ({ vendor,onClose }) => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6 bg-black min-h-screen">
+    <div className="max-w-6xl mx-auto mt-5 p-6 space-y-6 bg-black min-h-screen">
       {/* Banner Section */}
       <div className="relative">
          {/* Close Button */}
@@ -136,6 +136,8 @@ const VendorDetails: React.FC<VendorDetailsProps> = ({ vendor,onClose }) => {
                 src={vendorData.avatar || "/placeholder.svg"}
                 alt="Vendor Avatar"
                 className="w-full h-full object-cover rounded-full"
+                referrerPolicy="no-referrer"
+                crossOrigin="anonymous"
               />
             ) : (
               <span className="text-white text-2xl font-bold">{vendorData.username.charAt(0).toUpperCase()}</span>
@@ -177,7 +179,7 @@ const VendorDetails: React.FC<VendorDetailsProps> = ({ vendor,onClose }) => {
               </div>
               <div className="flex items-center text-gray-300">
                 <Calendar className="w-5 h-5 mr-3" />
-                <span>Joined {formatDate(vendorData.createdAt)}</span>
+                <span>Joined {vendorData.createdAt ? formatDate(vendorData.createdAt) : "N/A"}</span>
               </div>
             </div>
 

@@ -211,6 +211,8 @@ const handlePasswordValidation = () => {
                 src={profile.avatar}
                 alt="Profile Avatar"
                 className="w-full h-full object-cover"
+                referrerPolicy="no-referrer"
+                crossOrigin="anonymous"
               />
             ) : (
               <span className="text-white text-3xl md:text-4xl font-bold">{getInitials(profile.username)}</span>

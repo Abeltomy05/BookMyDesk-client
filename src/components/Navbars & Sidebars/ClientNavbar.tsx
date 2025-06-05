@@ -122,6 +122,8 @@ const PageNavbar: React.FC = () => {
                                 src={user && user?.avatar ? user.avatar : "https://res.cloudinary.com/dnivctodr/image/upload/v1748161444/default-user_rbydkc.png"}
                                 alt="User avatar"
                                 className="w-auto h-10 object-cover rounded-full border-3 border-[#f69938] hover:shadow-lg transform"
+                                referrerPolicy="no-referrer"
+                                crossOrigin="anonymous"
                             />
                         </div>
 

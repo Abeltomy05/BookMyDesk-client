@@ -1,4 +1,4 @@
-import type {IVendor } from "@/types/User";
+import type {IVendor } from "@/types/user.type";
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 

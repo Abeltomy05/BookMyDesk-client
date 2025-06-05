@@ -21,7 +21,16 @@ interface GetUsersParams {
   page?: number;
   limit?: number;
   search?: string;
+  status?: string;
   excludeStatus?: string | string[];
+}
+
+interface GetAllUsersResponse {
+  success: boolean;
+  users: ClientData[] | VendorData[];
+  totalPages: number;
+  currentPage: number;
+  message?: string
 }
 
 interface VendorData {
@@ -51,12 +60,7 @@ interface ClientData {
   updatedAt?: string;
 }
 
-interface GetAllUsersResponse {
-  success: boolean;
-  users: ClientData[] | VendorData[];
-  totalPages: number;
-  currentPage: number;
-}
+
 
 
 export const adminService = {
@@ -92,6 +96,7 @@ export const adminService = {
       page=1,
       limit=5,
       search="",
+      status,
       excludeStatus
     }:GetUsersParams): Promise<GetAllUsersResponse>=>{
         try {
@@ -101,6 +106,7 @@ export const adminService = {
                             page,
                             limit,
                             search,
+                            status,
                             excludeStatus
                           },
                         });

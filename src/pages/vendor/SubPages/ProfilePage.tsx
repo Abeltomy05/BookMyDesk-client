@@ -285,6 +285,8 @@ const handleIdProofChange = (event: React.ChangeEvent<HTMLInputElement>) => {
                 src={avatarUrl || "/placeholder.svg"}
                 alt="Vendor Avatar"
                 className="w-full h-full object-cover"
+                referrerPolicy="no-referrer"
+                crossOrigin="anonymous"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement
                   target.src =
