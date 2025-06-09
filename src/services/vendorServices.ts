@@ -1,5 +1,6 @@
 import authAxiosInstance from "@/api/auth.axios";
 import { vendorAxiosInstance } from "@/api/vendor.axios";
+import type { VendorRetryFormData } from "@/utils/validations/retry-vendor.validation";
 
 interface ApiResponse {
   success: boolean;
@@ -149,7 +150,40 @@ updatePassword: async (currentPassword: string, newPassword: string): Promise<Ap
     }
 },
 
+getRetrydata: async (token:string): Promise<ApiResponse>=>{
+  try {
+     const response = await vendorAxiosInstance.get(`/get-retry-data?token=${token}`);
+     console.log("Fetched retry data",response.data.data)
+     return response.data;
+  } catch (error:any) {
+    console.error('Error fetching retry data', error);
+      const message = error.response?.data?.message || 'Failed to fetch retry data';
+      return {
+        success: false,
+        message,
+      };
+  }
+},
 
+retryRegistration: async(data:{
+    email: string;
+    phone: string;
+    companyName: string;
+    companyAddress: string;
+    idProof: string;
+}): Promise<ApiResponse> =>{
+   try {
+     const response = await vendorAxiosInstance.post("/retry-registration",data);
+     return response.data;
+   } catch (error:any) {
+    console.error('Error retry registration:', error);
+      const message = error.response?.data?.message || 'Failed to update password';
+      return {
+        success: false,
+        message,
+      };
+   }
+},
 
 
 
