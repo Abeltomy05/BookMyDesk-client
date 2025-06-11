@@ -34,6 +34,7 @@ const VendorSignup = () => {
     companyAddress: false,
     idProof: false,
   })
+  
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isVisible, setIsVisible] = useState(false);

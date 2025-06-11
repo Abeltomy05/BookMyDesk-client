@@ -8,6 +8,8 @@ import { ProtectedRoute } from "@/utils/protected/ProtectedRoute"
 import { NoAuthRoute } from "@/utils/protected/PublicRoute"
 import { Route, Routes } from "react-router-dom"
 import VendorRetryForm from "@/pages/vendor/Retry"
+import BuildingManagement from "@/pages/vendor/SubPages/ManageBuildings"
+import RegisterBuilding from "@/pages/vendor/SubPages/RegisterBuilding"
 
 
 const VendorRoutes = () => {
@@ -20,6 +22,8 @@ const VendorRoutes = () => {
 
         <Route path="/home" element={<ProtectedRoute allowedRoles={["vendor"]} element={<VendorDashboard/>} />}/>
         <Route path="/profile" element={<ProtectedRoute allowedRoles={["vendor"]} element={<VendorProfile/>} />}/>
+        <Route path="/manage-buildings" element={<ProtectedRoute allowedRoles={["vendor"]} element={<BuildingManagement/>} />}/>
+        <Route path="/register-building" element={<ProtectedRoute allowedRoles={["vendor"]} element={<RegisterBuilding/>} />}/>
         
 
         <Route path="/*" element={<NotFoundPage/>}/>

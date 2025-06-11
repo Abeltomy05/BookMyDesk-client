@@ -1,5 +1,6 @@
 import authAxiosInstance from "@/api/auth.axios";
 import { vendorAxiosInstance } from "@/api/vendor.axios";
+import type { GetAllBuildingsResponse, GetBuildingsParams } from "@/types/building.type";
 import type { VendorRetryFormData } from "@/utils/validations/retry-vendor.validation";
 
 interface ApiResponse {
@@ -25,10 +26,8 @@ export interface VendorFormData {
   role: string
 }
 
+
 export const vendorService = {
-      /* ============================ */ 
-            /* Auth Services */
-     /* ============================ */
 
 sendOtp: async (email: string): Promise<ApiResponse> => {
     try {
@@ -107,7 +106,9 @@ uploadIdProof: async (idProof: string): Promise<ApiResponse> => {
     }
 },
 
- getSingleUser: async (): Promise<ApiResponse> => {
+//handle profile 
+
+getSingleUser: async (): Promise<ApiResponse> => {
    try {
       const response = await vendorAxiosInstance.get("/get-user-data");
       return response.data
@@ -120,7 +121,7 @@ uploadIdProof: async (idProof: string): Promise<ApiResponse> => {
      }
   },
 
- updateProfile: async (data: any): Promise<ApiResponse> => {
+updateProfile: async (data: any): Promise<ApiResponse> => {
     try {
       const response = await vendorAxiosInstance.put("/update-profile", data);
       return response.data;
@@ -149,6 +150,8 @@ updatePassword: async (currentPassword: string, newPassword: string): Promise<Ap
       };
     }
 },
+
+//retry registration
 
 getRetrydata: async (token:string): Promise<ApiResponse>=>{
   try {
@@ -185,6 +188,37 @@ retryRegistration: async(data:{
    }
 },
 
+//manage building
+
+getAllBuildings: async ({
+    page = 1,
+    limit = 5,
+    search = "",
+    status
+}: GetBuildingsParams): Promise<GetAllBuildingsResponse>=>{
+     try {
+      const response = await vendorAxiosInstance.get("/getAllBuildings", {
+        params: {
+          page,
+          limit,
+          search,
+          status: status === "all" ? undefined : status
+        },
+      });
+      
+      console.log('Buildings response:', response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error('Error fetching buildings:', error);
+      return {
+        success: false,
+        buildings: [],
+        totalPages: 0,
+        currentPage: 0,
+        message: error.response?.data?.message || 'Failed to fetch buildings'
+      };
+    }
+},
 
 
 
