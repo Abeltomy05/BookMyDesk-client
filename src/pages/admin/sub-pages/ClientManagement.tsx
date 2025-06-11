@@ -131,7 +131,7 @@ function ClientManagement() {
       actions={actions}
       filters={filters}
       searchPlaceholder="Search clients..."
-      itemsPerPage={4}
+      itemsPerPage={3}
       fetchData={fetchClients}
       emptyMessage="No clients found matching your criteria"
       loadingMessage="Loading clients..."

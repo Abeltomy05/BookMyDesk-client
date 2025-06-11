@@ -51,7 +51,7 @@ export const clientService = {
       console.error('Error verifying OTP:', error);
       return {
         success: false,
-        message: 'Failed to verify OTP',
+        message: 'The OTP you entered is incorrect or has expired. Please try again or request a new OTP.',
       };
     }
   },

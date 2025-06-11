@@ -195,10 +195,10 @@ const resendOtp = async () => {
          await completeSignup()
          setShowOtpModal(false)
       } else {
-        toast.error(response.message || "Invalid OTP. Please try again.")
+        toast.error(response.message || "The OTP you entered is incorrect or has expired. Please try again or request a new OTP.")
       }
     } catch (error) {
-      toast.error("Failed to verify OTP. Please try again.")
+      toast.error("The OTP you entered is incorrect or has expired. Please try again or request a new OTP.")
     } finally {
       setIsLoading(false)
     }

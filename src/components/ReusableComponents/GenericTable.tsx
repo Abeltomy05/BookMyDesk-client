@@ -63,7 +63,7 @@ export function GenericTable<T extends BaseItem>({
         setPagination({
           currentPage: response.currentPage || page,
           totalPages: response.totalPages || 0,
-          totalItems: items.length, // Update to reflect filtered count
+          totalItems: items.length, 
           itemsPerPage
         })
       } else {
