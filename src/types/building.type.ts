@@ -1,14 +1,21 @@
-export interface SpaceType{
-  type:string;
-  count:string;
-}
+import type { LocationData } from "./location.type";
+
 
 export interface Building {
   _id: string
-  name: string
-  availableSpaces: SpaceType[]
+  buildingName: string
+  summarizedSpaces: {
+    name:string;
+    count:number;
+  }[];
   status: "approved" | "pending" | "archived"
-  address: string
+   location: {
+    type?: string
+    name?: string
+    displayName?: string
+    zipCode?: string
+    coordinates?: number[]
+  }
   createdAt: string
   updatedAt?: string
 }
@@ -27,4 +34,31 @@ export interface GetAllBuildingsResponse {
   currentPage: number
   totalItems?: number
   message?: string
+}
+
+export interface BuildingRegistrationData {
+  name: string;
+  location: LocationData | null
+  openingHours: {
+    weekdays: {
+      is24_7: boolean;
+      openTime: string;
+      closeTime: string;
+    };
+    weekends: {
+      is24_7: boolean;
+      openTime: string;
+      closeTime: string;
+    };
+  };
+  photos: string[];
+  facilities: string[];
+  phone: string;
+  email: string;
+  spaceTypes: Array<{
+    name: string
+    totalSeats: number
+    pricePerDay: number
+    amenities: string[]
+  }>;
 }

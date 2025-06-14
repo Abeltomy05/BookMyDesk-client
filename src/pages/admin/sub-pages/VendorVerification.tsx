@@ -251,7 +251,7 @@ const columns: TableColumn<Vendor>[] = [
   return (
     <div>
       <GenericTable<Vendor>
-        key={refreshKey} // Force re-render when refreshKey changes
+        key={refreshKey} 
         title="Vendor Verification"
         columns={columns}
         actions={actions}

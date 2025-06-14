@@ -1,3 +1,5 @@
+import type { LocationData } from "./location.type"
+
 export interface BasicInfo {
   name: string
   location: string
@@ -14,6 +16,10 @@ export interface BasicInfo {
     }
   }
   photos: File[]
+}
+
+export interface UpdatedBasicInfo extends Omit<BasicInfo, 'location'> {
+  location: LocationData | null;
 }
 
 export interface Facilities {
@@ -46,7 +52,7 @@ export interface PricingPlans {
 }
 
 export interface BuildingFormData {
-  basicInfo: BasicInfo
+  basicInfo: UpdatedBasicInfo
   facilities: Facilities
   contactInfo: ContactInfo
   pricingPlans: PricingPlans

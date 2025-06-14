@@ -85,7 +85,6 @@ export function LightGenericTable<T extends BaseItem>({
     loadData(1, searchQuery)
   }, [activeFilter])
 
-
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
       loadData(1, searchQuery)
@@ -93,10 +92,18 @@ export function LightGenericTable<T extends BaseItem>({
     return () => clearTimeout(debounceTimer)
   }, [searchQuery])
 
+
+  const toggleDropdown = (e: React.MouseEvent, id: string) => {
+    console.log(id)
+    e.stopPropagation() 
+    e.preventDefault()
+    setActiveDropdown(prev => (prev === id ? null : id))
+  }
+
   const handleFilterChange = (value: string) => {
-  setActiveFilter(value)
-  onFilterChange?.(value)
-}
+    setActiveFilter(value)
+    onFilterChange?.(value)
+  }
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= pagination.totalPages) {
@@ -104,8 +111,10 @@ export function LightGenericTable<T extends BaseItem>({
     }
   }
 
-  const handleActionClick = async (action: TableAction<T>, item: T) => {
-    setActiveDropdown(null)
+  const handleActionClick = async (e: React.MouseEvent, action: TableAction<T>, item: T) => {
+    e.stopPropagation() 
+    setActiveDropdown(null) 
+    
     try {
       await action.onClick(item)
       if (onRefresh) {
@@ -119,14 +128,20 @@ export function LightGenericTable<T extends BaseItem>({
   }
 
   useEffect(() => {
-    const handleClickOutside = () => {
-      if (activeDropdown) {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement
+      if (activeDropdown && !target.closest(`[data-dropdown="${activeDropdown}"]`)) {
         setActiveDropdown(null)
       }
     }
     
-    document.addEventListener('click', handleClickOutside)
-    return () => document.removeEventListener('click', handleClickOutside)
+     if (activeDropdown) {
+    document.addEventListener('click', handleClickOutside, true)
+  }
+  
+  return () => {
+    document.removeEventListener('click', handleClickOutside, true)
+  }
   }, [activeDropdown])
 
   const containerVariants = {
@@ -254,58 +269,54 @@ export function LightGenericTable<T extends BaseItem>({
               ))}
 
               {/* Actions */}
-              {enableActions && actions.length > 0 && (
+             {enableActions && actions.length > 0 && (
                 <div className="col-span-1 text-right relative">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setActiveDropdown(activeDropdown === item._id ? null : item._id)
-                    }}
-                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                  >
-                    <MoreVertical size={18} className="text-gray-500" />
-                  </button>
-
-                  {/* Dropdown Menu */}
-                  {activeDropdown === item._id && (
-                    <motion.div
-                      className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-10"
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0 }}
+                  <div data-dropdown={item._id}>
+                    <button
+                      onClick={(e) => toggleDropdown(e, item._id)}
+                      className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                     >
-                      {actions
-                        .filter(action => !action.condition || action.condition(item))
-                        .map((action, index) => (
-                          <div key={index}>
-                            {action.separator && index > 0 && (
-                              <div className="border-t border-gray-100 my-1"></div>
-                            )}
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                handleActionClick(action, item)
-                              }}
-                              className={`w-full text-left px-4 py-2 hover:bg-gray-50 text-sm flex items-center gap-2 transition-colors ${
-                                index === 0 ? 'rounded-t-lg' : ''
-                              } ${
-                                index === actions.length - 1 ? 'rounded-b-lg' : ''
-                              } ${
-                                action.variant === 'danger' ? 'text-red-600 hover:text-red-700 hover:bg-red-50' :
-                                action.variant === 'warning' ? 'text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50' :
-                                action.variant === 'success' ? 'text-green-600 hover:text-green-700 hover:bg-green-50' :
-                                'text-gray-700 hover:text-gray-900'
-                              }`}
-                            >
-                              {typeof action.icon === 'function' ? action.icon(item) : action.icon}
-                              <span>
-                                {typeof action.label === 'function' ? action.label(item) : action.label}
-                              </span>
-                            </button>
-                          </div>
-                        ))}
-                    </motion.div>
-                  )}
+                      <MoreVertical size={18} className="text-gray-500" />
+                    </button>
+
+                    {/* Dropdown Menu */}
+                    {activeDropdown === item._id && (
+                      <motion.div
+                        className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-10"
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0 }}
+                      >
+                        {actions
+                          .filter(action => !action.condition || action.condition(item))
+                          .map((action, index) => (
+                            <div key={index}>
+                              {action.separator && index > 0 && (
+                                <div className="border-t border-gray-100 my-1"></div>
+                              )}
+                              <button
+                                onClick={(e) => handleActionClick(e, action, item)}
+                                className={`w-full text-left px-4 py-2 hover:bg-gray-50 text-sm flex items-center gap-2 transition-colors ${
+                                  index === 0 ? 'rounded-t-lg' : ''
+                                } ${
+                                  index === actions.length - 1 ? 'rounded-b-lg' : ''
+                                } ${
+                                  action.variant === 'danger' ? 'text-red-600 hover:text-red-700 hover:bg-red-50' :
+                                  action.variant === 'warning' ? 'text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50' :
+                                  action.variant === 'success' ? 'text-green-600 hover:text-green-700 hover:bg-green-50' :
+                                  'text-gray-700 hover:text-gray-900'
+                                }`}
+                              >
+                                {typeof action.icon === 'function' ? action.icon(item) : action.icon}
+                                <span>
+                                  {typeof action.label === 'function' ? action.label(item) : action.label}
+                                </span>
+                              </button>
+                            </div>
+                          ))}
+                      </motion.div>
+                    )}
+                  </div>
                 </div>
               )}
             </motion.div>

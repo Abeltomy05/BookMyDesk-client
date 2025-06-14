@@ -1,6 +1,6 @@
 import authAxiosInstance from "@/api/auth.axios";
 import { vendorAxiosInstance } from "@/api/vendor.axios";
-import type { GetAllBuildingsResponse, GetBuildingsParams } from "@/types/building.type";
+import type { BuildingRegistrationData, GetAllBuildingsResponse, GetBuildingsParams } from "@/types/building.type";
 import type { VendorRetryFormData } from "@/utils/validations/retry-vendor.validation";
 
 interface ApiResponse {
@@ -197,7 +197,7 @@ getAllBuildings: async ({
     status
 }: GetBuildingsParams): Promise<GetAllBuildingsResponse>=>{
      try {
-      const response = await vendorAxiosInstance.get("/getAllBuildings", {
+      const response = await vendorAxiosInstance.get("/get-all-buildings", {
         params: {
           page,
           limit,
@@ -220,6 +220,31 @@ getAllBuildings: async ({
     }
 },
 
+registerNewBuilding: async(data: BuildingRegistrationData): Promise<ApiResponse>=>{
+   try {
+     const response = await vendorAxiosInstance.post('/register-building', data);
+     return response.data;
+   } catch (error:any) {
+     console.error('Register building error:', error);
+     if (error.response) {
+       return {
+          success: false,
+          message: error.response.data?.message || 'Server error occurred',
+          data: error.response.data
+        };
+     }else if (error.request) {
+        return {
+          success: false,
+          message: 'Network error - please check your connection'
+        };
+     }else {
+        return {
+          success: false,
+          message: 'An unexpected error occurred'
+        };
+      }
+   }
+},
 
 
  logout: async():Promise<ApiResponse>=>{

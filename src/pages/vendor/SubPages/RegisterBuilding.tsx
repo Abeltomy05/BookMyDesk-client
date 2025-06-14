@@ -6,23 +6,30 @@ import { FacilitiesContactStep } from "@/components/RegisterBuildingComps/Facili
 import { PricingPlansStep } from "@/components/RegisterBuildingComps/Pricing&Plans"
 import type { BuildingFormData } from "@/types/building-form.type"
 import VendorLayout from "../VendorLayout"
+import { uploadImageCloudinary } from "@/utils/cloudinary/cloudinary"
+import { vendorService } from "@/services/vendorServices"
+import toast from "react-hot-toast"
+import { useNavigate } from "react-router-dom"
+import Loading from "@/components/Loadings/Loading"
 
 export default function RegisterBuilding() {
-  const [currentStep, setCurrentStep] = useState(1)
+  const navigate = useNavigate();
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [formData, setFormData] = useState<BuildingFormData>({
     basicInfo: {
       name: "",
-      location: "",
+      location: null,
       openingHours: {
         weekdays: {
           is24_7: false,
-          openTime: "09:00",
-          closeTime: "18:00",
+          openTime: "00:00",
+          closeTime: "00:00",
         },
         weekends: {
           is24_7: false,
-          openTime: "10:00",
-          closeTime: "16:00",
+          openTime: "00:00",
+          closeTime: "00:00",
         },
       },
       photos: [],
@@ -61,16 +68,90 @@ export default function RegisterBuilding() {
     }
   }
 
-  const handleRegister = async () => {
-    console.log("Registering building:", formData)
-    // Here you would typically send the data to your API
-    alert("Building registered successfully!")
+  const handleRegister = async (e: React.FormEvent) => {
+     e.preventDefault()
+     setIsLoading(true);
+    try {
+       let images = [];
+      if(formData.basicInfo.photos.length > 0){
+        for(let pic of formData.basicInfo.photos){
+           let cloudinaryUrl = '';
+           cloudinaryUrl = await uploadImageCloudinary(pic);
+           images.push(cloudinaryUrl);
+        }
+      }
+
+       const selectedFacilities = Object.entries(formData.facilities)
+      .filter(([key, value]) => value === true)
+      .map(([key, value]) => key);
+
+
+       let data = {
+          name: formData.basicInfo.name,
+          location: formData.basicInfo.location,
+          openingHours: formData.basicInfo.openingHours,
+          photos: images,
+          facilities: selectedFacilities,
+          phone: formData.contactInfo.phone,
+          email: formData.contactInfo.email,
+          spaceTypes: formData.pricingPlans.spaceTypes
+        }
+      const response = await vendorService.registerNewBuilding(data);
+      if(response.success){
+        toast.success( response.message || "Building Registered Sucessfully");
+        setFormData({
+          basicInfo: {
+            name: "",
+            location: null,
+            openingHours: {
+              weekdays: {
+                is24_7: false,
+                openTime: "09:00",
+                closeTime: "18:00",
+              },
+              weekends: {
+                is24_7: false,
+                openTime: "10:00",
+                closeTime: "16:00",
+              },
+            },
+            photos: [],
+          },
+          facilities: {
+            bicycleParking: false,
+            normalParking: false,
+            garden: false,
+            swimmingPool: false,
+            gym: false,
+            cafeteria: false,
+            wifi: false,
+            airConditioning: false,
+          },
+          contactInfo: {
+            phone: "",
+            email: "",
+          },
+          pricingPlans: {
+            spaceTypes: [],
+          },
+        });
+        setCurrentStep(1);
+        navigate("/vendor/manage-buildings")
+      }else{
+        toast.error(response.message || "Registration Failed")
+      }
+    } catch (error:any) {
+       console.error('Registration error:', error);
+    toast.error(error?.response?.data?.message || "An error occurred during registration");
+    }finally {
+    setIsLoading(false);
+  }
   }
 
   const isStepValid = () => {
     switch (currentStep) {
       case 1:
-        return formData.basicInfo.name && formData.basicInfo.location
+        return formData.basicInfo.name && formData.basicInfo.location?.displayName
       case 2:
         return formData.contactInfo.phone && formData.contactInfo.email
       case 3:
@@ -108,6 +189,9 @@ export default function RegisterBuilding() {
   }
 
   return (
+    <>
+    {isLoading && <Loading/>}
+
   <VendorLayout
      notificationCount={5}
       backgroundClass="bg-black"
@@ -182,5 +266,6 @@ export default function RegisterBuilding() {
       </div>
     </div>
     </VendorLayout>
+    </>
   )
 }

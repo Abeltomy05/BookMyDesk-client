@@ -1,10 +1,10 @@
 import { useState } from "react"
 import { LightGenericTable } from "@/components/ReusableComponents/LightGenericTable" 
 import type { TableColumn, TableAction, TableFilter } from "@/types/table.type"
-import { Plus, Edit, Eye, Trash2, Building2, Users, Calendar, MapPin, Archive } from "lucide-react"
+import { Plus, Eye, Building2, Users, Calendar, MapPin, Archive } from "lucide-react"
 import type { ApiResponse, FetchParams } from "@/types/api.type"
 import VendorLayout from "../VendorLayout"
-import type {  Building, SpaceType } from "@/types/building.type"
+import type {  Building } from "@/types/building.type"
 import { vendorService } from "@/services/vendorServices"
 import { useNavigate } from "react-router-dom"
 
@@ -51,7 +51,7 @@ export default function BuildingManagement() {
     }
   }
 
-  const renderAvailableSpaces = (spaces: SpaceType[]) => {
+  const renderAvailableSpaces = (spaces: { name: string; count: number }[]) => {
     if (!spaces || spaces.length === 0) {
       return <div className="text-sm text-gray-500">No spaces available</div>
     }
@@ -60,15 +60,15 @@ export default function BuildingManagement() {
       <div className="space-y-1">
         {spaces.map((space, index) => (
           <div key={index} className="flex items-center gap-2 text-sm">
-            {space.type.toLowerCase().includes('desk') ? (
+            {space.name.toLowerCase().includes('desk') ? (
               <Users className="w-4 h-4 text-blue-400" />
-            ) : space.type.toLowerCase().includes('meeting') || space.type.toLowerCase().includes('room') ? (
+            ) : space.name.toLowerCase().includes('meeting') || space.name.toLowerCase().includes('room') ? (
               <Calendar className="w-4 h-4 text-green-400" />
             ) : (
               <Building2 className="w-4 h-4 text-gray-400" />
             )}
             <span className="capitalize">
-              {space.type.replace(/([A-Z])/g, ' $1').trim()}: {space.count}
+              {space.name.replace(/([A-Z])/g, ' $1').trim()}: {space.count}
             </span>
           </div>
         ))}
@@ -87,10 +87,10 @@ export default function BuildingManagement() {
             <Building2 className="w-5 h-5 text-orange-600" />
           </div>
           <div>
-            <div className="font-medium text-gray-900">{building.name}</div>
+            <div className="font-medium text-gray-900">{building.buildingName}</div>
             <div className="text-sm text-gray-500 flex items-center gap-1">
               <MapPin className="w-3 h-3" />
-              {building.address}
+              {building.location.displayName ? building.location.displayName.split(',').slice(0, 2).join(', ') : ""}
             </div>
           </div>
         </div>
@@ -100,7 +100,7 @@ export default function BuildingManagement() {
       key: "availableSpaces",
       label: "Available Spaces",
       width: "col-span-3",
-      render: (building) => renderAvailableSpaces(building.availableSpaces),
+      render: (building) => renderAvailableSpaces(building.summarizedSpaces),
     },
     {
       key: "status",
@@ -144,18 +144,7 @@ export default function BuildingManagement() {
       label: "View & Edit Building",
       icon: <Eye className="w-4 h-4" />,
       onClick: async (building) => {
-        console.log("View & Edit building:", building.name)
-        // Implement view/edit logic here
-        alert(`View & Edit: ${building.name}`)
-      },
-    },
-    {
-      label: "Edit Details",
-      icon: <Edit className="w-4 h-4" />,
-      onClick: async (building) => {
-        console.log("Edit building:", building.name)
-        // Implement edit logic here
-        alert(`Edit: ${building.name}`)
+       
       },
     },
     {
@@ -164,29 +153,14 @@ export default function BuildingManagement() {
       onClick: async (building) => {
         const action = building.status === "archived" ? "unarchive" : "archive"
         const confirmMessage = building.status === "archived" 
-          ? `Are you sure you want to unarchive ${building.name}?`
-          : `Are you sure you want to archive ${building.name}?`
+          ? `Are you sure you want to unarchive ${building.buildingName}?`
+          : `Are you sure you want to archive ${building.buildingName}?`
           
         if (window.confirm(confirmMessage)) {
-          console.log(`${action} building:`, building.name)
-          // Implement archive/unarchive logic here
-          alert(`${action.charAt(0).toUpperCase() + action.slice(1)}d: ${building.name}`)
+         
         }
       },
       variant: "warning",
-    },
-    {
-      label: "Delete Building",
-      icon: <Trash2 className="w-4 h-4" />,
-      onClick: async (building) => {
-        if (window.confirm(`Are you sure you want to permanently delete ${building.name}? This action cannot be undone.`)) {
-          console.log("Delete building:", building.name)
-          // Implement delete logic here
-          alert(`Deleted: ${building.name}`)
-        }
-      },
-      variant: "danger",
-      separator: true,
     },
   ]
 
@@ -210,6 +184,11 @@ export default function BuildingManagement() {
       key: "archived",
       label: "Archived",
       value: "archived",
+    },
+     {
+      key: "rejected",
+      label: "Rejected",
+      value: "rejected",
     },
   ]
 
