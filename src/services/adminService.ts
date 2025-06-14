@@ -123,16 +123,34 @@ export const adminService = {
         }
     },
 
-    updateUserStatus: async (
-      userType: "client" | "vendor",
-      userId: string,
+    getPendingBuildings: async({page=1,limit=5,search="",})=>{
+      try {
+        const response = await adminAxiosInstance.get("/get-pending-buildings", {
+          params: { page, limit },
+       });
+        return response.data;
+      } catch (error) {
+         console.error("Failed to fetch pending buildings", error);
+    return {
+      success: false,
+      buildings: [],
+      totalPages: 0,
+      currentPage: 1,
+      message: "Error fetching buildings"
+    };
+      }
+    },
+
+    updateEntityStatus: async (
+      entityType: "client" | "vendor" | "building",
+      entityId: string,
       status: ClientStatus | VendorStatus,
       reason?: string
     ): Promise<ApiResponse> => {
       try {
-        const response = await adminAxiosInstance.post("/update-user-status", {
-          userType,
-          userId,
+        const response = await adminAxiosInstance.post("/update-status", {
+          entityType,
+          entityId,
           status,
           reason,
         });
@@ -145,6 +163,7 @@ export const adminService = {
         };
       }
     },
+
 
    getUserCount: async():Promise<ApiResponse>=>{
     try{

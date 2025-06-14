@@ -19,6 +19,7 @@ export interface TableAction<T> {
   condition?: (item: T) => boolean
   variant?: "default" | "danger" | "warning" | "success"
   separator?: boolean 
+  className?: string 
 }
 
 export interface TableFilter {

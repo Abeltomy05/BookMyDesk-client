@@ -74,7 +74,7 @@ export default function VendorManagement() {
 
   const changeVendorStatus = async(vendorId: string, newStatus: VendorStatus) => {
   try {
-    const response = await adminService.updateUserStatus("vendor", vendorId, newStatus)
+    const response = await adminService.updateEntityStatus("vendor", vendorId, newStatus)
     if (response.success) {
       toast.success(`Vendor status updated to ${newStatus}`)
     } else {

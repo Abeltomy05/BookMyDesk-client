@@ -71,7 +71,7 @@ function ClientManagement() {
       onClick: async (user) => {
         try {
           const newStatus = user.status === "active" ? "blocked" : "active"
-          const response = await adminService.updateUserStatus("client", user._id, newStatus)
+          const response = await adminService.updateEntityStatus("client", user._id, newStatus)
           if (response.success) {
             toast.success(`User ${newStatus === "active" ? "unblocked" : "blocked"} successfully`)
           } else {
