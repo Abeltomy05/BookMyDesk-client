@@ -249,6 +249,28 @@ export const clientService = {
      }
   },
 
+  //booking pages
+
+  getBookingPageData: async(spaceId:string): Promise<ApiResponse>=>{
+    try {
+      const response = await clientAxiosInstance.get(`/get-booking-page-data/${spaceId}`);
+      return response.data;
+    } catch (error:any) {
+       console.error('get  booking page details error:', error);
+     if (error.response) {
+       return {
+          success: false,
+          message: error.response.data?.message || 'Server error occurred',
+          data: error.response.data
+        };
+  }else{
+     return {
+          success: false,
+          message: 'An unexpected error occurred'
+        };
+    }
+    }
+  },
 
 
 

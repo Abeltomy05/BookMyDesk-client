@@ -91,10 +91,8 @@ const BuildingMap: React.FC<BuildingMapProps> = ({
                 popupAnchor: [0, -32]
             });
 
-            // Add marker
             const marker = window.L.marker([lat, lng], { icon: customIcon }).addTo(map);
 
-            // Add popup
             marker.bindPopup(`
                 <div style="font-family: system-ui, -apple-system, sans-serif;">
                     <h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: 600; color: #1f2937;">

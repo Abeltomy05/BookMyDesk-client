@@ -12,6 +12,7 @@ import { NoAuthRoute } from "@/utils/protected/PublicRoute";
 import { Route, Routes } from "react-router-dom";
 import BuildingsListing from "@/pages/client/SubPages/BuildingListing";
 import BuildingDetailsPage from "@/pages/client/SubPages/BuildingDetails";
+import SpaceBookingPage from "@/pages/client/SubPages/BookSlot";
 
 const ClientRoutes = () => {
   return (
@@ -28,6 +29,7 @@ const ClientRoutes = () => {
         <Route path="/profile" element={<ProtectedRoute allowedRoles={["client"]} element={<ClientProfile/>} />}/>
         <Route path="/buildings" element={<ProtectedRoute allowedRoles={["client"]} element={<BuildingsListing/>} />}/>
         <Route path="/building-details/:buildingId" element={<ProtectedRoute allowedRoles={["client"]} element={<BuildingDetailsPage/>} />}/>
+        <Route path="/book-space/:spaceId" element={<ProtectedRoute allowedRoles={["client"]} element={<SpaceBookingPage/>} />}/>
 
 
        

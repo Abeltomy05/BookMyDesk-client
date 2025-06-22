@@ -1,5 +1,5 @@
 import { Phone, Wifi, Car, Coffee, Users, ShieldCheck, Printer, MapPin, Clock } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect, lazy, Suspense } from "react";
 import ClientLayout from "../ClientLayout";
 import { clientService } from "@/services/clientServices";
@@ -17,7 +17,11 @@ export default function BuildingDetailsPage() {
     const [isImageModalOpen, setIsImageModalOpen] = useState(false);
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
+    const navigate = useNavigate()
+
     useEffect(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+
         const fetchBuildingData = async () => {
             try {
                 if (!buildingId) {
@@ -187,13 +191,14 @@ export default function BuildingDetailsPage() {
                     {/* Booking Options Section */}
                    <div className="mb-12">
                     <h2 className="text-2xl font-bold mb-6">Available Spaces</h2>
-                    {buildingData.summarizedSpaces && buildingData.summarizedSpaces.length > 0 ? (
+                    {buildingData.spaces && buildingData.spaces.length > 0 ? (
                         <>
                         <div className="grid md:grid-cols-3 gap-6 mb-4">
-                            {buildingData.summarizedSpaces.slice(0, 3).map((space, i) => (
+                            {buildingData.spaces.slice(0, 3).map((space, i) => (
                             <div
                                 key={space._id}
                                 className="relative overflow-hidden group cursor-pointer rounded-lg shadow-md"
+                                onClick={()=>navigate(`/book-space/${space._id}`)}
                             >
                                 <div className="relative">
                                 <img
@@ -215,7 +220,7 @@ export default function BuildingDetailsPage() {
                                     {space.name.toUpperCase()}
                                     </span>
                                     <span className="text-white text-sm block">
-                                    ₹{space.price}/day • {space.count} available
+                                    ₹{space.pricePerDay}/day • {space.capacity} available
                                     </span>
                                 </div>
                                 </div>
@@ -223,7 +228,7 @@ export default function BuildingDetailsPage() {
                             ))}
                         </div>
 
-                        {buildingData.summarizedSpaces.length > 3 && (
+                        {buildingData.spaces.length > 3 && (
                             <div className="text-right">
                             <button className="text-blue-600 hover:text-blue-800 underline">See More →</button>
                             </div>
