@@ -272,6 +272,57 @@ export const clientService = {
     }
   },
 
+  //Stripe
+
+  createPaymentIntent: async (data: {
+    amount: number
+    currency: string
+    spaceId: string
+    bookingDate: string
+    numberOfDesks: number
+  }):Promise<ApiResponse> => {
+    try {
+      const response = await clientAxiosInstance.post('/create-payment-intent', data);
+      return response.data;
+    } catch (error:any) {
+       console.error('create payment intent error:', error);
+     if (error.response) {
+       return {
+          success: false,
+          message: error.response.data?.message || 'Server error occurred',
+          data: error.response.data
+        };
+      }else{
+        return {
+              success: false,
+              message: 'An unexpected error occurred in create payment intent'
+            };
+        }
+    }
+  },
+
+  confirmPayment: async (data: {
+    paymentIntentId: string
+  }):Promise<ApiResponse> => {
+      try {
+        const response = await clientAxiosInstance.post('/confirm-payment', data);
+        return response.data;
+      } catch (error:any) {
+        console.error('confirm payment error:', error);
+        if (error.response) {
+          return {
+              success: false,
+              message: error.response.data?.message || 'Server error occurred',
+              data: error.response.data
+            };0
+          }else{
+            return {
+                  success: false,
+                  message: 'An unexpected error occurred in confirm payment'
+                };
+            }
+      }
+  },
 
 
 

@@ -1,51 +1,55 @@
 import { useEffect, useState } from "react"
-import { ShieldCheck, MapPin, Calendar, CheckCircle } from "lucide-react"
+import { MapPin, Calendar, CheckCircle } from "lucide-react"
 import { Calendar as CalendarComponent } from "@/components/ui/calendar"
 import ClientLayout from "../ClientLayout"
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { clientService } from "@/services/clientServices"
 import toast from "react-hot-toast"
 import SkeletonSpaceBooking from "@/components/Skeletons/BookSlotSkeleton"
+import StripePaymentModal from "@/components/ReusableComponents/StripeModal"
 
 export default function SpaceBookingPage() {
-  const {spaceId}  = useParams<{ spaceId: string }>(); 
+  const { spaceId } = useParams<{ spaceId: string }>()
   const [spaceData, setSpaceData] = useState<{
-    name:string;
-    location:string;
-    images:string[] | null;
-    pricePerDay: number;
-    amenities: string[] | [];
-    capacity: number;
-
+    name: string
+    location: string
+    images: string[] | null
+    pricePerDay: number
+    amenities: string[] | []
+    capacity: number
   }>({
-    name:"",
-    location:"",
-    images:null,
+    name: "",
+    location: "",
+    images: null,
     pricePerDay: 0,
     amenities: [],
     capacity: 0,
-  });
+  })
   const [selectedDate, setSelectedDate] = useState<Date>()
   const [numberOfDesks, setNumberOfDesks] = useState(1)
   const [showCalendar, setShowCalendar] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [showPaymentOptions, setShowPaymentOptions] = useState(false)
+  const [showStripeModal, setShowStripeModal] = useState(false)
+  
+  const navigate = useNavigate()
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: "smooth" })
 
     const fetchData = async () => {
       try {
-        if (!spaceId) return;
+        if (!spaceId) return
 
-        console.log("spaceId is: ",spaceId)
-        
-        setLoading(true);
-        const response = await clientService.getBookingPageData(spaceId);
-        
+        console.log("spaceId is: ", spaceId)
+
+        setLoading(true)
+        const response = await clientService.getBookingPageData(spaceId)
+
         if (!response.success) {
-          toast.error(response.message || "Failed to get data, please try again.");
-          return;
+          toast.error(response.message || "Failed to get data, please try again.")
+          return
         }
 
         const transformedData = {
@@ -53,35 +57,47 @@ export default function SpaceBookingPage() {
           location: response.data.building.location,
           images: response.data.building.images,
           pricePerDay: response.data.space.pricePerDay,
-          amenities: response.data.space.amenities || [], 
+          amenities: response.data.space.amenities || [],
           capacity: response.data.space.capacity,
+        }
 
-        };
+        console.log("transformedData", transformedData)
 
-        console.log("transformedData",transformedData)
-
-        setSpaceData(transformedData);
-
+        setSpaceData(transformedData)
       } catch (error) {
-        console.error("Error in fetchData:", error);
-        toast.error("An unexpected error occurred");
+        console.error("Error in fetchData:", error)
+        toast.error("An unexpected error occurred")
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchData();
+    fetchData()
   }, [spaceId])
 
   useEffect(() => {
-  if (!spaceData.images || spaceData.images.length <= 1) return;
+    if (!spaceData.images || spaceData.images.length <= 1) return
 
-  const interval = setInterval(() => {
-    setCurrentIndex((prev) => (prev + 1) % spaceData.images!.length);
-  }, 4000); 
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % spaceData.images!.length)
+    }, 4000)
 
-  return () => clearInterval(interval);
-}, [spaceData.images]);
+    return () => clearInterval(interval)
+  }, [spaceData.images])
+
+   const handleStripePayment = () => {
+    setShowPaymentOptions(false)
+    setShowStripeModal(true)
+  }
+
+  const handlePaymentSuccess = (bookingId: string) => {
+    setShowStripeModal(false)
+    // toast.success("Booking confirmed successfully!")
+  }
+
+  const handleCloseModal = () => {
+    setShowStripeModal(false)
+  }
 
   const formatDate = (date: Date) => {
     return date.toLocaleDateString("en-US", {
@@ -98,17 +114,18 @@ export default function SpaceBookingPage() {
   }
 
   const formatLocation = (location: string): string => {
-  const parts = location.split(',').map(p => p.trim());
-  if (parts.length <= 4) return location;
-  return `${parts[0]}, ${parts[1]}, ${parts[parts.length - 2]}, ${parts[parts.length - 1]}`;
-};
+    const parts = location.split(",").map((p) => p.trim())
+    if (parts.length <= 4) return location
+    return `${parts[0]}, ${parts[1]}, ${parts[parts.length - 2]}, ${parts[parts.length - 1]}`
+  }
+
 
   if (loading) {
     return (
       <ClientLayout>
-       <SkeletonSpaceBooking />
+        <SkeletonSpaceBooking />
       </ClientLayout>
-    );
+    )
   }
 
   if (!spaceData) {
@@ -120,10 +137,10 @@ export default function SpaceBookingPage() {
           </div>
         </div>
       </ClientLayout>
-    );
+    )
   }
 
-  const totalPrice = numberOfDesks * Number(spaceData.pricePerDay);
+  const totalPrice = numberOfDesks * Number(spaceData.pricePerDay)
 
   return (
     <ClientLayout>
@@ -148,14 +165,14 @@ export default function SpaceBookingPage() {
                     {spaceData.images.map((image, index) => (
                       <img
                         key={index}
-                        src={image}
+                        src={image || "/placeholder.svg"}
                         alt={`Space image ${index + 1}`}
                         className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-2000 ease-in-out ${
-                          index === currentIndex ? 'opacity-100' : 'opacity-0'
+                          index === currentIndex ? "opacity-100" : "opacity-0"
                         }`}
                       />
                     ))}
-                    
+
                     {/* Image indicators */}
                     {spaceData.images.length > 1 && (
                       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
@@ -164,9 +181,7 @@ export default function SpaceBookingPage() {
                             key={index}
                             onClick={() => setCurrentIndex(index)}
                             className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                              index === currentIndex 
-                                ? 'bg-white shadow-lg' 
-                                : 'bg-white/50 hover:bg-white/75'
+                              index === currentIndex ? "bg-white shadow-lg" : "bg-white/50 hover:bg-white/75"
                             }`}
                           />
                         ))}
@@ -174,15 +189,9 @@ export default function SpaceBookingPage() {
                     )}
                   </>
                 ) : (
-                  <img
-                    src="/placeholder.svg"
-                    alt="Placeholder"
-                    className="w-full h-full object-cover"
-                  />
+                  <img src="/placeholder.svg" alt="Placeholder" className="w-full h-full object-cover" />
                 )}
               </div>
-
-              
 
               {/* Amenities */}
               {spaceData.amenities && spaceData.amenities.length > 0 && (
@@ -198,17 +207,6 @@ export default function SpaceBookingPage() {
                   </div>
                 </div>
               )}
-
-              {/* Capacity Info */}
-              {/* {spaceData.capacity && (
-                <div className="rounded-lg border border-gray-200 bg-white shadow-sm p-6">
-                  <h3 className="text-xl font-semibold text-black mb-4">Capacity</h3>
-                  <div className="flex items-center space-x-3">
-                    <ShieldCheck className="w-5 h-5" style={{ color: "#f69938" }} />
-                    <span className="text-gray-700">Up to {spaceData.capacity} people</span>
-                  </div>
-                </div>
-              )} */}
             </div>
 
             {/* Right Column - Booking Form */}
@@ -311,13 +309,54 @@ export default function SpaceBookingPage() {
                 </div>
 
                 {/* Book Now Button */}
-                <button
-                  className="w-full text-white font-semibold py-3 text-lg rounded-md transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{ backgroundColor: "#f69938" }}
-                  disabled={!selectedDate}
-                >
-                  Book Now
-                </button>
+                <div className="relative">
+                  <button
+                    onClick={() => setShowPaymentOptions(!showPaymentOptions)}
+                    className="w-full text-white font-semibold py-3 text-lg rounded-md transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{ backgroundColor: "#f69938" }}
+                    disabled={!selectedDate}
+                  >
+                    Book Now
+                  </button>
+
+                  {/* Payment Options Dropdown - Left Side */}
+                  {showPaymentOptions && selectedDate && (
+                      <div className="absolute -top-16 right-full mr-8 z-50 bg-white border border-gray-200 rounded-md shadow-lg overflow-hidden w-80">
+                        <button
+                          onClick={handleStripePayment} // Updated to use the new handler
+                          className="w-full px-4 py-3 text-left hover:bg-gray-50 border-b border-gray-100 flex items-center space-x-3"
+                        >
+                          <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
+                            <span className="text-white text-xs font-bold">S</span>
+                          </div>
+                          <div>
+                            <div className="font-medium text-black">Pay with Stripe</div>
+                            <div className="text-sm text-gray-500">Credit/Debit Card, UPI, Net Banking</div>
+                          </div>
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            // Handle wallet payment
+                            console.log("Wallet payment selected")
+                            setShowPaymentOptions(false)
+                          }}
+                          className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center space-x-3"
+                        >
+                          <div
+                            className="w-8 h-8 rounded flex items-center justify-center"
+                            style={{ backgroundColor: "#f69938" }}
+                          >
+                            <span className="text-white text-xs font-bold">W</span>
+                          </div>
+                          <div>
+                            <div className="font-medium text-black">Pay with Wallet</div>
+                            <div className="text-sm text-gray-500">Use your wallet balance</div>
+                          </div>
+                        </button>
+                      </div>
+                    )}
+                </div>
 
                 {!selectedDate && (
                   <p className="text-sm text-gray-500 text-center mt-2">Please select a date to continue</p>
@@ -327,9 +366,33 @@ export default function SpaceBookingPage() {
           </div>
         </div>
 
-        {/* Overlay for calendar */}
-        {showCalendar && (
-          <div className="fixed inset-0 z-40 bg-transparent" onClick={() => setShowCalendar(false)} />
+        {/* Stripe Modal */}
+         {showStripeModal && (
+          <StripePaymentModal
+            isOpen={showStripeModal}
+            onClose={handleCloseModal}
+            onSuccess={handlePaymentSuccess}
+            bookingData={{
+              spaceId: spaceId || "",
+              spaceName: spaceData.name,
+              location: spaceData.location,
+              bookingDate: selectedDate || new Date(),
+              numberOfDesks: numberOfDesks,
+              totalAmount: totalPrice,
+              pricePerDay: spaceData.pricePerDay,
+            }}
+          />
+        )}
+
+        {/* Overlay for calendar and payment options */}
+        {(showCalendar || showPaymentOptions) && (
+          <div
+            className="fixed inset-0 z-40 bg-transparent"
+            onClick={() => {
+              setShowCalendar(false)
+              setShowPaymentOptions(false)
+            }}
+          />
         )}
       </div>
     </ClientLayout>
