@@ -41,9 +41,7 @@ export default function SpaceBookingPage() {
     const fetchData = async () => {
       try {
         if (!spaceId) return
-
         console.log("spaceId is: ", spaceId)
-
         setLoading(true)
         const response = await clientService.getBookingPageData(spaceId)
 
@@ -51,7 +49,6 @@ export default function SpaceBookingPage() {
           toast.error(response.message || "Failed to get data, please try again.")
           return
         }
-
         const transformedData = {
           name: response.data.space.name,
           location: response.data.building.location,
@@ -62,7 +59,6 @@ export default function SpaceBookingPage() {
         }
 
         console.log("transformedData", transformedData)
-
         setSpaceData(transformedData)
       } catch (error) {
         console.error("Error in fetchData:", error)
@@ -71,7 +67,6 @@ export default function SpaceBookingPage() {
         setLoading(false)
       }
     }
-
     fetchData()
   }, [spaceId])
 
@@ -154,7 +149,6 @@ export default function SpaceBookingPage() {
               <span>{formatLocation(spaceData.location)}</span>
             </div>
           </div>
-
           <div className="grid lg:grid-cols-2 gap-8">
             {/* Left Column */}
             <div className="space-y-6">
@@ -172,7 +166,6 @@ export default function SpaceBookingPage() {
                         }`}
                       />
                     ))}
-
                     {/* Image indicators */}
                     {spaceData.images.length > 1 && (
                       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
@@ -192,7 +185,6 @@ export default function SpaceBookingPage() {
                   <img src="/placeholder.svg" alt="Placeholder" className="w-full h-full object-cover" />
                 )}
               </div>
-
               {/* Amenities */}
               {spaceData.amenities && spaceData.amenities.length > 0 && (
                 <div className="rounded-lg border border-gray-200 bg-white shadow-sm p-6">
@@ -208,12 +200,10 @@ export default function SpaceBookingPage() {
                 </div>
               )}
             </div>
-
             {/* Right Column - Booking Form */}
             <div className="space-y-6">
               <div className="rounded-lg border border-gray-200 bg-white shadow-sm p-6">
                 <h3 className="text-xl font-semibold text-black mb-6">Book Your Space</h3>
-
                 {/* Date Selection */}
                 <div className="space-y-4 mb-6">
                   <label className="block text-sm font-medium text-black">Select Date</label>

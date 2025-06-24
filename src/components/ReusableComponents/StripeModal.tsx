@@ -9,6 +9,8 @@ import {
 } from "@stripe/react-stripe-js"
 import { clientService } from "@/services/clientServices"
 import toast from "react-hot-toast"
+import { useSelector } from "react-redux"
+import type { RootState } from "@/store/store"
 
 interface PaymentModalProps {
   isOpen: boolean
@@ -27,7 +29,7 @@ interface PaymentModalProps {
 
 interface PaymentIntentResponse {
   clientSecret: string
-  bookingId: string
+  paymentIntentId: string
   publishableKey: string
 }
 
@@ -50,16 +52,18 @@ const cardElementOptions = {
 
 function PaymentForm({ 
   clientSecret,  
+  paymentIntentId,
   bookingData, 
   onSuccess, 
   onError 
 }: {
   clientSecret: string
-  bookingId: string
+  paymentIntentId: string
   bookingData: PaymentModalProps['bookingData']
   onSuccess: (bookingId: string) => void
   onError: (error: string) => void
 }) {
+  const user = useSelector((state: RootState) => state.client.client)
   const stripe = useStripe()
   const elements = useElements()
   const [isProcessing, setIsProcessing] = useState(false)
@@ -87,7 +91,8 @@ function PaymentForm({
         payment_method: {
           card: cardElement,
           billing_details: {
-            name: 'Customer', // You can make this dynamic if you have user info
+            name: user?.username || 'Customer',
+            email: user?.email || undefined,
           },
         },
       })
@@ -96,26 +101,34 @@ function PaymentForm({
         console.error("Payment failed:", error)
         setCardError(error.message || "Payment failed")
         toast.error(error.message || "Payment failed")
-      } else if (paymentIntent.status === 'succeeded') {
-    try {
-        const confirmResponse = await clientService.confirmPayment({
+        onError(error.message || "Payment failed")
+      } else if (paymentIntent.status === 'requires_capture') {
+        try {
+          const confirmResponse = await clientService.confirmPayment({
             paymentIntentId: paymentIntent.id,
-        })
-        console.log("Payment confirmed:", confirmResponse)
+          })
+          console.log("Payment confirmed:", confirmResponse)
 
-        if (confirmResponse.success) {
+          if (confirmResponse.success) {
             toast.success("Payment successful! Your booking has been confirmed.")
             onSuccess(confirmResponse.data.bookingId)
-        } else {
+          } else {
             toast.error(confirmResponse.message || "Payment processed but booking confirmation failed. Please contact support.")
-            onError("Booking confirmation failed")
+            onError(confirmResponse.message || "Booking confirmation failed")
+          }
+        } catch (confirmError: any) {
+          console.error("Confirmation error:", confirmError)
+          toast.error("Payment processed but booking confirmation failed. Please contact support.")
+          onError("Booking confirmation failed")
         }
-    } catch (confirmError: any) {
-        console.error("Confirmation error:", confirmError)
-        toast.error("Payment processed but booking confirmation failed. Please contact support.")
-        onError("Booking confirmation failed")
-    }
-}
+      } else if (paymentIntent.status === 'succeeded') {
+        toast.success("Payment successful!")
+        onSuccess(paymentIntentId)
+      } else {
+        console.error("Unexpected payment status:", paymentIntent.status)
+        toast.error("Payment completed but with unexpected status. Please contact support.")
+        onError("Unexpected payment status")
+      }
     } catch (error: any) {
       console.error("Payment error:", error)
       const errorMessage = error.message || "An unexpected error occurred"
@@ -144,6 +157,12 @@ function PaymentForm({
     })
   }
 
+   const formatLocation = (location: string): string => {
+    const parts = location.split(",").map((p) => p.trim())
+    if (parts.length <= 4) return location
+    return `${parts[0]}, ${parts[1]}, ${parts[parts.length - 2]}, ${parts[parts.length - 1]}`
+  }
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Booking Summary */}
@@ -155,12 +174,20 @@ function PaymentForm({
             <span className="font-medium">{bookingData.spaceName}</span>
           </div>
           <div className="flex justify-between">
+            <span className="text-gray-600">Location:</span>
+            <span className="font-medium">{formatLocation(bookingData.location)}</span>
+          </div>
+          <div className="flex justify-between">
             <span className="text-gray-600">Date:</span>
             <span className="font-medium">{formatDate(bookingData.bookingDate)}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-600">Desks:</span>
             <span className="font-medium">{bookingData.numberOfDesks}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-600">Price per desk:</span>
+            <span className="font-medium">₹{bookingData.pricePerDay}</span>
           </div>
           <div className="flex justify-between pt-2 border-t border-gray-200">
             <span className="font-semibold">Total:</span>
@@ -184,7 +211,10 @@ function PaymentForm({
         </div>
         
         {cardError && (
-          <div className="text-red-600 text-sm">{cardError}</div>
+          <div className="text-red-600 text-sm flex items-center space-x-2">
+            <span>⚠️</span>
+            <span>{cardError}</span>
+          </div>
         )}
       </div>
 
@@ -198,12 +228,12 @@ function PaymentForm({
       <button
         type="submit"
         disabled={!stripe || isProcessing}
-        className="w-full bg-[#f69938] text-white font-semibold py-3 px-4 rounded-md hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+        className="w-full bg-[#f69938] text-white font-semibold py-3 px-4 rounded-md hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 transition-opacity"
       >
         {isProcessing ? (
           <>
             <Loader2 className="w-4 h-4 animate-spin" />
-            <span>Processing...</span>
+            <span>Processing Payment...</span>
           </>
         ) : (
           <span>Pay ₹{bookingData.totalAmount}</span>
@@ -235,8 +265,9 @@ export default function StripePaymentModal({
     setError(null)
 
     try {
+      // const totalAmountInPaise = Math.round(bookingData.totalAmount * 100);
       const response = await clientService.createPaymentIntent({
-        amount: bookingData.totalAmount,
+        amount: bookingData.totalAmount, 
         currency: "inr",
         spaceId: bookingData.spaceId,
         bookingDate: bookingData.bookingDate.toISOString(),
@@ -282,7 +313,7 @@ export default function StripePaymentModal({
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">
       {/* Backdrop */}
       <div 
-        className="absolute inset-0  bg-opacity-50"
+        className="absolute inset-0 bg-opacity-50"
         onClick={handleClose}
       />
       
@@ -311,7 +342,7 @@ export default function StripePaymentModal({
               <div className="text-red-600 mb-4">{error}</div>
               <button
                 onClick={initializePayment}
-                className="bg-[#f69938] text-white px-4 py-2 rounded-md hover:opacity-90"
+                className="bg-[#f69938] text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity"
               >
                 Try Again
               </button>
@@ -320,7 +351,7 @@ export default function StripePaymentModal({
             <Elements stripe={stripePromise} options={{ clientSecret: paymentData.clientSecret }}>
               <PaymentForm
                 clientSecret={paymentData.clientSecret}
-                bookingId={paymentData.bookingId}
+                paymentIntentId={paymentData.paymentIntentId}
                 bookingData={bookingData}
                 onSuccess={handlePaymentSuccess}
                 onError={handlePaymentError}
