@@ -28,6 +28,7 @@ export interface BookingData{
     };
     space?: {
         name: string;
+        pricePerDesk: number;
     };
   client?: {
     username: string;

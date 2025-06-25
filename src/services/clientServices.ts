@@ -335,6 +335,8 @@ export const clientService = {
       }
   },
 
+  //bookings
+  
   getBookings: async ({page = 1, limit = 5, search='', status}:{page:number,limit:number,search:string,status?:string}): Promise<GetBookingResponse> => {
      try {
       const response = await clientAxiosInstance.get('/get-bookings', {
@@ -356,6 +358,27 @@ export const clientService = {
         };
       }
      }
+  },
+
+  getBookingDetails: async (bookingId: string): Promise<ApiResponse> => {
+    try {
+      const response = await clientAxiosInstance.get(`/get-booking-details/${bookingId}`);
+      return response.data;
+    } catch (error:any) {
+      console.error('Error fetching bookings:', error);
+      if (error.response) {
+        return {
+          success: false,
+          message: error.response.data?.message || 'Server error occurred',
+          data: error.response.data
+        };
+      } else {
+        return {
+          success: false,
+          message: 'An unexpected error occurred while fetching bookings'
+        };
+      }
+    }
   },
 
 
