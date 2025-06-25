@@ -13,6 +13,7 @@ import { Route, Routes } from "react-router-dom";
 import BuildingsListing from "@/pages/client/SubPages/BuildingListing";
 import BuildingDetailsPage from "@/pages/client/SubPages/BuildingDetails";
 import SpaceBookingPage from "@/pages/client/SubPages/BookSlot";
+import ClientBookings from "@/pages/client/SubPages/Bookings";
 
 const ClientRoutes = () => {
   return (
@@ -30,6 +31,7 @@ const ClientRoutes = () => {
         <Route path="/buildings" element={<ProtectedRoute allowedRoles={["client"]} element={<BuildingsListing/>} />}/>
         <Route path="/building-details/:buildingId" element={<ProtectedRoute allowedRoles={["client"]} element={<BuildingDetailsPage/>} />}/>
         <Route path="/book-space/:spaceId" element={<ProtectedRoute allowedRoles={["client"]} element={<SpaceBookingPage/>} />}/>
+        <Route path="/bookings" element={<ProtectedRoute allowedRoles={["client"]} element={<ClientBookings/>} />}/>
 
 
        

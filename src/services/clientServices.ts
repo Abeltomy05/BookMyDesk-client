@@ -1,6 +1,7 @@
 import authAxiosInstance from "@/api/auth.axios";
 import { clientAxiosInstance } from "@/api/client.axios";
 import type { UserProfile } from "@/pages/client/SubPages/ClientProfile";
+import type { BookingData } from "@/types/booking.type";
 
 interface ApiResponse {
   success: boolean;
@@ -30,6 +31,16 @@ export interface LoginData {
   email: string;
   password: string;
   role:string;
+}
+
+
+export interface GetBookingResponse {
+  success: boolean;
+  data?: BookingData[];
+  totalItems?: number;
+  totalPages?: number;
+  currentPage?: number;
+  message?: string
 }
 
 export const clientService = {
@@ -322,6 +333,29 @@ export const clientService = {
                 };
             }
       }
+  },
+
+  getBookings: async ({page = 1, limit = 5, search='', status}:{page:number,limit:number,search:string,status?:string}): Promise<GetBookingResponse> => {
+     try {
+      const response = await clientAxiosInstance.get('/get-bookings', {
+        params: { page, limit, search, ...(status && { status }) }
+      })
+      return response.data;
+     } catch (error:any) {
+      console.error('Error fetching bookings:', error);
+      if (error.response) {
+        return {
+          success: false,
+          message: error.response.data?.message || 'Server error occurred',
+          data: error.response.data
+        };
+      } else {
+        return {
+          success: false,
+          message: 'An unexpected error occurred while fetching bookings'
+        };
+      }
+     }
   },
 
 

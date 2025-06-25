@@ -16,7 +16,6 @@ export interface TableRef<T extends BaseItem> {
   refreshData: () => void
 }
 
-// Fix the forwardRef typing by using a generic function component
 function LightGenericTableInner<T extends BaseItem>(
   {
     title,
@@ -50,7 +49,6 @@ function LightGenericTableInner<T extends BaseItem>(
     itemsPerPage
   })
 
-  // Expose methods via ref
   useImperativeHandle(ref, () => ({
     updateItemOptimistically: (id: string, updates: Partial<T>) => {
       setData(prevData => 

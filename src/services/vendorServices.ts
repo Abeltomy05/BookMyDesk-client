@@ -3,6 +3,7 @@ import { vendorAxiosInstance } from "@/api/vendor.axios";
 import type { BuildingRegistrationData, GetAllBuildingsResponse, GetBuildingsParams } from "@/types/building.type";
 import type { Building } from "@/types/view&editBuilding";
 import type { VendorRetryFormData } from "@/utils/validations/retry-vendor.validation";
+import type { GetBookingResponse } from "./clientServices";
 
 interface ApiResponse {
   success: boolean;
@@ -313,6 +314,29 @@ updateBuildingStatus: async (
         };
       }
     },
+
+getBookings: async ({page = 1, limit = 5, search='', status}:{page:number,limit:number,search:string,status?:string}): Promise<GetBookingResponse> => {
+     try {
+      const response = await vendorAxiosInstance.get('/get-bookings', {
+        params: { page, limit, search, ...(status && { status }) }
+      })
+      return response.data;
+     } catch (error:any) {
+      console.error('Error fetching bookings:', error);
+      if (error.response) {
+        return {
+          success: false,
+          message: error.response.data?.message || 'Server error occurred',
+          data: error.response.data
+        };
+      } else {
+        return {
+          success: false,
+          message: 'An unexpected error occurred while fetching bookings'
+        };
+      }
+     }
+  },    
 
  logout: async():Promise<ApiResponse>=>{
     try {

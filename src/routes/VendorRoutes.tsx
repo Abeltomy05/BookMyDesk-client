@@ -11,6 +11,7 @@ import VendorRetryForm from "@/pages/vendor/Retry"
 import BuildingManagement from "@/pages/vendor/SubPages/ManageBuildings"
 import RegisterBuilding from "@/pages/vendor/SubPages/RegisterBuilding"
 import BuildingDetailsEdit from "@/pages/vendor/SubPages/View&EndBuildings"
+import VendorManageBookings from "@/pages/vendor/SubPages/ManageBookings"
 
 
 const VendorRoutes = () => {
@@ -26,6 +27,7 @@ const VendorRoutes = () => {
         <Route path="/manage-buildings" element={<ProtectedRoute allowedRoles={["vendor"]} element={<BuildingManagement/>} />}/>
         <Route path="/register-building" element={<ProtectedRoute allowedRoles={["vendor"]} element={<RegisterBuilding/>} />}/>
         <Route path="/edit-building/:buildingId" element={<ProtectedRoute allowedRoles={["vendor"]} element={<BuildingDetailsEdit/>} />}/>
+        <Route path="/bookings" element={<ProtectedRoute allowedRoles={["vendor"]} element={<VendorManageBookings/>} />}/>
         
 
         <Route path="/*" element={<NotFoundPage/>}/>

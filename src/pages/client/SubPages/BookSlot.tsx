@@ -87,6 +87,7 @@ export default function SpaceBookingPage() {
 
   const handlePaymentSuccess = (bookingId: string) => {
     setShowStripeModal(false)
+    navigate(`/bookings`)
     // toast.success("Booking confirmed successfully!")
   }
 
