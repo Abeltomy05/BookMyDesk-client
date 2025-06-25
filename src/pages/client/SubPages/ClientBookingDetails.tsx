@@ -7,18 +7,21 @@ import ClientLayout from "../ClientLayout"
 import { clientService } from "@/services/clientServices"
 import { useParams, useNavigate } from "react-router-dom"
 import toast from "react-hot-toast"
+import StripePaymentModal from "@/components/ReusableComponents/StripeModal"
 
 export const BookingDetailsPage: React.FC = () => {
   const { bookingId } = useParams<{ bookingId: string }>()
   const navigate = useNavigate()
   const [booking, setBooking] = useState<BookingData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [showPaymentModal, setShowPaymentModal] = useState(false)
   
   useEffect(()=>{
     const fetchBookingDetails = async () => {
         try {
              if (!bookingId) return
             const response = await clientService.getBookingDetails(bookingId);
+            console.log("Booking details fetched:", response.data)
             setBooking(response.data)
         } catch (error) {
             console.error("Error fetching booking details:", error)
@@ -36,9 +39,23 @@ export const BookingDetailsPage: React.FC = () => {
   }
 
   const handleRetryBooking = () => {
-    console.log("Retrying booking...")
-     setBooking((prev) => prev ? { ...prev, status: "confirmed" } : null)
+      setShowPaymentModal(true)
   }
+
+  const handleRetrySuccess = (bookingId: string) => {
+  setShowPaymentModal(false)
+  const fetchBookingDetails = async () => {
+    try {
+      if (!bookingId) return
+      const response = await clientService.getBookingDetails(bookingId);
+      setBooking(response.data)
+      // toast.success("Payment successful! Your booking has been confirmed.")
+    } catch (error) {
+      console.error("Error fetching booking details:", error)
+    }
+  }
+  fetchBookingDetails()
+}
 
   const handleDownloadInvoice = () => {
     console.log("Downloading invoice...")
@@ -145,6 +162,24 @@ return (
             <BookingDetails booking={booking} />
         </div>
         </div>
+
+        {showPaymentModal && booking && (
+        <StripePaymentModal
+          isOpen={showPaymentModal}
+          onClose={() => setShowPaymentModal(false)}
+          onSuccess={handleRetrySuccess}
+          bookingData={{
+            spaceId: booking.spaceId,
+            spaceName: booking.space?.name ?? "Unknown Space",
+            location: booking.building?.location?.displayName ?? "Unknown Location",
+            bookingDate: new Date(booking.bookingDate),
+            numberOfDesks: booking.numberOfDesks ?? 1,
+            totalAmount: booking.totalPrice ?? 0,
+            pricePerDay: booking.space?.pricePerDay ?? 0, 
+            bookingId: booking._id ,
+          }}
+        />
+      )}
     </ClientLayout>
 )
 }

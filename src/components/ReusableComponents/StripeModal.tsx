@@ -24,6 +24,7 @@ interface PaymentModalProps {
     numberOfDesks: number
     totalAmount: number
     pricePerDay: number
+    bookingId?: string
   }
 }
 
@@ -272,6 +273,7 @@ export default function StripePaymentModal({
         spaceId: bookingData.spaceId,
         bookingDate: bookingData.bookingDate.toISOString(),
         numberOfDesks: bookingData.numberOfDesks,
+        bookingId: bookingData.bookingId || undefined,
       })
 
       if (response.success) {

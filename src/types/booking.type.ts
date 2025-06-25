@@ -4,7 +4,8 @@ export type PaymentMethod = "stripe" | "wallet";
 
 export interface BookingData{
     _id: string;
-    
+    spaceId: string;
+    buildingId: string;
     bookingDate: Date;
     numberOfDesks?: number;
     totalPrice?: number;
@@ -28,7 +29,7 @@ export interface BookingData{
     };
     space?: {
         name: string;
-        pricePerDesk: number;
+        pricePerDay: number;
     };
   client?: {
     username: string;

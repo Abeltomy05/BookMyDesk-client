@@ -291,6 +291,7 @@ export const clientService = {
     spaceId: string
     bookingDate: string
     numberOfDesks: number
+    bookingId?: string
   }):Promise<ApiResponse> => {
     try {
       const response = await clientAxiosInstance.post('/create-payment-intent', data);
@@ -336,7 +337,7 @@ export const clientService = {
   },
 
   //bookings
-  
+
   getBookings: async ({page = 1, limit = 5, search='', status}:{page:number,limit:number,search:string,status?:string}): Promise<GetBookingResponse> => {
      try {
       const response = await clientAxiosInstance.get('/get-bookings', {
