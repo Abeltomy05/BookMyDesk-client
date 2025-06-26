@@ -11,6 +11,7 @@ import { clientService } from "@/services/clientServices"
 import toast from "react-hot-toast"
 import { useSelector } from "react-redux"
 import type { RootState } from "@/store/store"
+import { formatDate } from "@/utils/formatters/date"
 
 interface PaymentModalProps {
   isOpen: boolean
@@ -149,14 +150,6 @@ function PaymentForm({
     }
   }
 
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    })
-  }
 
    const formatLocation = (location: string): string => {
     const parts = location.split(",").map((p) => p.trim())

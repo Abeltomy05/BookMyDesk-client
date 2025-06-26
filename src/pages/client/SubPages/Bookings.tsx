@@ -7,6 +7,7 @@ import type { TableColumn } from '@/types/table.type';
 import type { BookingData } from '@/types/booking.type';
 import type { FetchParams } from '@/types/api.type';
 import ClientLayout from '../ClientLayout';
+import { formatDate } from '@/utils/formatters/date';
 
 const ClientBookings = () => {
   const tableRef = useRef(null);
@@ -69,14 +70,6 @@ const ClientBookings = () => {
     }
   };
 
-  const formatDate = (dateInput:Date | string) => {
-    const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
-   return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  });
-  };
 
   const handleFilterChange = (filterValue: string) => {
   setCurrentFilter(filterValue);

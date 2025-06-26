@@ -7,7 +7,9 @@ import type { TableColumn, TableAction } from '@/types/table.type';
 import type { BookingData } from '@/types/booking.type';
 import type { FetchParams } from '@/types/api.type';
 import VendorLayout from '../VendorLayout';
+import { formatCurrency } from '@/utils/formatters/currency';
 import toast from 'react-hot-toast';
+import { formatDate } from '@/utils/formatters/date';
 
 const VendorManageBookings = () => {
   const tableRef = useRef(null);
@@ -72,21 +74,8 @@ const VendorManageBookings = () => {
     }
   };
 
-  const formatDate = (dateInput: Date | string) => {
-    const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
-  };
+
 
   const handleFilterChange = (filterValue: string) => {
     setCurrentFilter(filterValue);
@@ -172,7 +161,6 @@ const VendorManageBookings = () => {
             {item.numberOfDesks || 0} desks
           </div>
           <div className="flex items-center gap-1 text-xs text-green-600 font-medium">
-            <DollarSign size={12} />
             {formatCurrency(item.totalPrice || 0)}
           </div>
         </div>

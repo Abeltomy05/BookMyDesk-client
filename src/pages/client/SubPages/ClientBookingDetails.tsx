@@ -8,6 +8,7 @@ import { clientService } from "@/services/clientServices"
 import { useParams, useNavigate } from "react-router-dom"
 import toast from "react-hot-toast"
 import StripePaymentModal from "@/components/ReusableComponents/StripeModal"
+import CancelBookingModal from "@/components/BookingDetailsComponents/CancelConfirmModal"
 
 export const BookingDetailsPage: React.FC = () => {
   const { bookingId } = useParams<{ bookingId: string }>()
@@ -15,6 +16,8 @@ export const BookingDetailsPage: React.FC = () => {
   const [booking, setBooking] = useState<BookingData | null>(null)
   const [loading, setLoading] = useState(true)
   const [showPaymentModal, setShowPaymentModal] = useState(false)
+  const [showCancelModal, setShowCancelModal] = useState(false)
+  const [cancelLoading, setCancelLoading] = useState(false)
   
   useEffect(()=>{
     const fetchBookingDetails = async () => {
@@ -34,9 +37,31 @@ export const BookingDetailsPage: React.FC = () => {
   },[bookingId])
   
   const handleCancelBooking = () => {
-    console.log("Cancelling booking...")
-    setBooking((prev) => prev ? { ...prev, status: "cancelled" } : null)
+      setShowCancelModal(true)
   }
+
+   const handleConfirmCancel = async (reason: string) => {
+    if (!bookingId) return;
+    
+    setCancelLoading(true);
+    try {
+      const cancelResponse = await clientService.cancelBooking(bookingId, reason);
+      if(!cancelResponse.success) {
+        toast.error(cancelResponse.message || "Failed to cancel booking. Please try again.");
+        return;
+      }
+      toast.success("Booking cancelled successfully and money refunded to your wallet.");
+      setShowCancelModal(false);
+      
+      const response = await clientService.getBookingDetails(bookingId);
+      setBooking(response.data);
+    } catch (error:any) {
+      console.error("Error cancelling booking:", error);
+      toast.error(error.message || "Failed to cancel booking. Please try again.");
+    } finally {
+      setCancelLoading(false);
+    }
+  };
 
   const handleRetryBooking = () => {
       setShowPaymentModal(true)
@@ -180,6 +205,14 @@ return (
           }}
         />
       )}
+
+        {/* Cancel Booking Modal */}
+        <CancelBookingModal
+          isOpen={showCancelModal}
+          onClose={() => setShowCancelModal(false)}
+          onConfirm={handleConfirmCancel}
+          loading={cancelLoading}
+        />
     </ClientLayout>
 )
 }

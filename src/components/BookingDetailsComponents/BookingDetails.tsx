@@ -1,6 +1,7 @@
 import type React from "react"
 import type { BookingData } from "@/types/booking.type" 
 import { formatCurrency } from "../../utils/formatters/currency"
+import { formatDate } from "@/utils/formatters/date"
 
 interface BookingDetailsProps {
   booking: BookingData
@@ -10,15 +11,6 @@ export const BookingDetails: React.FC<BookingDetailsProps> = ({ booking }) => {
 
 
 
-  const formatDate = (date: string | Date | undefined) => {
-    if (!date) return 'N/A'
-    const parsedDate = typeof date === 'string' ? new Date(date) : date
-    return parsedDate.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    })
-  }
 
   const calculatePricePerDay = () => {
     const totalPrice = booking.totalPrice ?? 0

@@ -1,5 +1,6 @@
 import type React from "react"
 import { Calendar, MapPin, Phone, Mail, Building, DollarSign, BookOpen, X } from "lucide-react"
+import { formatDate } from "@/utils/formatters/date"
 
 interface VendorSpace {
   type: string
@@ -79,13 +80,6 @@ const VendorDetails: React.FC<VendorDetailsProps> = ({ vendor,onClose }) => {
     }).format(amount)
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    })
-  }
 
   const getAvatarPlaceholder = (name: string) => {
     const colors = [

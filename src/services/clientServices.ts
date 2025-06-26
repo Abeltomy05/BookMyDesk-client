@@ -382,6 +382,22 @@ export const clientService = {
     }
   },
 
+  cancelBooking: async (bookingId: string, reason: string): Promise<ApiResponse> => {
+     try {
+      const response = await clientAxiosInstance.post(`/cancel-booking`, { 
+        reason,
+        bookingId
+       });
+      return response.data;
+     } catch (error) {
+      console.error('Error cancelling booking:', error);
+      return {
+        success: false,
+        message: 'Failed to cancel booking. Please try again later.',
+      };
+     }
+  },
+
 
 
 
