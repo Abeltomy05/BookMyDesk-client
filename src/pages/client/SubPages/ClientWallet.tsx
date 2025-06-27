@@ -1,6 +1,6 @@
 import type React from "react"
 import { useRef, useState } from "react"
-import { Plus, Minus, Download, Upload, Calendar, Hash, DollarSign } from "lucide-react"
+import { Plus, Minus, Download, Upload, Calendar, Hash, DollarSign, CreditCard } from "lucide-react"
 import ClientLayout from "../ClientLayout"
 import { formatCurrency } from "@/utils/formatters/currency"
 import { formatDate } from "@/utils/formatters/date"
@@ -117,6 +117,8 @@ const WalletPage: React.FC = () => {
         return <Download className="w-4 h-4 text-red-600" />
       case "refund":
         return <DollarSign className="w-4 h-4 text-blue-600" />
+      case "payment":
+        return <CreditCard className="w-4 h-4 text-yellow-600" />;  
       default:
         return null
     }
@@ -130,6 +132,8 @@ const WalletPage: React.FC = () => {
         return "text-red-600 bg-red-50"
       case "refund":
         return "text-blue-600 bg-blue-50"
+      case "payment":
+        return "text-yellow-600 bg-yellow-50";  
       default:
         return "text-gray-600 bg-gray-50"
     }
@@ -177,9 +181,9 @@ const WalletPage: React.FC = () => {
       width: 'col-span-2',
       render: (transaction) => (
         <span className={`font-semibold ${
-          transaction.type === 'withdrawal' ? 'text-red-600' : 'text-green-600'
+          ['withdrawal', 'payment'].includes(transaction.type) ? 'text-red-600' : 'text-green-600'
         }`}>
-          {transaction.type === 'withdrawal' ? '-' : '+'}
+          {['withdrawal', 'payment'].includes(transaction.type) ? '-' : '+'}
           {formatCurrency(Math.abs(transaction.amount))}
         </span>
       )
@@ -242,7 +246,7 @@ const WalletPage: React.FC = () => {
           enableSearch={false}
           enablePagination={true}
           enableActions={false}
-          itemsPerPage={4}
+          itemsPerPage={5}
           emptyMessage="No transactions found"
           loadingMessage="Loading transactions..."
         />

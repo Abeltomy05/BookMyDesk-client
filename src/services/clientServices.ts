@@ -415,6 +415,25 @@ export const clientService = {
     }
   },
 
+  payWithWallet:async ({spaceId,bookingDate,numberOfDesks,totalPrice}:{spaceId: string,bookingDate:Date,numberOfDesks:number,totalPrice:number})=>{
+    try {
+      const response = await clientAxiosInstance.post("/pay-with-wallet",{
+        spaceId,
+        bookingDate,
+        numberOfDesks,
+        totalPrice
+      })
+      return response.data;
+    } catch (error:any) {
+      console.error('Error booking with wallet:', error);
+       const message = error.response?.data?.message || error.message || "Unknown error occurred";
+      return {
+        success: false,
+        message,
+      };
+    }
+  },
+
 
 
 

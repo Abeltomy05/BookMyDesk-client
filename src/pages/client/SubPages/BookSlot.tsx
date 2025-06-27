@@ -7,6 +7,7 @@ import { clientService } from "@/services/clientServices"
 import toast from "react-hot-toast"
 import SkeletonSpaceBooking from "@/components/Skeletons/BookSlotSkeleton"
 import StripePaymentModal from "@/components/ReusableComponents/StripeModal"
+import WalletPaymentModal from "@/components/ReusableComponents/WalletPaymentModal"
 
 export default function SpaceBookingPage() {
   const { spaceId } = useParams<{ spaceId: string }>()
@@ -32,6 +33,8 @@ export default function SpaceBookingPage() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [showPaymentOptions, setShowPaymentOptions] = useState(false)
   const [showStripeModal, setShowStripeModal] = useState(false)
+  const [showWalletModal, setShowWalletModal] = useState(false)
+  const [walletBalance, setWalletBalance] = useState(0)
   
   const navigate = useNavigate()
 
@@ -56,9 +59,12 @@ export default function SpaceBookingPage() {
           pricePerDay: response.data.space.pricePerDay,
           amenities: response.data.space.amenities || [],
           capacity: response.data.space.capacity,
+          walletId:response.data.wallet._id || null,
+          walletBalance: response.data.wallet.balance || 0
         }
-
+ 
         console.log("transformedData", transformedData)
+        setWalletBalance(transformedData.walletBalance)
         setSpaceData(transformedData)
       } catch (error) {
         console.error("Error in fetchData:", error)
@@ -85,6 +91,7 @@ export default function SpaceBookingPage() {
     setShowStripeModal(true)
   }
 
+
   const handlePaymentSuccess = (bookingId: string) => {
     setShowStripeModal(false)
     navigate(`/bookings`)
@@ -94,6 +101,21 @@ export default function SpaceBookingPage() {
   const handleCloseModal = () => {
     setShowStripeModal(false)
   }
+
+  const handleWalletPayment = ()=>{
+    setShowPaymentOptions(false)
+    setShowWalletModal(true)
+  }
+
+  const handleWalletPaymentSuccess = (bookingId: string) => {
+    setShowWalletModal(false)
+    navigate(`/bookings`)
+  // toast.success("Booking confirmed successfully!")
+ }
+
+  const handleWalletModalClose = () => {
+  setShowWalletModal(false)
+}
 
   const formatDate = (date: Date) => {
     return date.toLocaleDateString("en-US", {
@@ -310,11 +332,11 @@ export default function SpaceBookingPage() {
                     Book Now
                   </button>
 
-                  {/* Payment Options Dropdown - Left Side */}
+                  {/* Payment Options Dropdown  */}
                   {showPaymentOptions && selectedDate && (
                       <div className="absolute -top-16 right-full mr-8 z-50 bg-white border border-gray-200 rounded-md shadow-lg overflow-hidden w-80">
                         <button
-                          onClick={handleStripePayment} // Updated to use the new handler
+                          onClick={handleStripePayment}
                           className="w-full px-4 py-3 text-left hover:bg-gray-50 border-b border-gray-100 flex items-center space-x-3"
                         >
                           <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
@@ -327,11 +349,7 @@ export default function SpaceBookingPage() {
                         </button>
 
                         <button
-                          onClick={() => {
-                            // Handle wallet payment
-                            console.log("Wallet payment selected")
-                            setShowPaymentOptions(false)
-                          }}
+                          onClick={handleWalletPayment}
                           className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center space-x-3"
                         >
                           <div
@@ -375,8 +393,27 @@ export default function SpaceBookingPage() {
           />
         )}
 
+          {/* Wallet Payment Modal */}
+          {showWalletModal && (
+            <WalletPaymentModal
+              isOpen={showWalletModal}
+              onClose={handleWalletModalClose}
+              onSuccess={handleWalletPaymentSuccess}
+              walletBalance={walletBalance}
+              bookingData={{
+                spaceId: spaceId || "",
+                spaceName: spaceData.name,
+                location: spaceData.location,
+                bookingDate: selectedDate || new Date(),
+                numberOfDesks: numberOfDesks,
+                totalAmount: totalPrice,
+                pricePerDay: spaceData.pricePerDay,
+              }}
+            />
+          )}
+
         {/* Overlay for calendar and payment options */}
-        {(showCalendar || showPaymentOptions) && (
+        {(showCalendar || showPaymentOptions || showWalletModal) && (
           <div
             className="fixed inset-0 z-40 bg-transparent"
             onClick={() => {
