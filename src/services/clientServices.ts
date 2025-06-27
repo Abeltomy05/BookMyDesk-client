@@ -398,6 +398,23 @@ export const clientService = {
      }
   },
 
+  //wallet
+
+  getWalletDetails: async ({page,limit}:{page:number,limit:number}): Promise<ApiResponse> => {
+    try {
+       const response = await clientAxiosInstance.get('/get-wallet-details',{
+        params:{page,limit}
+       });
+       return response.data;
+    } catch (error:any) {
+      console.error('Error fetching wallet details:', error);
+      return {
+        success: false,
+        message: error.message || 'Failed to fetch wallet details. Please try again later.',
+      };
+    }
+  },
+
 
 
 

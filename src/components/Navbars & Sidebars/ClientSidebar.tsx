@@ -114,7 +114,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             </li>
             <li>
               <a
-                href="#"
+                href="/wallet"
                 className="flex items-center px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 transition-colors duration-200 rounded-r-full mb-1"
               >
                 <Wallet className="mr-3" size={20} />
