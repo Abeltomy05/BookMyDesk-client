@@ -28,6 +28,7 @@ export interface VendorFormData {
   role: string
 }
 export type BuildingStatus = "approved" | "archived";
+export type BookingStatus = "pending" | "confirmed" | "cancelled" | "completed" | "failed";
 
 export const vendorService = {
 
@@ -336,7 +337,30 @@ getBookings: async ({page = 1, limit = 5, search='', status}:{page:number,limit:
         };
       }
      }
-  },    
+  },  
+  
+updateBookingStatus: async ( 
+      entityType: "booking",
+      entityId: string,
+      status: BookingStatus ,
+      reason?: string
+    ): Promise<ApiResponse> =>{
+     try {
+       const response = await vendorAxiosInstance.patch("/update-status", {
+          entityType,
+          entityId,
+          status,
+          reason,
+        });
+        return response.data;
+     } catch (error:any) {
+      console.error("Error updating user status:", error);
+        return {
+          success: false,
+          message: error.response?.data?.message || "Failed to update user status",
+        };
+     }
+ },
 
  logout: async():Promise<ApiResponse>=>{
     try {

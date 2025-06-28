@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Eye, MapPin, Calendar, Users, Clock, Edit, CheckCircle, XCircle, Phone, Mail, User, DollarSign } from 'lucide-react';
-import { LightGenericTable } from '@/components/ReusableComponents/LightGenericTable';
+import { LightGenericTable, type TableRef } from '@/components/ReusableComponents/LightGenericTable';
 import { vendorService } from '@/services/vendorServices';
 import { useNavigate } from 'react-router-dom';
 import type { TableColumn, TableAction } from '@/types/table.type';
@@ -10,11 +10,16 @@ import VendorLayout from '../VendorLayout';
 import { formatCurrency } from '@/utils/formatters/currency';
 import toast from 'react-hot-toast';
 import { formatDate } from '@/utils/formatters/date';
+import ConfirmModal from '@/components/ReusableComponents/ConfirmModal';
 
 const VendorManageBookings = () => {
-  const tableRef = useRef(null);
+  const tableRef = useRef<TableRef<BookingData> | null>(null);
   const navigate = useNavigate();
   const [currentFilter, setCurrentFilter] = useState<string>("all");
+
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showCompleteModal, setShowCompleteModal] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState<BookingData | null>(null);
 
   const fetchBookings = async (params: FetchParams) => {
     try {
@@ -74,28 +79,67 @@ const VendorManageBookings = () => {
     }
   };
 
-
-
-
   const handleFilterChange = (filterValue: string) => {
     setCurrentFilter(filterValue);
   };
 
-  const handleUpdateStatus = async (booking: BookingData, newStatus: string) => {
+   const handleCancelBooking = async () => {
+    // if (!selectedBooking) return;
+    
     // try {
-    //   const response = await vendorService.updateBookingStatus(booking._id, newStatus);
+    //   const response = await vendorService.updateBookingStatus(selectedBooking._id, 'cancelled');
     //   if (response.success) {
     //     if (tableRef.current) {
-    //       tableRef.current.updateItemOptimistically(booking._id, { status: newStatus });
+    //       tableRef.current.updateItemOptimistically(selectedBooking._id, { status: 'cancelled' });
     //     }
-    //     toast.success('Booking status updated successfully');
+    //     toast.success('Booking cancelled successfully. Refund has been processed.');
     //   } else {
-    //     console.error('Failed to update booking status:', response.message);
-    //     toast.error(response.message || 'Failed to update booking status');
+    //     console.error('Failed to cancel booking:', response.message);
+    //     toast.error(response.message || 'Failed to cancel booking');
     //   }
     // } catch (error) {
-    //   console.error('Error updating booking status:', error);
+    //   console.error('Error cancelling booking:', error);
+    //   toast.error('An error occurred while cancelling the booking');
+    // } finally {
+    //   setSelectedBooking(null);
     // }
+  };
+
+   const handleCompleteBooking = async () => {
+    if (!selectedBooking) return;
+    
+    try {
+      const response = await vendorService.updateBookingStatus(
+        "booking",
+        selectedBooking._id,
+        'completed'
+      );
+
+      if (response.success) {
+        if (tableRef.current) {
+          tableRef.current.updateItemOptimistically(selectedBooking._id, { status: 'completed' });
+        }
+        toast.success('Booking marked as completed successfully');
+      } else {
+        console.error('Failed to complete booking:', response.message);
+        toast.error(response.message || 'Failed to mark booking as completed');
+      }
+    } catch (error) {
+      console.error('Error completing booking:', error);
+      toast.error('An error occurred while completing the booking');
+    } finally {
+      setSelectedBooking(null);
+    }
+  };
+
+   const handleUpdateStatus = async (booking: BookingData, newStatus: string) => {
+    setSelectedBooking(booking);
+    
+    if (newStatus === 'cancelled') {
+      setShowCancelModal(true);
+    } else if (newStatus === 'completed') {
+      setShowCompleteModal(true);
+    }
   };
 
   const tableColumns: TableColumn<BookingData>[] = [
@@ -187,14 +231,6 @@ const VendorManageBookings = () => {
       refreshAfter: false
     },
     {
-      label: 'Confirm Booking',
-      icon: <CheckCircle size={16} />,
-      onClick: (item) => handleUpdateStatus(item, 'confirmed'),
-      variant: 'success',
-      condition: (item) => item.status === 'pending',
-      refreshAfter: false
-    },
-    {
       label: 'Mark Completed',
       icon: <CheckCircle size={16} />,
       onClick: (item) => handleUpdateStatus(item, 'completed'),
@@ -243,6 +279,44 @@ const VendorManageBookings = () => {
           onFilterChange={handleFilterChange}
         />
       </div>
+
+       {/* Cancel Booking Modal */}
+      <ConfirmModal
+        isOpen={showCancelModal}
+        onClose={() => {
+          setShowCancelModal(false);
+          setSelectedBooking(null);
+        }}
+        onConfirm={handleCancelBooking}
+        title="Cancel Booking"
+        message={
+          selectedBooking 
+            ? `Are you sure you want to cancel this booking? The amount of ${formatCurrency(selectedBooking.totalPrice || 0)} will be refunded back to ${selectedBooking.client?.username || 'the client'}'s wallet. This action cannot be undone.`
+            : 'Are you sure you want to cancel this booking?'
+        }
+        confirmText="Yes, Cancel Booking"
+        cancelText="Keep Booking"
+        variant="danger"
+      />
+
+        {/* Mark Completed Modal */}
+      <ConfirmModal
+        isOpen={showCompleteModal}
+        onClose={() => {
+          setShowCompleteModal(false);
+          setSelectedBooking(null);
+        }}
+        onConfirm={handleCompleteBooking}
+        title="Mark as Completed"
+        message={
+          selectedBooking 
+            ? `Are you sure you want to mark this booking as completed? This will finalize the service delivery for ${selectedBooking.client?.username || 'the client'}. This action cannot be undone.`
+            : 'Are you sure you want to mark this booking as completed?'
+        }
+        confirmText="Yes, Mark Completed"
+        cancelText="Not Yet"
+        variant="warning"
+      />
     </VendorLayout>
   );
 };
