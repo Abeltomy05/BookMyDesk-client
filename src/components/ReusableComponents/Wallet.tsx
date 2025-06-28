@@ -169,20 +169,24 @@ const WalletComponent: React.FC<WalletComponentProps> = ({
     }
   }
 
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case "topup":
-        return "text-green-600 bg-green-50"
-      case "withdrawal":
-        return "text-red-600 bg-red-50"
-      case "refund":
-        return "text-blue-600 bg-blue-50"
-      case "payment":
-        return "text-yellow-600 bg-yellow-50"
-      default:
-        return "text-gray-600 bg-gray-50"
-    }
+const getTypeColor = (type: string) => {
+  switch (type) {
+    case "topup":
+      return "text-green-600 bg-green-50"
+    case "withdrawal":
+      return "text-red-600 bg-red-50"
+    case "refund":
+      return "text-blue-600 bg-blue-50"
+    case "payment":
+      return "text-yellow-600 bg-yellow-50"
+    case "booking-income":
+      return "text-emerald-600 bg-emerald-50"
+    case "booking-refund":
+      return "text-rose-600 bg-rose-50"
+    default:
+      return "text-gray-600 bg-gray-50"
   }
+}
 
   const tableColumns: TableColumn<WalletTransaction>[] = [
     {
@@ -226,9 +230,9 @@ const WalletComponent: React.FC<WalletComponentProps> = ({
       width: 'col-span-2',
       render: (transaction) => (
         <span className={`font-semibold ${
-          ['withdrawal', 'payment'].includes(transaction.type) ? 'text-red-600' : 'text-green-600'
+          ['withdrawal', 'payment', "booking-refund"].includes(transaction.type) ? 'text-red-600' : 'text-green-600'
         }`}>
-          {['withdrawal', 'payment'].includes(transaction.type) ? '-' : '+'}
+          {['withdrawal', 'payment', "booking-refund"].includes(transaction.type) ? '-' : '+'}
           {formatCurrency(Math.abs(transaction.amount))}
         </span>
       )
