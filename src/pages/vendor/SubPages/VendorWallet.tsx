@@ -1,15 +1,19 @@
 import React from 'react'
-import ClientLayout from '../ClientLayout'
+import VendorLayout from '../VendorLayout'
 import WalletComponent from '@/components/ReusableComponents/Wallet' 
-import { clientService } from '@/services/clientServices'
+import { vendorService } from '@/services/vendorServices' 
 
-const ClientWalletPage: React.FC = () => {
+const VendorWalletPage: React.FC = () => {
   return (
-    <ClientLayout>
+    <VendorLayout
+      notificationCount={5}
+      backgroundClass="bg-black"
+    >
+    <div className='mt-13'>
       <WalletComponent
         title="My Wallet"
         subtitle="Manage your balance and view transaction history"
-        walletService={clientService}
+        walletService={vendorService}
         showTopUpButton={true}
         showWithdrawButton={false}
         primaryColor="#f69938"
@@ -17,8 +21,9 @@ const ClientWalletPage: React.FC = () => {
         itemsPerPage={5}
         enableWithdrawal={false}
       />
-    </ClientLayout>
+    </div>  
+    </VendorLayout>
   )
 }
 
-export default ClientWalletPage
+export default VendorWalletPage

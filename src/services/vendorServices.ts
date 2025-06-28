@@ -378,6 +378,21 @@ cancelBooking: async (bookingId: string, reason: string): Promise<ApiResponse> =
      }
   }, 
 
+getWalletDetails: async ({page,limit}:{page:number,limit:number}): Promise<ApiResponse> => {
+  try {
+      const response = await vendorAxiosInstance.get('/get-wallet-details',{
+      params:{page,limit}
+      });
+      return response.data;
+  } catch (error:any) {
+    console.error('Error fetching wallet details:', error);
+    return {
+      success: false,
+      message: error.message || 'Failed to fetch wallet details. Please try again later.',
+    };
+  }
+},  
+
  logout: async():Promise<ApiResponse>=>{
     try {
       const response = await vendorAxiosInstance.post("/logout");

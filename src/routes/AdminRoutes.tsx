@@ -9,6 +9,7 @@ import { Route, Routes } from 'react-router-dom'
 import ClientManagement from '@/pages/admin/sub-pages/ClientManagement'
 import VendorVerification from '@/pages/admin/sub-pages/VendorVerification'
 import BuildingVerification from '@/pages/admin/sub-pages/BuildingVerification'
+import AdminWalletPage from '@/pages/admin/sub-pages/AdminWallet'
 
 const AdminRoutes = () => {
   return (
@@ -22,6 +23,7 @@ const AdminRoutes = () => {
           <Route path="/vendors" element={<ProtectedRoute allowedRoles={["admin"]}  element={<AdminLayout><VendorManagement /></AdminLayout>} />}/>
           <Route path="/vendor-verification" element={<ProtectedRoute allowedRoles={["admin"]}  element={<AdminLayout><VendorVerification /></AdminLayout>} />}/>
           <Route path="/buildings" element={<ProtectedRoute allowedRoles={["admin"]}  element={<AdminLayout><BuildingVerification /></AdminLayout>} />}/>
+          <Route path="/wallet" element={<ProtectedRoute allowedRoles={["admin"]}  element={<AdminLayout><AdminWalletPage /></AdminLayout>} />}/>
     </Routes>
   )
 }

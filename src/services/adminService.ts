@@ -164,7 +164,6 @@ export const adminService = {
       }
     },
 
-
    getUserCount: async():Promise<ApiResponse>=>{
     try{
       const response = await adminAxiosInstance.get('/get-user-count');
@@ -177,6 +176,21 @@ export const adminService = {
         data: null
       };
     }
-   }
+   },
+
+   getWalletDetails: async ({page,limit}:{page:number,limit:number}): Promise<ApiResponse> => {
+     try {
+         const response = await adminAxiosInstance.get('/get-wallet-details',{
+         params:{page,limit}
+         });
+         return response.data;
+     } catch (error:any) {
+       console.error('Error fetching wallet details:', error);
+       return {
+         success: false,
+         message: error.message || 'Failed to fetch wallet details. Please try again later.',
+       };
+     }
+   },
 
 }

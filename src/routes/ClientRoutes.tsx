@@ -15,7 +15,7 @@ import BuildingDetailsPage from "@/pages/client/SubPages/BuildingDetails";
 import SpaceBookingPage from "@/pages/client/SubPages/BookSlot";
 import ClientBookings from "@/pages/client/SubPages/Bookings";
 import BookingDetailsPage from "@/pages/client/SubPages/ClientBookingDetails";
-import WalletPage from "@/pages/client/SubPages/ClientWallet";
+import ClientWalletPage from "@/pages/client/SubPages/ClientWallet";
 
 const ClientRoutes = () => {
   return (
@@ -35,7 +35,7 @@ const ClientRoutes = () => {
         <Route path="/book-space/:spaceId" element={<ProtectedRoute allowedRoles={["client"]} element={<SpaceBookingPage/>} />}/>
         <Route path="/bookings" element={<ProtectedRoute allowedRoles={["client"]} element={<ClientBookings/>} />}/>
         <Route path="/booking-details/:bookingId" element={<ProtectedRoute allowedRoles={["client"]} element={<BookingDetailsPage/>} />}/>
-        <Route path="/wallet" element={<ProtectedRoute allowedRoles={["client"]} element={<WalletPage/>} />}/>
+        <Route path="/wallet" element={<ProtectedRoute allowedRoles={["client"]} element={<ClientWalletPage/>} />}/>
 
 
        

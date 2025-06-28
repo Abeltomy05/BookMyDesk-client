@@ -151,7 +151,7 @@ export function GenericTable<T extends BaseItem>({
       animate="visible"
       variants={containerVariants}
     >
-      <motion.h1 className="text-2xl font-bold mb-6 text-[#f69938]" variants={itemVariants}>
+      <motion.h1 className="text-2xl font-bold mb-2 text-[#f69938]" variants={itemVariants}>
         {title}
       </motion.h1>
 
