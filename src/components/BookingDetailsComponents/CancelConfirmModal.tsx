@@ -5,23 +5,34 @@ interface CancelBookingModalProps {
   onClose: () => void;
   onConfirm: (reason: string) => void;
   loading?: boolean;
+  isVendor?: boolean;
 }
 
 const CancelBookingModal: React.FC<CancelBookingModalProps> = ({
   isOpen,
   onClose,
   onConfirm,
-  loading = false
+  loading = false,
+  isVendor = false
 }) => {
   const [selectedReason, setSelectedReason] = useState<string>('');
   const [customReason, setCustomReason] = useState<string>('');
 
-  const defaultReasons = [
+  const clientReasons  = [
     'Change of plans',
     'Found alternative venue',
     'Schedule conflict',
     'Other'
   ];
+
+   const vendorReasons = [
+    'Space unavailable due to maintenance',
+    'Technical issues',
+    'Safety concerns',
+    'Other'
+  ];
+
+  const defaultReasons = isVendor ? vendorReasons : clientReasons;
 
   const handleConfirm = () => {
     const reason = selectedReason === 'Other' ? customReason.trim() : selectedReason;
@@ -66,15 +77,34 @@ const CancelBookingModal: React.FC<CancelBookingModalProps> = ({
           {/* Warning Message */}
           <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
             <div className="flex">
-              <svg className="w-5 h-5 text-red-400 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 18.5c-.77.833.192 2.5 1.732 2.5z" />
+              <svg
+                className="w-5 h-5 text-red-400 mt-0.5 mr-3 flex-shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 18.5c-.77.833.192 2.5 1.732 2.5z"
+                />
               </svg>
               <div>
-                <h3 className="text-sm font-medium text-red-800">Are you sure you want to cancel?</h3>
-                <p className="text-sm text-red-700 mt-1">Please note: Upon cancellation, the refund will be credited to your wallet balance and not to your bank account.</p>
+                <h3 className="text-sm font-medium text-red-800">
+                  {isVendor
+                    ? 'You are about to cancel this booking for the client.'
+                    : 'Are you sure you want to cancel?'}
+                </h3>
+                <p className="text-sm text-red-700 mt-1">
+                  {isVendor
+                    ? 'Upon cancellation, the client will receive a full refund to their wallet. This action cannot be undone.'
+                    : 'Please note: Upon cancellation, the refund will be credited to your wallet balance and not to your bank account.'}
+                </p>
               </div>
             </div>
           </div>
+
 
           {/* Reason Selection */}
           <div className="mb-6">

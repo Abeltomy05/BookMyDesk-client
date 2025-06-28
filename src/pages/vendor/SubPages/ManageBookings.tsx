@@ -11,6 +11,7 @@ import { formatCurrency } from '@/utils/formatters/currency';
 import toast from 'react-hot-toast';
 import { formatDate } from '@/utils/formatters/date';
 import ConfirmModal from '@/components/ReusableComponents/ConfirmModal';
+import CancelBookingModal from '@/components/BookingDetailsComponents/CancelConfirmModal';
 
 const VendorManageBookings = () => {
   const tableRef = useRef<TableRef<BookingData> | null>(null);
@@ -18,6 +19,7 @@ const VendorManageBookings = () => {
   const [currentFilter, setCurrentFilter] = useState<string>("all");
 
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancelLoading, setCancelLoading] = useState(false);
   const [showCompleteModal, setShowCompleteModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<BookingData | null>(null);
 
@@ -83,26 +85,31 @@ const VendorManageBookings = () => {
     setCurrentFilter(filterValue);
   };
 
-   const handleCancelBooking = async () => {
-    // if (!selectedBooking) return;
+  const handleCancelBooking = async (reason: string) => {
+       if (!selectedBooking) return;
     
-    // try {
-    //   const response = await vendorService.updateBookingStatus(selectedBooking._id, 'cancelled');
-    //   if (response.success) {
-    //     if (tableRef.current) {
-    //       tableRef.current.updateItemOptimistically(selectedBooking._id, { status: 'cancelled' });
-    //     }
-    //     toast.success('Booking cancelled successfully. Refund has been processed.');
-    //   } else {
-    //     console.error('Failed to cancel booking:', response.message);
-    //     toast.error(response.message || 'Failed to cancel booking');
-    //   }
-    // } catch (error) {
-    //   console.error('Error cancelling booking:', error);
-    //   toast.error('An error occurred while cancelling the booking');
-    // } finally {
-    //   setSelectedBooking(null);
-    // }
+    setCancelLoading(true);
+    
+    try {
+      const response = await vendorService.cancelBooking( selectedBooking._id, reason );
+
+      if (response.success) {
+        if (tableRef.current) {
+          tableRef.current.updateItemOptimistically(selectedBooking._id, { status: 'cancelled' });
+        }
+        toast.success('Booking cancelled successfully. Refund has been processed.');
+        setShowCancelModal(false);
+        setSelectedBooking(null);
+      } else {
+        console.error('Failed to cancel booking:', response.message);
+        toast.error(response.message || 'Failed to cancel booking');
+      }
+    } catch (error) {
+      console.error('Error cancelling booking:', error);
+      toast.error('An error occurred while cancelling the booking');
+    } finally {
+      setCancelLoading(false);
+    }
   };
 
    const handleCompleteBooking = async () => {
@@ -223,13 +230,13 @@ const VendorManageBookings = () => {
   ];
 
   const tableActions: TableAction<BookingData>[] = [
-    {
-      label: 'View Details',
-      icon: <Eye size={16} />,
-      onClick: (item) => navigate(`/vendor/booking-details/${item._id}`),
-      variant: 'default',
-      refreshAfter: false
-    },
+    // {
+    //   label: 'View Details',
+    //   icon: <Eye size={16} />,
+    //   onClick: (item) => navigate(`/vendor/booking-details/${item._id}`),
+    //   variant: 'default',
+    //   refreshAfter: false
+    // },
     {
       label: 'Mark Completed',
       icon: <CheckCircle size={16} />,
@@ -281,22 +288,15 @@ const VendorManageBookings = () => {
       </div>
 
        {/* Cancel Booking Modal */}
-      <ConfirmModal
+     <CancelBookingModal
         isOpen={showCancelModal}
         onClose={() => {
           setShowCancelModal(false);
           setSelectedBooking(null);
         }}
         onConfirm={handleCancelBooking}
-        title="Cancel Booking"
-        message={
-          selectedBooking 
-            ? `Are you sure you want to cancel this booking? The amount of ${formatCurrency(selectedBooking.totalPrice || 0)} will be refunded back to ${selectedBooking.client?.username || 'the client'}'s wallet. This action cannot be undone.`
-            : 'Are you sure you want to cancel this booking?'
-        }
-        confirmText="Yes, Cancel Booking"
-        cancelText="Keep Booking"
-        variant="danger"
+        loading={cancelLoading}
+        isVendor={true}
       />
 
         {/* Mark Completed Modal */}

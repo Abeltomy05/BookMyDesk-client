@@ -15,6 +15,8 @@ export interface BookingData{
     paymentMethod: PaymentMethod;
     
     transactionId?: string;
+    cancellationReason?: string;
+    cancelledBy?: "vendor" | "client"; 
     createdAt?: Date;
     updatedAt?: Date;
     building?: {

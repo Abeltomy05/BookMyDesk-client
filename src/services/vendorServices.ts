@@ -362,6 +362,22 @@ updateBookingStatus: async (
      }
  },
 
+cancelBooking: async (bookingId: string, reason: string): Promise<ApiResponse> => {
+     try {
+      const response = await vendorAxiosInstance.post(`/cancel-booking`, { 
+        reason,
+        bookingId
+       });
+      return response.data;
+     } catch (error) {
+      console.error('Error cancelling booking:', error);
+      return {
+        success: false,
+        message: 'Failed to cancel booking. Please try again later.',
+      };
+     }
+  }, 
+
  logout: async():Promise<ApiResponse>=>{
     try {
       const response = await vendorAxiosInstance.post("/logout");

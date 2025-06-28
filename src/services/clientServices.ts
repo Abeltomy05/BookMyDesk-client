@@ -33,7 +33,6 @@ export interface LoginData {
   role:string;
 }
 
-
 export interface GetBookingResponse {
   success: boolean;
   data?: BookingData[];
