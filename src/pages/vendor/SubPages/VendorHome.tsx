@@ -252,54 +252,6 @@ const VendorDashboard: React.FC = () => {
             ))}
           </motion.div>
 
-          {/* Quick Actions */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="mb-8"
-          >
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h2>
-            <motion.div 
-              variants={staggerContainer}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
-            >
-              {[
-                { title: "Add New Building", icon: Plus, color: "[#f69938]", bgColor: "bg-orange-100", borderColor: "hover:border-[#f69938]" },
-                { title: "Add Space", icon: Plus, color: "green-600", bgColor: "bg-green-100", borderColor: "hover:border-green-300" },
-                { title: "Manage Bookings", icon: Calendar, color: "purple-600", bgColor: "bg-purple-100", borderColor: "hover:border-purple-300" },
-                { title: "Settings", icon: Settings, color: "orange-600", bgColor: "bg-orange-100", borderColor: "hover:border-orange-300" }
-              ].map((action, index) => (
-                <motion.button
-                  key={index}
-                  variants={cardVariants}
-                  whileHover={{ 
-                    y: -5,
-                    scale: 1.02,
-                    boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
-                    transition: { duration: 0.3 }
-                  }}
-                  whileTap={{ scale: 0.98 }}
-                  className={`bg-white rounded-xl p-6 shadow-sm border border-gray-200 ${action.borderColor} transition-all duration-300 group`}
-                >
-                  <div className="flex flex-col items-center text-center">
-                    <motion.div 
-                      whileHover={{ scale: 1.2, rotate: 5 }}
-                      transition={{ duration: 0.3 }}
-                      className={`w-12 h-12 ${action.bgColor} rounded-lg flex items-center justify-center mb-3`}
-                    >
-                      <action.icon className={`w-6 h-6 text-${action.color}`} />
-                    </motion.div>
-                    <span className="font-medium text-gray-900">{action.title}</span>
-                  </div>
-                </motion.button>
-              ))}
-            </motion.div>
-          </motion.div>
 
 
 
