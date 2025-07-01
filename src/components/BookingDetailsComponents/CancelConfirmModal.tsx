@@ -98,8 +98,8 @@ const CancelBookingModal: React.FC<CancelBookingModalProps> = ({
                 </h3>
                 <p className="text-sm text-red-700 mt-1">
                   {isVendor
-                    ? 'Upon cancellation, the client will receive a full refund to their wallet. This action cannot be undone.'
-                    : 'Please note: Upon cancellation, the refund will be credited to your wallet balance and not to your bank account.'}
+                    ? 'Upon cancellation, the client will receive a full refund to their wallet (including the platform fee). This action cannot be undone.'
+                    : 'Please note: Upon cancellation, the refund will be credited to your wallet balance and not to your bank account. A 5% cancellation fee will be deducted, and the remaining amount will be refunded.'}
                 </p>
               </div>
             </div>

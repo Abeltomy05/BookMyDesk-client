@@ -1,9 +1,13 @@
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import authAxiosInstance from "@/api/auth.axios";
 import { vendorAxiosInstance } from "@/api/vendor.axios";
 import type { BuildingRegistrationData, GetAllBuildingsResponse, GetBuildingsParams } from "@/types/building.type";
 import type { Building } from "@/types/view&editBuilding";
-import type { VendorRetryFormData } from "@/utils/validations/retry-vendor.validation";
 import type { GetBookingResponse } from "./clientServices";
+import type { VendorHomeData } from '@/types/vendor-home.types'; 
+import { formatCurrency } from '@/utils/formatters/currency';
+import { formatDate } from '@/utils/formatters/date';
 
 interface ApiResponse {
   success: boolean;
@@ -406,6 +410,76 @@ getHomeData: async ()=>{
   }
 },
 
+//download report
+downloadPdf: (data: VendorHomeData,vendorData:{username?:string,companyName?:string,email?:string})=>{
+   const monthlyData = Array.isArray(data.monthlyBookings) ? data.monthlyBookings : [];
+   const recentBookings = Array.isArray(data.completedBookings) ? data.completedBookings : [];
+   const doc = new jsPDF();
+
+   //Heading
+   doc.setFont('helvetica', 'bold');
+   doc.setFontSize(22);
+   doc.text('Book My Desk', 70, 20);
+
+   doc.setFontSize(13);
+   doc.text('Vendor Revenue Report', 69, 30);
+
+
+   doc.setFontSize(12);
+
+    // Name
+    doc.setFont('helvetica', 'bold');
+    doc.text('Name:', 14, 40);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`${vendorData.username || ''}`, 40, 40);
+
+    // Company
+    doc.setFont('helvetica', 'bold');
+    doc.text('Company:', 14, 46);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`${vendorData.companyName || ''}`, 40, 46);
+
+    // Email
+    doc.setFont('helvetica', 'bold');
+    doc.text('Email:', 14, 52);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`${vendorData.email || ''}`, 40, 52);
+
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.text('Monthly Booking', 14, 65);
+
+   autoTable(doc, {
+      startY: 70,
+      head: [['Month', 'Bookings', 'Revenue']],
+      body: monthlyData.map((m) => [
+        m.month,
+        m.bookings.toString(),
+        formatCurrency(m.revenue),
+      ]),
+    });
+
+   const startY = (doc as any).lastAutoTable.finalY + 10;
+   doc.setFontSize(14);
+   doc.text('Recent Completed Bookings', 14, startY);
+
+    autoTable(doc, {
+      startY: startY + 5,
+      head: [['Booking ID', 'Customer', 'Space', 'Building', 'Desks', 'Amount', 'Date']],
+      body: recentBookings.slice(0, 5).map((b) => [
+        b._id.slice(0,16),
+        b.client?.username || '',
+        b.space?.name || '',
+        b.building?.buildingName || '',
+        b.numberOfDesks.toString(),
+        formatCurrency(b.totalPrice),
+        formatDate(b.bookingDate),
+      ]),
+    });
+
+  doc.save('vendor-revenue-report.pdf');
+},
 
  logout: async():Promise<ApiResponse>=>{
     try {

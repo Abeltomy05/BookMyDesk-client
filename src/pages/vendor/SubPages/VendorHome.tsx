@@ -65,6 +65,7 @@ const textVariants = {
 
 const VendorDashboard: React.FC = () => {
   const user = useSelector((state: RootState) => state.vendor.vendor);
+  console.log("Vendor Details",user)
   const [loading, setLoading] = useState(true);
   const [homeData, setHomeData] = useState<VendorHomeData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -102,7 +103,15 @@ const VendorDashboard: React.FC = () => {
   : [];
   console.log('CharacterData',revenueData)
 
-
+  const handleDownloadReport = () => {
+    if (!homeData) return;
+    const vendorData = {
+      username:user?.username,
+      companyName: user?.companyName,
+      email: user?.email,
+    }
+    vendorService.downloadPdf(homeData,vendorData);
+  };
 
   const completedBookings = homeData ? homeData.completedBookings  : [];
 
@@ -303,6 +312,7 @@ const VendorDashboard: React.FC = () => {
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Download Reports</h3>
                   <div className="space-y-3">
                     <motion.button
+                      onClick={handleDownloadReport}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       className="w-full bg-[#f69938] text-white py-3 px-4 rounded-lg hover:bg-[#e8872e] transition-colors duration-200 flex items-center justify-center space-x-2"
