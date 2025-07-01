@@ -393,9 +393,11 @@ getWalletDetails: async ({page,limit}:{page:number,limit:number}): Promise<ApiRe
   }
 },  
 
-getHomeData: async ()=>{
+getHomeData: async (page = 1, limit = 5, onlyTable = false)=>{
   try {
-    const response = await vendorAxiosInstance.get("/get-vendor-home-data");
+    const response = await vendorAxiosInstance.get("/get-vendor-home-data",{
+       params: { page, limit, onlyTable },
+    });
     return response.data;
   } catch (error:any) {
     console.error('Error fetching vendor home details:', error);

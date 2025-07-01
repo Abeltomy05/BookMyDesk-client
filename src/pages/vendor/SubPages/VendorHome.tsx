@@ -71,15 +71,30 @@ const VendorDashboard: React.FC = () => {
 
   const navigate = useNavigate()
 
-  const fetchData = async () => {
+  const fetchData = async (page = 1, limit = 2, onlyTable = false) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await vendorService.getHomeData();
+      const response = await vendorService.getHomeData(page, limit, onlyTable);
       console.log(response.data)
       if (response.success) {
+        if (onlyTable) {
+        setHomeData(prev => {
+        if (!prev) return prev; 
+        return {
+          ...prev,
+          completedBookings: response.data.completedBookings,
+          completedBookingsCount: response.data.completedBookingsCount,
+          pagination: response.data.pagination,
+          totalBuildings: prev.totalBuildings,
+          totalSpaces: prev.totalSpaces,
+          totalRevenue: prev.totalRevenue,
+          monthlyBookings: prev.monthlyBookings
+        };
+      });
+      } else {
         setHomeData(response.data);
-        console.log(response.data)
+      }
       } else {
         setError(response.message || 'Failed to fetch data');
       }
@@ -95,6 +110,10 @@ const VendorDashboard: React.FC = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const handlePageChange = (newPage:number) => {
+  fetchData(newPage, 2, true); 
+};
 
 
   const revenueData: RevenueDataPoint[] = Array.isArray(homeData?.monthlyBookings)
@@ -123,7 +142,7 @@ const VendorDashboard: React.FC = () => {
           <div className="text-center">
             <p className="text-red-600 mb-4">{error}</p>
             <button 
-              onClick={fetchData}
+              onClick={()=>fetchData()}
               className="bg-[#f69938] text-white px-4 py-2 rounded-lg hover:bg-[#e8872e] transition-colors"
             >
               Retry
@@ -336,6 +355,8 @@ const VendorDashboard: React.FC = () => {
             {/* Completed Bookings Table */}
             <CompletedBookingsTable 
             completedBookings={completedBookings}
+            pagination={homeData?.pagination!}
+            onPageChange={handlePageChange}
             loading={loading}
             onViewAll={() => {
               navigate('/vendor/bookings')

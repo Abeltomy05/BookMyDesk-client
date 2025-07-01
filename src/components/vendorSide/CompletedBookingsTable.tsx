@@ -19,10 +19,14 @@ const CompletedBookingsTable: React.FC<{
   completedBookings: CompletedBooking[];
   loading: boolean;
   onViewAll?: () => void;
+  pagination: { currentPage: number; totalPages: number };
+  onPageChange: (page: number) => void;
 }> = ({ 
   completedBookings = [], 
   loading = false, 
-  onViewAll 
+  onViewAll,
+  pagination,  
+  onPageChange  
 }) => {
 
   const tableVariants = {
@@ -179,6 +183,29 @@ const CompletedBookingsTable: React.FC<{
           </table>
         </div>
       </div>
+      {pagination.totalPages > 1 && (
+        <div className="flex justify-end px-6 py-4 border-t border-gray-200">
+          <div className="flex items-center space-x-2">
+            <button
+              disabled={pagination.currentPage === 1}
+              onClick={() => onPageChange(pagination.currentPage - 1)}
+              className="px-3 py-1 rounded border text-sm disabled:opacity-50"
+            >
+              Prev
+            </button>
+            <span className="text-sm text-gray-700">
+              Page {pagination.currentPage} of {pagination.totalPages}
+            </span>
+            <button
+              disabled={pagination.currentPage === pagination.totalPages}
+              onClick={() => onPageChange(pagination.currentPage + 1)}
+              className="px-3 py-1 rounded border text-sm disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 };
