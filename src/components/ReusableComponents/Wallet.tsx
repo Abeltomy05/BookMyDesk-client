@@ -8,20 +8,13 @@ import { LightGenericTable } from "@/components/ReusableComponents/LightGenericT
 import type { TableColumn } from "@/types/table.type"
 import type { FetchParams } from "@/types/api.type"
 import type { WalletData, WalletTransaction } from "@/types/wallet.type";
+import StripeTopUpModal from "./TopUpModal";
 
 
 interface WalletService {
   getWalletDetails: (params: { page: number; limit: number }) => Promise<{
     success: boolean
     data?: WalletData
-    message?: string
-  }>
-  topUpWallet?: (params: { amount: number }) => Promise<{
-    success: boolean
-    message?: string
-  }>
-  withdrawFunds?: (params: { amount: number }) => Promise<{
-    success: boolean
     message?: string
   }>
 }
@@ -98,60 +91,15 @@ const WalletComponent: React.FC<WalletComponentProps> = ({
     }
   }
 
-  const handleTopUp = async () => {
-    if (!walletService.topUpWallet) {
-      console.warn('Top up service not provided');
-      return;
-    }
-
-    const amount = Number.parseFloat(topUpAmount)
-    if (amount <= 0) return;
-
-    setIsLoading(true);
-    try {
-      const response = await walletService.topUpWallet({ amount });
-      if (response.success) {
-        setTopUpAmount("")
-        setShowTopUpModal(false)
-        
-        // Refresh the table to get updated data
-        if (tableRef.current) {
-          (tableRef.current as any).refreshData()
-        }
-      }
-    } catch (error) {
-      console.error('Error topping up wallet:', error);
-    } finally {
-      setIsLoading(false);
+  const handleTopUpSuccess = async (amount?: number) => {
+     setShowTopUpModal(false)
+     if (tableRef.current) {
+      (tableRef.current as any).refreshData()
     }
   }
 
   const handleWithdraw = async () => {
-    if (!enableWithdrawal || !walletService.withdrawFunds) {
-      console.warn('Withdrawal not enabled or service not provided');
-      return;
-    }
-
-    const amount = Number.parseFloat(withdrawAmount)
-    if (amount <= 0 || amount > balance) return;
-
-    setIsLoading(true);
-    try {
-      const response = await walletService.withdrawFunds({ amount });
-      if (response.success) {
-        setWithdrawAmount("")
-        setShowWithdrawModal(false)
-
-        // Refresh the table to get updated data
-        if (tableRef.current) {
-          (tableRef.current as any).refreshData()
-        }
-      }
-    } catch (error) {
-      console.error('Error withdrawing funds:', error);
-    } finally {
-      setIsLoading(false);
-    }
+   console.log("withdraw")
   }
 
   const getTypeIcon = (type: string) => {
@@ -318,61 +266,12 @@ const getTypeColor = (type: string) => {
         />
 
         {/* Top Up Modal */}
-        {showTopUpModal && (
-          <div className="fixed inset-0 bg-black/40 backdrop-blur bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-2xl p-6 w-full max-w-md">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Top Up Wallet</h3>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Amount</label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
-                  <input
-                    type="number"
-                    value={topUpAmount}
-                    onChange={(e) => setTopUpAmount(e.target.value)}
-                      className={clsx(
-                            "w-full pl-8 pr-4 py-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:border-transparent",
-                            `focus:ring-${primaryColor}`
-                        )}
-                    placeholder="0.00"
-                    min="0"
-                    step="0.01"
-                    disabled={isLoading}
-                  />
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setShowTopUpModal(false)}
-                  disabled={isLoading}
-                  className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleTopUp}
-                  disabled={isLoading || !topUpAmount || Number.parseFloat(topUpAmount) <= 0}
-                  className="flex-1 px-4 py-3 text-white rounded-xl font-semibold transition-colors duration-200 disabled:opacity-50"
-                  style={{ 
-                    backgroundColor: primaryColor,
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isLoading && topUpAmount && Number.parseFloat(topUpAmount) > 0) {
-                      e.currentTarget.style.backgroundColor = primaryColorHover;
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isLoading && topUpAmount && Number.parseFloat(topUpAmount) > 0) {
-                      e.currentTarget.style.backgroundColor = primaryColor;
-                    }
-                  }}
-                >
-                  {isLoading ? 'Processing...' : 'Top Up'}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+         <StripeTopUpModal
+          isOpen={showTopUpModal}
+          onClose={() => setShowTopUpModal(false)}
+          onSuccess={handleTopUpSuccess}
+          currentBalance={balance}
+        />
 
         {/* Withdraw Modal */}
         {showWithdrawModal && enableWithdrawal && (

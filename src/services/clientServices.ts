@@ -397,7 +397,7 @@ export const clientService = {
      }
   },
 
-  //wallet
+  // wallet
 
   getWalletDetails: async ({page,limit}:{page:number,limit:number}): Promise<ApiResponse> => {
     try {
@@ -433,6 +433,35 @@ export const clientService = {
     }
   },
 
+  // wallet topup
+
+  createTopUpPaymentIntent:async({amount,currency}:{amount:number,currency:string}): Promise<ApiResponse>=>{
+    try {
+      const response = await clientAxiosInstance.post('/create-topup-payment-intent',{amount,currency});
+      return response.data;
+    } catch (error:any) {
+       console.error('Error creating payment intent:', error);
+       const message = error.response?.data?.message || error.message || "Unknown error occurred";
+      return {
+        success: false,
+        message,
+      };
+    }
+  },
+
+  confirmTopUpPayment: async(paymentIntentId: string):Promise<ApiResponse>=>{
+    try {
+       const response = await clientAxiosInstance.post("/confirm-topup-payment",{ paymentIntentId });
+       return response.data;
+    } catch (error:any) {
+        console.error('Error confirm topup payment intent:', error);
+       const message = error.response?.data?.message || error.message || "Unknown error occurred";
+      return {
+        success: false,
+        message,
+      };
+    }
+  },
 
 
 

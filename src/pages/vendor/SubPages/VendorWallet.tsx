@@ -14,7 +14,7 @@ const VendorWalletPage: React.FC = () => {
         title="My Wallet"
         subtitle="Manage your balance and view transaction history"
         walletService={vendorService}
-        showTopUpButton={true}
+        showTopUpButton={false}
         showWithdrawButton={false}
         primaryColor="#f69938"
         primaryColorHover="#e8872e"
