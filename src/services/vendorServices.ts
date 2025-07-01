@@ -393,6 +393,20 @@ getWalletDetails: async ({page,limit}:{page:number,limit:number}): Promise<ApiRe
   }
 },  
 
+getHomeData: async ()=>{
+  try {
+    const response = await vendorAxiosInstance.get("/get-vendor-home-data");
+    return response.data;
+  } catch (error:any) {
+    console.error('Error fetching vendor home details:', error);
+    return {
+      success: false,
+      message: error.message || 'Failed to fetch vendor home details. Please try again later.',
+    };
+  }
+},
+
+
  logout: async():Promise<ApiResponse>=>{
     try {
       const response = await vendorAxiosInstance.post("/logout");
