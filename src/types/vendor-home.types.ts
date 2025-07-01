@@ -33,11 +33,6 @@ export interface VendorHomeData {
       }
     }
   }>;
-  pagination: {
-    totalItems: number;
-    currentPage: number;
-    totalPages: number;
-  };
 }
 
 //revenur chart component
