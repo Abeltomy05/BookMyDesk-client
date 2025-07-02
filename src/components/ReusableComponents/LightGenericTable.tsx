@@ -3,6 +3,7 @@ import { motion } from "framer-motion"
 import { Search, MoreVertical, ChevronLeft, ChevronRight, AlertCircle } from "lucide-react"
 import { type BaseItem, type TableConfiguration, type PaginationInfo, type TableAction} from "@/types/table.type"
 import type { ApiResponse, FetchParams } from "@/types/api.type"
+import { TableLoadingSkeleton } from "@/components/Skeletons/TableLoadingSkeleton"
 
 interface GenericTableProps<T extends BaseItem> extends TableConfiguration<T> {
   fetchData: (params: FetchParams) => Promise<ApiResponse<T>>
@@ -97,7 +98,9 @@ function LightGenericTableInner<T extends BaseItem>(
       setPagination(prev => ({ ...prev, totalPages: 0, totalItems: 0 }))
       console.error("Fetch error:", err)
     } finally {
+      setTimeout(()=>{
       setLoading(false)
+      },2000)
     }
   }
 
@@ -261,10 +264,12 @@ function LightGenericTableInner<T extends BaseItem>(
 
         {/* Loading State */}
         {loading && (
-          <div className="p-8 text-center text-gray-500">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#f69938] mx-auto"></div>
-            <p className="mt-2">{loadingMessage}</p>
-          </div>
+          <TableLoadingSkeleton 
+            rows={itemsPerPage} 
+            columns={columns.length} 
+            showActions={enableActions && actions.length > 0} 
+            variant="light"
+          />
         )}
 
         {/* Data Rows */}

@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect  } from "react"
+import { TableLoadingSkeleton } from "@/components/Skeletons/TableLoadingSkeleton"
 import { motion } from "framer-motion"
 import {
   ChevronLeft,
@@ -142,7 +143,9 @@ const [totalItems, setTotalItems] = useState(0)
   } catch (error) {
     console.error('Error fetching bookings:', error)
   } finally {
-    setLoading(false)
+    setTimeout(()=>{
+      setLoading(false);
+    },2000)
   }
 }
 
@@ -283,50 +286,63 @@ useEffect(() => {
                   </tr>
                 </thead>
                 <tbody>
-                  {currentBookings.map((booking, index) => (
-                    <motion.tr
+                  {loading ? (
+                    <tr>
+                      <td colSpan={8} className="p-0">
+                        <TableLoadingSkeleton 
+                          rows={4} 
+                          columns={8} 
+                          showActions={false}
+                          variant="dark"
+                        />
+                      </td>
+                    </tr>
+                  ) : (
+                    currentBookings.map((booking, index) => (
+                      <motion.tr
                         key={booking._id}
                         className="border-b border-gray-700 hover:bg-gray-750 transition-colors"
                         variants={itemVariants}
                         initial="hidden"
                         animate="visible"
                         transition={{ delay: index * 0.05 }}
-                    >
+                      >
                         <td className="p-4 text-white font-medium">{booking._id}</td>
                         <td className="p-4 text-white">
-                        <div className="flex flex-col leading-tight">
+                          <div className="flex flex-col leading-tight">
                             <span className="font-medium">{booking.clientName}</span>
                             <span className="text-gray-400 text-sm">{booking.clientEmail}</span>
-                        </div>
+                          </div>
                         </td>
                         <td className="p-4 text-white">
-                        <div className="flex flex-col leading-tight">
+                          <div className="flex flex-col leading-tight">
                             <span className="font-medium">{booking.vendorName}</span>
                             <span className="text-gray-400 text-sm">{booking.vendorEmail}</span>
-                        </div>
+                          </div>
                         </td>
                         <td className="p-4 text-white">{booking.buildingName}</td>
                         <td className="p-4 text-white">{booking.spaceName}</td>
                         <td className="p-4 text-white">
-                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2">
                             <Calendar size={14} className="text-gray-400" />
                             <span>{new Date(booking.bookingDate).toLocaleDateString()}</span>
-                        </div>
+                          </div>
                         </td>
                         <td className="p-4">
-                        <Badge className={`flex items-center gap-1 w-fit ${getStatusColor(booking.status)}`}>
+                          <Badge className={`flex items-center gap-1 w-fit ${getStatusColor(booking.status)}`}>
                             {getStatusIcon(booking.status)}
                             {booking.status}
-                        </Badge>
+                          </Badge>
                         </td>
                         <td className="p-4 text-white font-semibold">₹{booking.totalPrice}</td>
-                    </motion.tr>
-                  ))}
+                      </motion.tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
 
-            {currentBookings.length === 0 && (
+           {currentBookings.length === 0 && !loading && (
               <div className="text-center py-12">
                 <p className="text-gray-400 text-lg">No bookings found matching your criteria</p>
               </div>
