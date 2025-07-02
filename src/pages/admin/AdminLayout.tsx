@@ -181,12 +181,6 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                       transition={{ duration: 0.2 }}
                       className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg border border-gray-700 py-1 z-50"
                     >
-                      <a href="#" className="block px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">
-                        <div className="flex items-center">
-                          <User size={16} className="mr-2" />
-                          <span>Profile</span>
-                        </div>
-                      </a>
                       <button 
                         onClick={handleLogout}
                         className="w-full block px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white transition-colors text-left"

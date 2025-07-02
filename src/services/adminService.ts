@@ -226,6 +226,20 @@ export const adminService = {
       data: null, 
     };
     }
-   }
+   },
+
+   getSingleVendorData: async(vendorId:string):Promise<ApiResponse>=>{
+    try {
+      const response = await adminAxiosInstance.get(`/get-single-vendor/${vendorId}`);
+      return response.data;
+    } catch (error) {
+       console.error("Error fetching vendor data:", error);
+    return {
+      success: false,
+      message: "Failed to fetch vendor data.",
+      data: null, 
+    };
+    }
+   },
 
 }

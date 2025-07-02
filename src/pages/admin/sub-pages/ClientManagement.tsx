@@ -4,7 +4,8 @@ import { adminService } from "@/services/adminService"
 import { User, Shield} from "lucide-react"
 import toast from "react-hot-toast"
 import type { FetchParams, ApiResponse } from "@/types/api.type"
-import { useState } from "react"
+import { useRef, useState } from "react"
+import type { TableRef } from "@/components/ReusableComponents/LightGenericTable"
 
 interface ClientUser {
   _id: string
@@ -16,6 +17,8 @@ interface ClientUser {
 }
 
 function ClientManagement() {
+  const tableRef = useRef<TableRef<ClientUser>>(null)
+
   const columns: TableColumn<ClientUser>[] = [
     {
       key: "user",
@@ -73,6 +76,7 @@ function ClientManagement() {
           const newStatus = user.status === "active" ? "blocked" : "active"
           const response = await adminService.updateEntityStatus("client", user._id, newStatus)
           if (response.success) {
+            tableRef.current?.updateItemOptimistically(user._id, { status: newStatus })
             toast.success(`User ${newStatus === "active" ? "unblocked" : "blocked"} successfully`)
           } else {
             toast.error(response.message || "Failed to update user status")
@@ -82,9 +86,9 @@ function ClientManagement() {
           console.error("Status update error:", error)
         }
       },
-      refreshAfter:true,
+      refreshAfter:false,
       variant: "danger",
-      condition: (user) => true
+      condition: () => true
     }
   ]
 
@@ -127,6 +131,7 @@ function ClientManagement() {
 
   return (
     <GenericTable<ClientUser>
+      ref={tableRef}
       title="Client Management"
       columns={columns}
       actions={actions}

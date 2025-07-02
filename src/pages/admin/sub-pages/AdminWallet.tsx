@@ -142,7 +142,7 @@ export default function AdminWalletPage() {
               </div>
             </div>
             
-            <motion.button
+            {/* <motion.button
               onClick={handleWithdraw}
               disabled={isWithdrawing}
               className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
@@ -164,7 +164,7 @@ export default function AdminWalletPage() {
                   <span>Withdraw</span>
                 </>
               )}
-            </motion.button>
+            </motion.button> */}
           </div>
         </motion.div>
 
