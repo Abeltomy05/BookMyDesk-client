@@ -342,9 +342,9 @@ export default function BuildingsListing() {
                     className="w-full px-6 py-2 border border-[#f69938] text-[#f69938] hover:bg-orange-50 rounded transition-colors cursor-pointer">
                       DETAILS
                     </button>
-                    <button className="w-full px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors cursor-pointer">
+                    {/* <button className="w-full px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors cursor-pointer">
                       BOOK NOW
-                    </button>
+                    </button> */}
                   </div>
                 </div>
               </div>

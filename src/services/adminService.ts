@@ -164,7 +164,6 @@ export const adminService = {
       }
     },
 
-
    getUserCount: async():Promise<ApiResponse>=>{
     try{
       const response = await adminAxiosInstance.get('/get-user-count');
@@ -177,6 +176,70 @@ export const adminService = {
         data: null
       };
     }
-   }
+   },
+
+   getWalletDetails: async ({page,limit}:{page:number,limit:number}): Promise<ApiResponse> => {
+     try {
+         const response = await adminAxiosInstance.get('/get-wallet-details',{
+         params:{page,limit}
+         });
+         return response.data;
+     } catch (error:any) {
+       console.error('Error fetching wallet details:', error);
+       return {
+         success: false,
+         message: error.message || 'Failed to fetch wallet details. Please try again later.',
+       };
+     }
+   },
+
+   getVendorsAndBuildings:async():Promise<ApiResponse>=>{
+    try {
+       const response = await adminAxiosInstance.get("/get-vendor-buildings");
+       return response.data;
+    } catch (error:any) {
+     console.error('Error fetching wallet details:', error);
+       return {
+         success: false,
+         message: error.message || 'Failed to fetch wallet details. Please try again later.',
+       };
+    }
+   },
+
+   getBookingsForAdmin:async(params:{ page: number; limit: number; vendorId?: string; buildingId?: string; status?: string }):Promise<ApiResponse>=>{
+    try {
+       const response = await adminAxiosInstance.get("/get-bookings",{
+        params: {
+        page: params.page,
+        limit: params.limit,
+        vendorId: params.vendorId,
+        buildingId: params.buildingId,
+        status: params.status,
+      },
+       })
+       return response.data;
+    } catch (error) {
+      console.error("Error fetching bookings:", error);
+    return {
+      success: false,
+      message: "Failed to fetch bookings.",
+      data: null, 
+    };
+    }
+   },
+
+   getSingleVendorData: async(vendorId:string):Promise<ApiResponse>=>{
+    try {
+      const response = await adminAxiosInstance.get(`/get-single-vendor/${vendorId}`);
+      return response.data;
+    } catch (error) {
+       console.error("Error fetching vendor data:", error);
+    return {
+      success: false,
+      message: "Failed to fetch vendor data.",
+      data: null, 
+    };
+    }
+   },
 
 }

@@ -1,5 +1,5 @@
 import { Phone, Wifi, Car, Coffee, Users, ShieldCheck, Printer, MapPin, Clock } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect, lazy, Suspense } from "react";
 import ClientLayout from "../ClientLayout";
 import { clientService } from "@/services/clientServices";
@@ -17,7 +17,11 @@ export default function BuildingDetailsPage() {
     const [isImageModalOpen, setIsImageModalOpen] = useState(false);
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
+    const navigate = useNavigate()
+
     useEffect(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+
         const fetchBuildingData = async () => {
             try {
                 if (!buildingId) {
@@ -186,54 +190,81 @@ export default function BuildingDetailsPage() {
 
                     {/* Booking Options Section */}
                    <div className="mb-12">
-                    <h2 className="text-2xl font-bold mb-6">Available Spaces</h2>
-                    {buildingData.summarizedSpaces && buildingData.summarizedSpaces.length > 0 ? (
-                        <>
-                        <div className="grid md:grid-cols-3 gap-6 mb-4">
-                            {buildingData.summarizedSpaces.slice(0, 3).map((space, i) => (
-                            <div
-                                key={space._id}
-                                className="relative overflow-hidden group cursor-pointer rounded-lg shadow-md"
-                            >
-                                <div className="relative">
-                                <img
-                                    src={
-                                    buildingData.images && buildingData.images[i % buildingData.images.length]
-                                        ? buildingData.images[i % buildingData.images.length]
-                                        : mainImage
-                                    }
-                                    alt={space.name}
-                                    className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-115"
-                                    onError={(e) => {
-                                    const target = e.target as HTMLImageElement;
-                                    target.src = mainImage;
-                                    }}
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/90 from-20% via-black/40 via-40% to-transparent group-hover:from-black/95 transition-all duration-300" />
-                                <div className="absolute bottom-4 left-4">
-                                    <span className="text-white text-2xl font-semibold tracking-wide block">
-                                    {space.name.toUpperCase()}
-                                    </span>
-                                    <span className="text-white text-sm block">
-                                    ₹{space.price}/day • {space.count} available
-                                    </span>
-                                </div>
-                                </div>
+                        <h2 className="text-2xl font-bold mb-6">Available Spaces</h2>
+                        {buildingData.spaces && buildingData.spaces.length > 0 ? (
+                            <>
+                            <div className="grid md:grid-cols-3 gap-6 mb-4">
+                                {buildingData.spaces.slice(0, 3).map((space, i) => {
+                                    const isUnavailable = !space.isAvailable;
+                                    const hasNoCapacity = space.capacity === 0;
+                                    const isNotClickable = isUnavailable || hasNoCapacity;
+                                    
+                                    return (
+                                    <div
+                                        key={space._id}
+                                        className={`relative overflow-hidden group rounded-lg shadow-md ${
+                                            isNotClickable 
+                                                ? 'cursor-not-allowed opacity-75' 
+                                                : 'cursor-pointer'
+                                        }`}
+                                        onClick={isNotClickable ? undefined : () => navigate(`/book-space/${space._id}`)}
+                                    >
+                                        <div className="relative">
+                                        <img
+                                            src={
+                                            buildingData.images && buildingData.images[i % buildingData.images.length]
+                                                ? buildingData.images[i % buildingData.images.length]
+                                                : mainImage
+                                            }
+                                            alt={space.name}
+                                            className={`w-full h-48 object-cover transition-transform duration-300 ${
+                                                isNotClickable ? '' : 'group-hover:scale-115'
+                                            }`}
+                                            onError={(e) => {
+                                            const target = e.target as HTMLImageElement;
+                                            target.src = mainImage;
+                                            }}
+                                        />
+                                        <div className={`absolute inset-0 bg-gradient-to-t from-black/90 from-20% via-black/40 via-40% to-transparent transition-all duration-300 ${
+                                            isNotClickable ? '' : 'group-hover:from-black/95'
+                                        }`} />
+                                        
+                                        {/* Unavailability Overlay */}
+                                        {isNotClickable && (
+                                            <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                                                <div className="bg-red-600 text-white px-4 py-2 rounded-lg text-center">
+                                                    <p className="font-semibold text-sm">
+                                                        {isUnavailable ? 'Space Not Available Currently' : 'Zero Space Available'}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        )}
+                                        
+                                        <div className="absolute bottom-4 left-4">
+                                            <span className="text-white text-2xl font-semibold tracking-wide block">
+                                            {space.name.toUpperCase()}
+                                            </span>
+                                            <span className="text-white text-sm block">
+                                            ₹{space.pricePerDay}/day • {space.capacity} available
+                                            </span>
+                                        </div>
+                                        </div>
+                                    </div>
+                                    );
+                                })}
                             </div>
-                            ))}
-                        </div>
 
-                        {buildingData.summarizedSpaces.length > 3 && (
-                            <div className="text-right">
-                            <button className="text-blue-600 hover:text-blue-800 underline">See More →</button>
+                            {buildingData.spaces.length > 3 && (
+                                <div className="text-right">
+                                <button className="text-blue-600 hover:text-blue-800 underline">See More →</button>
+                                </div>
+                            )}
+                            </>
+                        ) : (
+                            <div className="text-center py-8">
+                            <p className="text-gray-500">No spaces available at the moment.</p>
                             </div>
                         )}
-                        </>
-                    ) : (
-                        <div className="text-center py-8">
-                        <p className="text-gray-500">No spaces available at the moment.</p>
-                        </div>
-                    )}
                     </div>
 
                     {/* Photos and Amenities Section */}

@@ -1,8 +1,10 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useImperativeHandle, forwardRef } from "react"
 import { motion } from "framer-motion"
 import { Search, MoreVertical, ChevronLeft, ChevronRight, AlertCircle } from "lucide-react"
 import { type BaseItem, type TableConfiguration, type PaginationInfo, type TableAction} from "@/types/table.type"
 import type { ApiResponse, FetchParams } from "@/types/api.type"
+import { TableLoadingSkeleton } from "@/components/Skeletons/TableLoadingSkeleton"
+import type { TableRef } from "./LightGenericTable"
 
 interface GenericTableProps<T extends BaseItem> extends TableConfiguration<T> {
   fetchData: (params: FetchParams) => Promise<ApiResponse<T>>
@@ -11,7 +13,7 @@ interface GenericTableProps<T extends BaseItem> extends TableConfiguration<T> {
   onFilterChange?: (filterValue: string) => void
 }
 
-export function GenericTable<T extends BaseItem>({
+function GenericTableInner<T extends BaseItem>({
   title,
   columns,
   actions = [],
@@ -27,7 +29,8 @@ export function GenericTable<T extends BaseItem>({
   onRefresh,
   className = "",
   onFilterChange
-}: GenericTableProps<T>) {
+}: GenericTableProps<T>,
+ref: React.Ref<TableRef<T>>) {
   const [data, setData] = useState<T[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -40,6 +43,19 @@ export function GenericTable<T extends BaseItem>({
     totalItems: 0,
     itemsPerPage
   })
+
+  useImperativeHandle(ref, () => ({
+    updateItemOptimistically: (id: string, updates: Partial<T>) => {
+      setData(prevData =>
+        prevData.map(item =>
+          item._id === id ? { ...item, ...updates } : item
+        )
+      )
+    },
+    refreshData: () => {
+      loadData(pagination.currentPage, searchQuery)
+    }
+  }))
 
   const loadData = async (page: number = 1, search: string = "") => {
     setLoading(true)
@@ -77,7 +93,9 @@ export function GenericTable<T extends BaseItem>({
       setPagination(prev => ({ ...prev, totalPages: 0, totalItems: 0 }))
       console.error("Fetch error:", err)
     } finally {
-      setLoading(false)
+      setTimeout(()=>{
+         setLoading(false);
+      },2000)
     }
   }
 
@@ -103,10 +121,13 @@ export function GenericTable<T extends BaseItem>({
     setActiveDropdown(null)
     try {
       await action.onClick(item)
-      if (onRefresh) {
-        onRefresh()
-      } else {
-        loadData(pagination.currentPage, searchQuery)
+
+     if (action.refreshAfter !== false) {
+        if (onRefresh) {
+          onRefresh()
+        } else {
+          loadData(pagination.currentPage, searchQuery)
+        }
       }
     } catch (error) {
       console.error("Action failed:", error)
@@ -151,7 +172,7 @@ export function GenericTable<T extends BaseItem>({
       animate="visible"
       variants={containerVariants}
     >
-      <motion.h1 className="text-2xl font-bold mb-6 text-[#f69938]" variants={itemVariants}>
+      <motion.h1 className="text-2xl font-bold mb-2 text-[#f69938]" variants={itemVariants}>
         {title}
       </motion.h1>
 
@@ -224,10 +245,12 @@ export function GenericTable<T extends BaseItem>({
 
         {/* Loading State */}
         {loading && (
-          <div className="p-8 text-center text-gray-400">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#f69938] mx-auto"></div>
-            <p className="mt-2">{loadingMessage}</p>
-          </div>
+          <TableLoadingSkeleton 
+            rows={itemsPerPage} 
+            columns={columns.length} 
+            showActions={enableActions && actions.length > 0} 
+            variant="dark"
+          />
         )}
 
         {/* Data Rows */}
@@ -387,3 +410,7 @@ export function GenericTable<T extends BaseItem>({
     </motion.div>
   )
 }
+
+export const GenericTable = forwardRef(GenericTableInner) as <T extends BaseItem>(
+  props: GenericTableProps<T> & { ref?: React.Ref<TableRef<T>> }
+) => React.ReactElement;

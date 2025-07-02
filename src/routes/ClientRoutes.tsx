@@ -12,6 +12,10 @@ import { NoAuthRoute } from "@/utils/protected/PublicRoute";
 import { Route, Routes } from "react-router-dom";
 import BuildingsListing from "@/pages/client/SubPages/BuildingListing";
 import BuildingDetailsPage from "@/pages/client/SubPages/BuildingDetails";
+import SpaceBookingPage from "@/pages/client/SubPages/BookSlot";
+import ClientBookings from "@/pages/client/SubPages/Bookings";
+import BookingDetailsPage from "@/pages/client/SubPages/ClientBookingDetails";
+import ClientWalletPage from "@/pages/client/SubPages/ClientWallet";
 
 const ClientRoutes = () => {
   return (
@@ -28,6 +32,10 @@ const ClientRoutes = () => {
         <Route path="/profile" element={<ProtectedRoute allowedRoles={["client"]} element={<ClientProfile/>} />}/>
         <Route path="/buildings" element={<ProtectedRoute allowedRoles={["client"]} element={<BuildingsListing/>} />}/>
         <Route path="/building-details/:buildingId" element={<ProtectedRoute allowedRoles={["client"]} element={<BuildingDetailsPage/>} />}/>
+        <Route path="/book-space/:spaceId" element={<ProtectedRoute allowedRoles={["client"]} element={<SpaceBookingPage/>} />}/>
+        <Route path="/bookings" element={<ProtectedRoute allowedRoles={["client"]} element={<ClientBookings/>} />}/>
+        <Route path="/booking-details/:bookingId" element={<ProtectedRoute allowedRoles={["client"]} element={<BookingDetailsPage/>} />}/>
+        <Route path="/wallet" element={<ProtectedRoute allowedRoles={["client"]} element={<ClientWalletPage/>} />}/>
 
 
        

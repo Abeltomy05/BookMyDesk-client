@@ -1,5 +1,5 @@
 
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { GenericTable } from "@/components/ReusableComponents/GenericTable"
 import { User, Building2, Eye,} from "lucide-react"
 import { adminService } from "@/services/adminService"
@@ -7,6 +7,7 @@ import toast from "react-hot-toast"
 import VendorDetails from "./VendorDetails"
 import type { TableColumn, TableAction, TableFilter } from "@/types/table.type"
 import type { ApiResponse, FetchParams } from "@/types/api.type"
+import type { TableRef } from "@/components/ReusableComponents/LightGenericTable"
 
 
 type VendorStatus = "approved" | "rejected" | "pending" | "blocked"
@@ -29,6 +30,7 @@ interface VendorData {
 export default function VendorManagement() {
   const [activeFilter, setActiveFilter] = useState<VendorStatus | "all">("all")
   const [selectedVendor, setSelectedVendor] = useState<VendorData | null>(null)
+  const tableRef = useRef<TableRef<VendorData>>(null)
 
 
    const fetchVendors =  async (params: FetchParams): Promise<ApiResponse<VendorData>> =>  {
@@ -76,6 +78,7 @@ export default function VendorManagement() {
   try {
     const response = await adminService.updateEntityStatus("vendor", vendorId, newStatus)
     if (response.success) {
+      tableRef.current?.updateItemOptimistically(vendorId, { status: newStatus })
       toast.success(`Vendor status updated to ${newStatus}`)
     } else {
       toast.error(response.message || "Failed to update vendor status")
@@ -161,7 +164,7 @@ export default function VendorManagement() {
         setSelectedVendor(vendor)
       },
       variant: "default",
-      refreshAfter:true,
+      refreshAfter:false,
     },
     {
       label: "Approve",
@@ -169,21 +172,21 @@ export default function VendorManagement() {
       condition: (vendor: VendorData) => vendor.status !== "approved",
       variant: "success",
       separator: true,
-      refreshAfter:true,
+      refreshAfter:false,
     },
     {
       label: "Reject",
       onClick: (vendor: VendorData) => changeVendorStatus(vendor._id, "rejected"),
       condition: (vendor: VendorData) => vendor.status !== "rejected",
       variant: "danger",
-      refreshAfter:true,
+      refreshAfter:false,
     },
     {
       label: "Block",
       onClick: (vendor: VendorData) => changeVendorStatus(vendor._id, "blocked"),
       condition: (vendor: VendorData) => vendor.status !== "blocked",
       variant: "warning",
-      refreshAfter:true,
+      refreshAfter:false,
     }
   ]
 
@@ -201,6 +204,7 @@ export default function VendorManagement() {
   return (
     <>
       <GenericTable<VendorData>
+         ref={tableRef}
         title="Vendor Management"
         columns={columns}
         actions={actions}

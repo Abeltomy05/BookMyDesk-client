@@ -71,24 +71,14 @@ export interface VendorTouchedFields {
   idProof?: boolean
 }
 
-interface VendorSignupPayload {
-  username: string;
-  email: string;
-  phone: string;
-  password: string;
-  companyName: string;
-  companyAddress: string;
-  role: string;
-  idProof: string; 
-}
 
 
 export const validateVendorField = (
-  name: keyof VendorFormData, 
-  value: string | File | null,
-  formData?: VendorFormData
+  name: string, 
+  value: any,
+  formData?: any
 ): string | undefined => {
-  switch (name) {
+  switch (name as keyof VendorFormData) {
     case "username":
       return !value || typeof value !== 'string' || !value.trim() ? "Username is required" : undefined
       
@@ -157,8 +147,8 @@ export const validateVendorSignupForm = (
   formData: VendorFormData,
   setErrors: React.Dispatch<React.SetStateAction<VendorFormErrors>>,
   setTouched: React.Dispatch<React.SetStateAction<VendorTouchedFields>>,
-  validateField: ((name: keyof VendorFormData, value: string | File | null) => string | undefined) = 
-    (name, value) => validateVendorField(name, value, formData)
+  validateField: ((name: string, value: any) => string | undefined) = 
+  (name, value) => validateVendorField(name, value, formData)
 ): boolean => {
   const newErrors: VendorFormErrors = {}
   
@@ -186,52 +176,6 @@ export const validateVendorSignupForm = (
 
 
 //client
-export const validateSignupForm = (formData: FormData): ValidationErrors => {
-  const errors: ValidationErrors = {};
-
-  if (!formData.username.trim()) {
-    errors.username = "Username is required";
-  } else if (formData.username.length < 2) {
-    errors.username = "Name must be at least 2 characters long";
-  } else if (!/^[a-zA-Z\s]+$/.test(formData.username)) {
-    errors.username = "Name must contain only alphabetic characters and spaces";
-  }
-
-
-  if (!formData.email.trim()) {
-    errors.email = "Email is required";
-  } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(formData.email)) {
-    errors.email = "Invalid email format";
-  }
-
-  if (!formData.phone.trim()) {
-    errors.phone = "Phone number is required";
-  } else if (formData.phone.length !== 10) {
-    errors.phone = "Phone number must be exactly 10 digits";
-  } else if (!/^\d{10}$/.test(formData.phone)) {
-    errors.phone = "Phone number must contain only digits";
-  }
-
-  if (!formData.password) {
-    errors.password = "Password is required";
-  } else {
-    if (formData.password.length < 8) {
-      errors.password = "Password must be at least 8 characters long";
-    } else if (!/[A-Z]/.test(formData.password)) {
-      errors.password = "Password must contain at least one uppercase letter";
-    } else if (!/[0-9]/.test(formData.password)) {
-      errors.password = "Password must contain at least one digit";
-    } else if (!/[@$!%*?&]/.test(formData.password)) {
-      errors.password = "Password must contain at least one special character";
-    }
-  }
-
-  if (formData.password !== formData.confirmPassword) {
-    errors.confirmPassword = "Passwords do not match";
-  }
-
-  return errors;
-};
 
 export const validateLoginForm = (formData: LoginFormData): LoginValidationErrors => {
   const errors: LoginValidationErrors = {};
@@ -281,4 +225,83 @@ export const validateResetPasswordForm = (formData: ResetPasswordFormData): Rese
   }
 
   return errors;
+}
+
+export const validateClientField = (
+  name: string, 
+  value: any,
+  formData?: any
+): string | undefined => {
+  switch (name as keyof FormData) {
+    case "username":
+      return !value || typeof value !== 'string' || !value.trim() ? "Username is required" : undefined
+      
+    case "email":
+      return !value || typeof value !== 'string' || !value.trim() 
+        ? "Email is required" 
+        : !/\S+@\S+\.\S+/.test(value) 
+          ? "Email is invalid" 
+          : undefined
+          
+    case "password":
+      if (!value || typeof value !== 'string') {
+        return "Password is required" 
+      } else if (value.length < 8) {
+        return "Password must be at least 8 characters long"
+      } else if (!/[A-Z]/.test(value)) {
+        return "Password must contain at least one uppercase letter"
+      } else if (!/[0-9]/.test(value)) {
+        return "Password must contain at least one digit"
+      } else if (!/[@$!%*?&]/.test(value)) {
+        return "Password must contain at least one special character"
+      }
+      return undefined
+      
+    case "confirmPassword":
+      return !value || typeof value !== 'string'
+        ? "Confirm password is required"
+        : formData && value !== formData.password 
+          ? "Passwords do not match" 
+          : undefined
+          
+    case "phone":
+      return !value || typeof value !== 'string' || !value.trim()
+        ? "Phone number is required"
+        : !/^\d{10}$/.test(value.replace(/\D/g, ''))
+          ? "Phone number must be exactly 10 digits"
+          : undefined;
+          
+    default:
+      return undefined
+  }
+}
+
+export const validateClientSignupForm = (
+  formData: FormData,
+  setErrors: React.Dispatch<React.SetStateAction<ValidationErrors>>,
+  setTouched: React.Dispatch<React.SetStateAction<Record<string, boolean>>>,
+  validateField: ((name: string, value: any) => string | undefined) = 
+    (name, value) => validateClientField(name, value, formData)
+): boolean => {
+  const newErrors: ValidationErrors = {}
+  
+  // Mark all fields as touched
+  const allTouched: Record<string, boolean> = Object.keys(formData).reduce((acc, key) => {
+    acc[key] = true
+    return acc
+  }, {} as Record<string, boolean>)
+  
+  setTouched(allTouched)
+  
+  // Validate each field
+  Object.keys(formData).forEach((key) => {
+    const fieldName = key as keyof FormData
+    const error = validateField(fieldName, formData[fieldName])
+    if (error) {
+      newErrors[fieldName] = error
+    }
+  })
+  
+  setErrors(newErrors)
+  return Object.keys(newErrors).length === 0
 }

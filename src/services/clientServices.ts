@@ -1,6 +1,7 @@
 import authAxiosInstance from "@/api/auth.axios";
 import { clientAxiosInstance } from "@/api/client.axios";
 import type { UserProfile } from "@/pages/client/SubPages/ClientProfile";
+import type { BookingData } from "@/types/booking.type";
 
 interface ApiResponse {
   success: boolean;
@@ -30,6 +31,15 @@ export interface LoginData {
   email: string;
   password: string;
   role:string;
+}
+
+export interface GetBookingResponse {
+  success: boolean;
+  data?: BookingData[];
+  totalItems?: number;
+  totalPages?: number;
+  currentPage?: number;
+  message?: string
 }
 
 export const clientService = {
@@ -249,8 +259,209 @@ export const clientService = {
      }
   },
 
+  //booking pages
 
+  getBookingPageData: async(spaceId:string): Promise<ApiResponse>=>{
+    try {
+      const response = await clientAxiosInstance.get(`/get-booking-page-data/${spaceId}`);
+      return response.data;
+    } catch (error:any) {
+       console.error('get  booking page details error:', error);
+     if (error.response) {
+       return {
+          success: false,
+          message: error.response.data?.message || 'Server error occurred',
+          data: error.response.data
+        };
+  }else{
+     return {
+          success: false,
+          message: 'An unexpected error occurred'
+        };
+    }
+    }
+  },
 
+  //Stripe
+
+  createPaymentIntent: async (data: {
+    amount: number
+    currency: string
+    spaceId: string
+    bookingDate: string
+    numberOfDesks: number
+    bookingId?: string
+  }):Promise<ApiResponse> => {
+    try {
+      const response = await clientAxiosInstance.post('/create-payment-intent', data);
+      return response.data;
+    } catch (error:any) {
+       console.error('create payment intent error:', error);
+     if (error.response) {
+       return {
+          success: false,
+          message: error.response.data?.message || 'Server error occurred',
+          data: error.response.data
+        };
+      }else{
+        return {
+              success: false,
+              message: 'An unexpected error occurred in create payment intent'
+            };
+        }
+    }
+  },
+
+  confirmPayment: async (data: {
+    paymentIntentId: string
+  }):Promise<ApiResponse> => {
+      try {
+        const response = await clientAxiosInstance.post('/confirm-payment', data);
+        return response.data;
+      } catch (error:any) {
+        console.error('confirm payment error:', error);
+        if (error.response) {
+          return {
+              success: false,
+              message: error.response.data?.message || 'Server error occurred',
+              data: error.response.data
+            };0
+          }else{
+            return {
+                  success: false,
+                  message: 'An unexpected error occurred in confirm payment'
+                };
+            }
+      }
+  },
+
+  //bookings
+
+  getBookings: async ({page = 1, limit = 5, search='', status}:{page:number,limit:number,search:string,status?:string}): Promise<GetBookingResponse> => {
+     try {
+      const response = await clientAxiosInstance.get('/get-bookings', {
+        params: { page, limit, search, ...(status && { status }) }
+      })
+      return response.data;
+     } catch (error:any) {
+      console.error('Error fetching bookings:', error);
+      if (error.response) {
+        return {
+          success: false,
+          message: error.response.data?.message || 'Server error occurred',
+          data: error.response.data
+        };
+      } else {
+        return {
+          success: false,
+          message: 'An unexpected error occurred while fetching bookings'
+        };
+      }
+     }
+  },
+
+  getBookingDetails: async (bookingId: string): Promise<ApiResponse> => {
+    try {
+      const response = await clientAxiosInstance.get(`/get-booking-details/${bookingId}`);
+      return response.data;
+    } catch (error:any) {
+      console.error('Error fetching bookings:', error);
+      if (error.response) {
+        return {
+          success: false,
+          message: error.response.data?.message || 'Server error occurred',
+          data: error.response.data
+        };
+      } else {
+        return {
+          success: false,
+          message: 'An unexpected error occurred while fetching bookings'
+        };
+      }
+    }
+  },
+
+  cancelBooking: async (bookingId: string, reason: string): Promise<ApiResponse> => {
+     try {
+      const response = await clientAxiosInstance.post(`/cancel-booking`, { 
+        reason,
+        bookingId
+       });
+      return response.data;
+     } catch (error) {
+      console.error('Error cancelling booking:', error);
+      return {
+        success: false,
+        message: 'Failed to cancel booking. Please try again later.',
+      };
+     }
+  },
+
+  // wallet
+
+  getWalletDetails: async ({page,limit}:{page:number,limit:number}): Promise<ApiResponse> => {
+    try {
+       const response = await clientAxiosInstance.get('/get-wallet-details',{
+        params:{page,limit}
+       });
+       return response.data;
+    } catch (error:any) {
+      console.error('Error fetching wallet details:', error);
+      return {
+        success: false,
+        message: error.message || 'Failed to fetch wallet details. Please try again later.',
+      };
+    }
+  },
+
+  payWithWallet:async ({spaceId,bookingDate,numberOfDesks,totalPrice}:{spaceId: string,bookingDate:Date,numberOfDesks:number,totalPrice:number})=>{
+    try {
+      const response = await clientAxiosInstance.post("/pay-with-wallet",{
+        spaceId,
+        bookingDate,
+        numberOfDesks,
+        totalPrice
+      })
+      return response.data;
+    } catch (error:any) {
+      console.error('Error booking with wallet:', error);
+       const message = error.response?.data?.message || error.message || "Unknown error occurred";
+      return {
+        success: false,
+        message,
+      };
+    }
+  },
+
+  // wallet topup
+
+  createTopUpPaymentIntent:async({amount,currency}:{amount:number,currency:string}): Promise<ApiResponse>=>{
+    try {
+      const response = await clientAxiosInstance.post('/create-topup-payment-intent',{amount,currency});
+      return response.data;
+    } catch (error:any) {
+       console.error('Error creating payment intent:', error);
+       const message = error.response?.data?.message || error.message || "Unknown error occurred";
+      return {
+        success: false,
+        message,
+      };
+    }
+  },
+
+  confirmTopUpPayment: async(paymentIntentId: string):Promise<ApiResponse>=>{
+    try {
+       const response = await clientAxiosInstance.post("/confirm-topup-payment",{ paymentIntentId });
+       return response.data;
+    } catch (error:any) {
+        console.error('Error confirm topup payment intent:', error);
+       const message = error.response?.data?.message || error.message || "Unknown error occurred";
+      return {
+        success: false,
+        message,
+      };
+    }
+  },
 
 
 

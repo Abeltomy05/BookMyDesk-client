@@ -1,8 +1,13 @@
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import authAxiosInstance from "@/api/auth.axios";
 import { vendorAxiosInstance } from "@/api/vendor.axios";
 import type { BuildingRegistrationData, GetAllBuildingsResponse, GetBuildingsParams } from "@/types/building.type";
 import type { Building } from "@/types/view&editBuilding";
-import type { VendorRetryFormData } from "@/utils/validations/retry-vendor.validation";
+import type { GetBookingResponse } from "./clientServices";
+import type { VendorHomeData } from '@/types/vendor-home.types'; 
+import { formatCurrency } from '@/utils/formatters/currency';
+import { formatDate } from '@/utils/formatters/date';
 
 interface ApiResponse {
   success: boolean;
@@ -27,6 +32,7 @@ export interface VendorFormData {
   role: string
 }
 export type BuildingStatus = "approved" | "archived";
+export type BookingStatus = "pending" | "confirmed" | "cancelled" | "completed" | "failed";
 
 export const vendorService = {
 
@@ -313,6 +319,167 @@ updateBuildingStatus: async (
         };
       }
     },
+
+getBookings: async ({page = 1, limit = 5, search='', status}:{page:number,limit:number,search:string,status?:string}): Promise<GetBookingResponse> => {
+     try {
+      const response = await vendorAxiosInstance.get('/get-bookings', {
+        params: { page, limit, search, ...(status && { status }) }
+      })
+      return response.data;
+     } catch (error:any) {
+      console.error('Error fetching bookings:', error);
+      if (error.response) {
+        return {
+          success: false,
+          message: error.response.data?.message || 'Server error occurred',
+          data: error.response.data
+        };
+      } else {
+        return {
+          success: false,
+          message: 'An unexpected error occurred while fetching bookings'
+        };
+      }
+     }
+  },  
+  
+updateBookingStatus: async ( 
+      entityType: "booking",
+      entityId: string,
+      status: BookingStatus ,
+      reason?: string
+    ): Promise<ApiResponse> =>{
+     try {
+       const response = await vendorAxiosInstance.patch("/update-status", {
+          entityType,
+          entityId,
+          status,
+          reason,
+        });
+        return response.data;
+     } catch (error:any) {
+      console.error("Error updating user status:", error);
+        return {
+          success: false,
+          message: error.response?.data?.message || "Failed to update user status",
+        };
+     }
+ },
+
+cancelBooking: async (bookingId: string, reason: string): Promise<ApiResponse> => {
+     try {
+      const response = await vendorAxiosInstance.post(`/cancel-booking`, { 
+        reason,
+        bookingId
+       });
+      return response.data;
+     } catch (error) {
+      console.error('Error cancelling booking:', error);
+      return {
+        success: false,
+        message: 'Failed to cancel booking. Please try again later.',
+      };
+     }
+  }, 
+
+getWalletDetails: async ({page,limit}:{page:number,limit:number}): Promise<ApiResponse> => {
+  try {
+      const response = await vendorAxiosInstance.get('/get-wallet-details',{
+      params:{page,limit}
+      });
+      return response.data;
+  } catch (error:any) {
+    console.error('Error fetching wallet details:', error);
+    return {
+      success: false,
+      message: error.message || 'Failed to fetch wallet details. Please try again later.',
+    };
+  }
+},  
+
+getHomeData: async ()=>{
+  try {
+    const response = await vendorAxiosInstance.get("/get-vendor-home-data");
+    return response.data;
+  } catch (error:any) {
+    console.error('Error fetching vendor home details:', error);
+    return {
+      success: false,
+      message: error.message || 'Failed to fetch vendor home details. Please try again later.',
+    };
+  }
+},
+
+//download report
+downloadPdf: (data: VendorHomeData,vendorData:{username?:string,companyName?:string,email?:string})=>{
+   const monthlyData = Array.isArray(data.monthlyBookings) ? data.monthlyBookings : [];
+   const recentBookings = Array.isArray(data.completedBookings) ? data.completedBookings : [];
+   const doc = new jsPDF();
+
+   //Heading
+   doc.setFont('helvetica', 'bold');
+   doc.setFontSize(22);
+   doc.text('Book My Desk', 70, 20);
+
+   doc.setFontSize(13);
+   doc.text('Vendor Revenue Report', 69, 30);
+
+
+   doc.setFontSize(12);
+
+    // Name
+    doc.setFont('helvetica', 'bold');
+    doc.text('Name:', 14, 40);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`${vendorData.username || ''}`, 40, 40);
+
+    // Company
+    doc.setFont('helvetica', 'bold');
+    doc.text('Company:', 14, 46);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`${vendorData.companyName || ''}`, 40, 46);
+
+    // Email
+    doc.setFont('helvetica', 'bold');
+    doc.text('Email:', 14, 52);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`${vendorData.email || ''}`, 40, 52);
+
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.text('Monthly Booking', 14, 65);
+
+   autoTable(doc, {
+      startY: 70,
+      head: [['Month', 'Bookings', 'Revenue']],
+      body: monthlyData.map((m) => [
+        m.month,
+        m.bookings.toString(),
+        formatCurrency(m.revenue),
+      ]),
+    });
+
+   const startY = (doc as any).lastAutoTable.finalY + 10;
+   doc.setFontSize(14);
+   doc.text('Recent Completed Bookings', 14, startY);
+
+    autoTable(doc, {
+      startY: startY + 5,
+      head: [['Booking ID', 'Customer', 'Space', 'Building', 'Desks', 'Amount', 'Date']],
+      body: recentBookings.slice(0, 5).map((b) => [
+        b._id.slice(0,16),
+        b.client?.username || '',
+        b.space?.name || '',
+        b.building?.buildingName || '',
+        b.numberOfDesks.toString(),
+        formatCurrency(b.totalPrice),
+        formatDate(b.bookingDate),
+      ]),
+    });
+
+  doc.save('vendor-revenue-report.pdf');
+},
 
  logout: async():Promise<ApiResponse>=>{
     try {

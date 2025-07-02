@@ -96,7 +96,6 @@ export default function BuildingManagement() {
   const handleArchiveAction = async () => {
     if (!confirmModal.building || !confirmModal.newStatus) return;
 
-    // Optimistically update UI first
     if (tableRef.current) {
       tableRef.current.updateItemOptimistically(confirmModal.building._id, {
         status: confirmModal.newStatus
@@ -112,10 +111,9 @@ export default function BuildingManagement() {
     if (result.success) {
       toast.success(`${confirmModal.building.buildingName} has been ${confirmModal.newStatus}`);
     } else {
-      // Revert the optimistic update if the API call failed
       if (tableRef.current) {
         tableRef.current.updateItemOptimistically(confirmModal.building._id, {
-          status: confirmModal.building.status // Revert to original status
+          status: confirmModal.building.status
         });
       }
       toast.error(result.message || "Failed to update building status.");
