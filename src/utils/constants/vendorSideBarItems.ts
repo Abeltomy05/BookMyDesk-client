@@ -6,5 +6,5 @@ export const sidebarItems = [
     { icon: Calendar, label: 'Wallet', href: '/vendor/wallet' },
     { icon: Star, label: 'Reviews & Ratings', href: '#' },
     { icon: User, label: 'Profile', href: '/vendor/profile' },
-    { icon: MessageCircle, label: 'Chat', href: '#' }
+    { icon: MessageCircle, label: 'Offer', href: '/vendor/offer' }
   ];

@@ -13,6 +13,7 @@ import RegisterBuilding from "@/pages/vendor/SubPages/RegisterBuilding"
 import BuildingDetailsEdit from "@/pages/vendor/SubPages/View&EndBuildings"
 import VendorManageBookings from "@/pages/vendor/SubPages/ManageBookings"
 import VendorWalletPage from "@/pages/vendor/SubPages/VendorWallet"
+import OfferPage from "@/pages/vendor/SubPages/OfferManagement"
 
 
 const VendorRoutes = () => {
@@ -30,6 +31,7 @@ const VendorRoutes = () => {
         <Route path="/edit-building/:buildingId" element={<ProtectedRoute allowedRoles={["vendor"]} element={<BuildingDetailsEdit/>} />}/>
         <Route path="/bookings" element={<ProtectedRoute allowedRoles={["vendor"]} element={<VendorManageBookings/>} />}/>
         <Route path="/wallet" element={<ProtectedRoute allowedRoles={["vendor"]} element={<VendorWalletPage/>} />}/>
+        <Route path="/offer" element={<ProtectedRoute allowedRoles={["vendor"]} element={<OfferPage/>} />}/>
         
 
         <Route path="/*" element={<NotFoundPage/>}/>

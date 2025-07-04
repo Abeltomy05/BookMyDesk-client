@@ -95,7 +95,7 @@ ref: React.Ref<TableRef<T>>) {
     } finally {
       setTimeout(()=>{
          setLoading(false);
-      },2000)
+      },1000)
     }
   }
 
