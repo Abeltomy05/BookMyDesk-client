@@ -9,6 +9,7 @@ export interface BookingData{
     bookingDate: Date;
     numberOfDesks?: number;
     totalPrice?: number;
+    discountAmount?: number;
     
     status: BookingStatus;
     paymentStatus: PaymentStatus;

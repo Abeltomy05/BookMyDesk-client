@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import type { BuildingData  } from "@/types/building-form.type";
 import MapSkeleton from "@/components/Skeletons/MapSkeleton";
 import BuildingDetailsPageSkeleton from "@/components/Skeletons/BuildingDetailsPageSkeleton";
+import OfferBadge from "@/components/OfferComponents/OfferBadge";
 const Map = lazy(()=> import("@/components/ReusableComponents/MapView"))
 const ImageModal = lazy(()=> import("@/components/ReusableComponents/ImageModal"))
 
@@ -99,7 +100,6 @@ export default function BuildingDetailsPage() {
         ? buildingData.images[0] 
         : "https://res.cloudinary.com/dnivctodr/image/upload/v1750089129/srptqnckz38fpjjxekdz.jpg";
 
-    // Prepare images for display (max 3, no repetition)
     const displayImages = buildingData.images && buildingData.images.length > 0 
         ? buildingData.images.slice(0, 3)
         : [mainImage];
@@ -202,14 +202,14 @@ export default function BuildingDetailsPage() {
                                     return (
                                     <div
                                         key={space._id}
-                                        className={`relative overflow-hidden group rounded-lg shadow-md ${
+                                        className={`relative overflow-visible group rounded-lg shadow-md ${
                                             isNotClickable 
                                                 ? 'cursor-not-allowed opacity-75' 
                                                 : 'cursor-pointer'
                                         }`}
                                         onClick={isNotClickable ? undefined : () => navigate(`/book-space/${space._id}`)}
                                     >
-                                        <div className="relative">
+                                        <div className="relative overflow-hidden rounded-t-lg">
                                         <img
                                             src={
                                             buildingData.images && buildingData.images[i % buildingData.images.length]
@@ -249,6 +249,21 @@ export default function BuildingDetailsPage() {
                                             </span>
                                         </div>
                                         </div>
+
+                                         {/* Offer Badge */}
+                                        {space.offer && (
+                                            <div className="absolute top-3 right-3 z-10">
+                                                <OfferBadge 
+                                                    offer={{
+                                                        percentage: space.offer.discountPercentage,
+                                                        title: space.offer.title,
+                                                        description: space.offer.description || '',
+                                                        startDate: space.offer.startDate,
+                                                        endDate: space.offer.endDate
+                                                    }}
+                                                />
+                                            </div>
+                                        )}
                                     </div>
                                     );
                                 })}

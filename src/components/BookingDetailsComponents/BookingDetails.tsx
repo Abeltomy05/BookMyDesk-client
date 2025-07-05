@@ -9,14 +9,10 @@ interface BookingDetailsProps {
 
 export const BookingDetails: React.FC<BookingDetailsProps> = ({ booking }) => {
 
-
-
-
   const calculatePricePerDay = () => {
-    const totalPrice = booking.totalPrice ?? 0
-    const numberOfDesks = booking.numberOfDesks || 1
-    return totalPrice / numberOfDesks
+    return ((booking.totalPrice ?? 0) + (booking.discountAmount ?? 0)) / (booking.numberOfDesks || 1);
   }
+
 
 return (
     <div className="bg-white rounded-lg shadow-md p-6 mb-6">
@@ -64,7 +60,7 @@ return (
       </div>
 
       {/* Pricing Section */}
-      <div className="mb-6">
+     <div className="mb-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">Pricing Breakdown</h3>
         <div className="bg-gray-50 p-4 rounded-lg space-y-3">
           <div className="flex justify-between">
@@ -75,6 +71,12 @@ return (
             <span className="text-gray-600">Number of Desks:</span>
             <span className="text-gray-800">x {booking.numberOfDesks || 0}</span>
           </div>
+          {booking.discountAmount && booking.discountAmount > 0 && (
+            <div className="flex justify-between">
+              <span className="text-green-600 font-medium">Discount Applied:</span>
+              <span className="text-green-600 font-medium">-{formatCurrency(booking.discountAmount)}</span>
+            </div>
+          )}
           <div className="border-t border-gray-300 pt-3">
             <div className="flex justify-between">
               <span className="text-lg font-semibold text-gray-800">Total Amount:</span>
@@ -83,6 +85,7 @@ return (
           </div>
         </div>
       </div>
+
 
       {/* Payment Information Section */}
       <div className="border-t border-gray-200 pt-4">

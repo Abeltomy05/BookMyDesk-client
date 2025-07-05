@@ -8,6 +8,7 @@ import toast from "react-hot-toast"
 import SkeletonSpaceBooking from "@/components/Skeletons/BookSlotSkeleton"
 import StripePaymentModal from "@/components/ReusableComponents/StripeModal"
 import WalletPaymentModal from "@/components/ReusableComponents/WalletPaymentModal"
+import OfferBadge from "@/components/OfferComponents/OfferBadge"
 
 export default function SpaceBookingPage() {
   const { spaceId } = useParams<{ spaceId: string }>()
@@ -18,6 +19,13 @@ export default function SpaceBookingPage() {
     pricePerDay: number
     amenities: string[] | []
     capacity: number
+    offer?: {
+      title?: string
+      description?: string
+      startDate?: Date
+      endDate?: Date
+      discountPercentage?: number
+    }
   }>({
     name: "",
     location: "",
@@ -60,7 +68,14 @@ export default function SpaceBookingPage() {
           amenities: response.data.space.amenities || [],
           capacity: response.data.space.capacity,
           walletId:response.data.wallet._id || null,
-          walletBalance: response.data.wallet.balance || 0
+          walletBalance: response.data.wallet.balance || 0,
+           offer: response.data.offer?.discountPercentage ? {
+              title: response.data.offer.title,
+              description: response.data.offer.description,
+              startDate: response.data.offer.startDate,
+              endDate: response.data.offer.endDate,
+              discountPercentage: response.data.offer.discountPercentage,
+           } : undefined,
         }
  
         console.log("transformedData", transformedData)
@@ -137,6 +152,14 @@ export default function SpaceBookingPage() {
     return `${parts[0]}, ${parts[1]}, ${parts[parts.length - 2]}, ${parts[parts.length - 1]}`
   }
 
+  const handleBookNow = ()=>{
+    if(numberOfDesks > spaceData.capacity){
+      toast.error("Number of desks selected is greater than actual capacity.",{icon:'📢'});
+      return;
+    }
+    setShowPaymentOptions(!showPaymentOptions)
+  }
+
 
   if (loading) {
     return (
@@ -158,7 +181,11 @@ export default function SpaceBookingPage() {
     )
   }
 
-  const totalPrice = numberOfDesks * Number(spaceData.pricePerDay)
+  const originalPrice = numberOfDesks * Number(spaceData.pricePerDay)
+  const discountAmount = spaceData.offer?.discountPercentage 
+  ? (originalPrice * spaceData.offer.discountPercentage) / 100 
+  : 0
+  const totalPrice = originalPrice - discountAmount
 
   return (
     <ClientLayout>
@@ -176,38 +203,53 @@ export default function SpaceBookingPage() {
             {/* Left Column */}
             <div className="space-y-6">
               {/* Space Image */}
-              <div className="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden relative h-80">
-                {spaceData.images && spaceData.images.length > 0 ? (
-                  <>
-                    {spaceData.images.map((image, index) => (
-                      <img
-                        key={index}
-                        src={image || "/placeholder.svg"}
-                        alt={`Space image ${index + 1}`}
-                        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-2000 ease-in-out ${
-                          index === currentIndex ? "opacity-100" : "opacity-0"
-                        }`}
-                      />
-                    ))}
-                    {/* Image indicators */}
-                    {spaceData.images.length > 1 && (
-                      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-                        {spaceData.images.map((_, index) => (
-                          <button
+              <div className="rounded-lg border border-gray-200 bg-white shadow-sm overflow-visible relative h-80">
+                    {/* Offer Badge */}
+                    {spaceData.offer && (
+                      <div className="absolute top-4 left-4 z-10">
+                        <OfferBadge
+                          offer={{
+                            percentage: spaceData.offer.discountPercentage || 0,
+                            title: spaceData.offer.title || "",
+                            description: spaceData.offer.description || "",
+                            startDate: spaceData.offer.startDate ? new Date(spaceData.offer.startDate).toISOString() : "",
+                            endDate: spaceData.offer.endDate ? new Date(spaceData.offer.endDate).toISOString() : "",
+                          }}
+                        />
+                      </div>
+                    )}
+                    
+                    {spaceData.images && spaceData.images.length > 0 ? (
+                      <>
+                        {spaceData.images.map((image, index) => (
+                          <img
                             key={index}
-                            onClick={() => setCurrentIndex(index)}
-                            className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                              index === currentIndex ? "bg-white shadow-lg" : "bg-white/50 hover:bg-white/75"
+                            src={image || "/placeholder.svg"}
+                            alt={`Space image ${index + 1}`}
+                            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-2000 ease-in-out ${
+                              index === currentIndex ? "opacity-100" : "opacity-0"
                             }`}
                           />
                         ))}
-                      </div>
+                        {/* Image indicators */}
+                        {spaceData.images.length > 1 && (
+                          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                            {spaceData.images.map((_, index) => (
+                              <button
+                                key={index}
+                                onClick={() => setCurrentIndex(index)}
+                                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                                  index === currentIndex ? "bg-white shadow-lg" : "bg-white/50 hover:bg-white/75"
+                                }`}
+                              />
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <img src="/placeholder.svg" alt="Placeholder" className="w-full h-full object-cover" />
                     )}
-                  </>
-                ) : (
-                  <img src="/placeholder.svg" alt="Placeholder" className="w-full h-full object-cover" />
-                )}
-              </div>
+                </div>
               {/* Amenities */}
               {spaceData.amenities && spaceData.amenities.length > 0 && (
                 <div className="rounded-lg border border-gray-200 bg-white shadow-sm p-6">
@@ -312,6 +354,24 @@ export default function SpaceBookingPage() {
                       <span className="text-gray-600">Price per desk:</span>
                       <span className="text-black">₹{spaceData.pricePerDay}</span>
                     </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Subtotal:</span>
+                      <span className={`text-black ${spaceData.offer ? 'line-through text-gray-500' : ''}`}>
+                        ₹{originalPrice}
+                      </span>
+                    </div>
+                    {spaceData.offer && (
+                      <>
+                        <div className="flex justify-between">
+                          <span className="text-green-600">Discount ({spaceData.offer.discountPercentage}%):</span>
+                          <span className="text-green-600">-₹{discountAmount}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Offer Price:</span>
+                          <span className="text-black font-medium">₹{totalPrice}</span>
+                        </div>
+                      </>
+                    )}
                     <div className="border-t border-gray-200 pt-2 mt-2">
                       <div className="flex justify-between font-semibold text-lg">
                         <span className="text-black">Total:</span>
@@ -324,7 +384,7 @@ export default function SpaceBookingPage() {
                 {/* Book Now Button */}
                 <div className="relative">
                   <button
-                    onClick={() => setShowPaymentOptions(!showPaymentOptions)}
+                    onClick={handleBookNow}
                     className="w-full text-white font-semibold py-3 text-lg rounded-md transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{ backgroundColor: "#f69938" }}
                     disabled={!selectedDate}
@@ -388,6 +448,7 @@ export default function SpaceBookingPage() {
               bookingDate: selectedDate || new Date(),
               numberOfDesks: numberOfDesks,
               totalAmount: totalPrice,
+              discountAmount,
               pricePerDay: spaceData.pricePerDay,
             }}
           />
@@ -407,6 +468,7 @@ export default function SpaceBookingPage() {
                 bookingDate: selectedDate || new Date(),
                 numberOfDesks: numberOfDesks,
                 totalAmount: totalPrice,
+                discountAmount,
                 pricePerDay: spaceData.pricePerDay,
               }}
             />

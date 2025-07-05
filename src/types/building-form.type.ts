@@ -10,11 +10,30 @@ export interface BuildingData {
     location: LocationData;
     openingHours: OpeningHours;
     phone: string;
-    spaces: any[];
+    spaces: SpaceData[];
     status: string;
     summarizedSpaces: SummarizedSpace[];
     vendorId: string;
     _id: string;
+}
+
+export interface OfferPreview {
+  discountPercentage: number;
+  title: string;
+  description?: string;
+  startDate: string;
+  endDate: string;
+}
+
+export interface SpaceData {
+  _id: string;
+  name: string;
+  capacity: number;
+  pricePerDay: number;
+  amenities: string[];
+  isAvailable:boolean;
+
+  offer?: OfferPreview;
 }
 
 export interface SummarizedSpace {

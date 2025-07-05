@@ -24,6 +24,7 @@ interface PaymentModalProps {
     bookingDate: Date
     numberOfDesks: number
     totalAmount: number
+    discountAmount?: number
     pricePerDay: number
     bookingId?: string
   }
@@ -183,6 +184,13 @@ function PaymentForm({
             <span className="text-gray-600">Price per desk:</span>
             <span className="font-medium">₹{bookingData.pricePerDay}</span>
           </div>
+          {/* Add discount section if discount exists */}
+          {bookingData.discountAmount && bookingData.discountAmount > 0 && (
+            <div className="flex justify-between text-green-600">
+              <span>Discount:</span>
+              <span className="font-medium">-₹{bookingData.discountAmount}</span>
+            </div>
+          )}
           <div className="flex justify-between pt-2 border-t border-gray-200">
             <span className="font-semibold">Total:</span>
             <span className="font-semibold text-lg">₹{bookingData.totalAmount}</span>
@@ -266,6 +274,7 @@ export default function StripePaymentModal({
         spaceId: bookingData.spaceId,
         bookingDate: bookingData.bookingDate.toISOString(),
         numberOfDesks: bookingData.numberOfDesks,
+        discountAmount: bookingData.discountAmount,
         bookingId: bookingData.bookingId || undefined,
       })
 
