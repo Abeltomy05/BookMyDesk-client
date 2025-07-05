@@ -1,3 +1,5 @@
+import type { LocationData } from "./location.type";
+
 export type UserRoles = "admin" | "vendor" | "client";
 export type VendorStatus = "pending" | "approved" | "rejected" | "blocked";
 export type ClientStatus = "active" | "blocked";
@@ -23,6 +25,7 @@ export interface IClient extends User{
     googleId?: string;
     walletBalance?: number;
     status?: ClientStatus;
+    location?: LocationData | null;
 }
 
 export interface IVendor extends User{

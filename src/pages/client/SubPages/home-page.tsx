@@ -1,25 +1,25 @@
 import FindNearestSection from "@/components/HomeComponents/FindNearestSection"
-import Footer from "@/components/HomeComponents/Footer"
 import HeroSection from "@/components/HomeComponents/HeroSection"
 import PicksSection from "@/components/HomeComponents/PicksSection"
 import WhyBookSection from "@/components/HomeComponents/WhyBookSection"
 import Loading from "@/components/Loadings/Loading"
 import { useState, useEffect } from "react"
-import PageNavbar from "@/components/Navbars & Sidebars/ClientNavbar"
 import ClientLayout from "../ClientLayout"
 
 const Home = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isVisible, setIsVisible] = useState<boolean>(false);
 
+
   useEffect(() => {
-    // Trigger animation after component mounts
     const timer = setTimeout(() => {
       setIsVisible(true);
     }, 50);
 
     return () => clearTimeout(timer);
   }, []);
+
+
 
   return (
     <ClientLayout>

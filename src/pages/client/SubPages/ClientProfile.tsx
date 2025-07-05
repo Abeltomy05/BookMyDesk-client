@@ -4,9 +4,12 @@ import { Save, Eye, EyeOff, Upload } from "lucide-react"
 import { clientValidateProfileForm, validatePasswordForm, type ClientProfileErrors, type PasswordErrors } from "@/utils/validations/profile-update.validation"
 import toast from "react-hot-toast"
 import { clientService } from "@/services/clientServices"
-import PageNavbar from "@/components/Navbars & Sidebars/ClientNavbar"
 import { uploadImageCloudinary } from "@/utils/cloudinary/cloudinary"
 import ClientLayout from "../ClientLayout"
+import type { LocationData } from "@/types/location.type"
+import { LocationInput } from "@/components/ReusableComponents/LocationInput"
+import { useDispatch } from "react-redux"
+import { clientLogin } from "@/store/slices/client.slice";
 
 export interface UserProfile {
   username: string
@@ -14,6 +17,7 @@ export interface UserProfile {
   phone: string
   avatar: string | null
   avatarFile?: File | null
+   location: LocationData | null
 }
 
 const ClientProfile: React.FC = () => {
@@ -25,6 +29,7 @@ const ClientProfile: React.FC = () => {
    phone: "",
    avatar: "",
    avatarFile: null,
+   location: null,
   })
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
@@ -48,6 +53,8 @@ const ClientProfile: React.FC = () => {
   password: {},
   });
 
+  const dispatch = useDispatch();
+
     useEffect(()=>{
     fetchProfileData();
   },[])
@@ -61,6 +68,7 @@ const fetchProfileData = async () => {
         email: response.data.email,
         phone: response.data.phone,
         avatar: response.data.avatar || null,
+        location: response.data.location || null,
        });
     }catch(error){
         console.error("Error fetching profile data:", error)
@@ -102,6 +110,13 @@ const fetchProfileData = async () => {
       },
     })
   }
+
+const handleLocationChange = (location: LocationData | null) => {
+  setProfile({
+    ...profile,
+    location: location,
+  })
+}
 
   const togglePasswordVisibility = (field: "current" | "new" | "confirm") => {
     setShowPasswords({
@@ -168,6 +183,7 @@ const handlePasswordValidation = () => {
         const response = await clientService.updateProfile(updatedProfile);
         console.log("Profile update response:", response.data);
         if(response.success){
+            dispatch(clientLogin(response.data));
             toast.success("Profile updated successfully!");
         }else{
             toast.error("Failed to update profile. Please try again later.");
@@ -312,6 +328,17 @@ const handlePasswordValidation = () => {
               {errors.profile.phone && <p className="mt-1 text-sm text-red-600">{errors.profile.phone}</p>}
             </div>
 
+            <div>
+            <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-2">
+              Location
+            </label>
+            <LocationInput
+              value={profile.location}
+              onChange={handleLocationChange}
+              placeholder="Search for your location..."
+              className="w-full"
+            />
+          </div>
 
             <button
               onClick={handleProfileSave}
