@@ -157,3 +157,7 @@
   background-size: 200px 100%;
 }
 
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}

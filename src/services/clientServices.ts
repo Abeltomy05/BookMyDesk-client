@@ -2,6 +2,7 @@ import authAxiosInstance from "@/api/auth.axios";
 import { clientAxiosInstance } from "@/api/client.axios";
 import type { UserProfile } from "@/pages/client/SubPages/ClientProfile";
 import type { BookingData } from "@/types/booking.type";
+import type { LoginData } from "./adminService";
 
 interface ApiResponse {
   success: boolean;
@@ -25,12 +26,6 @@ export interface SignupData {
   phone: string;
   password: string;
   role: string;
-}
-
-export interface LoginData {
-  email: string;
-  password: string;
-  role:string;
 }
 
 export interface GetBookingResponse {
@@ -290,6 +285,7 @@ export const clientService = {
     spaceId: string
     bookingDate: string
     numberOfDesks: number
+    discountAmount?: number
     bookingId?: string
   }):Promise<ApiResponse> => {
     try {
@@ -414,13 +410,14 @@ export const clientService = {
     }
   },
 
-  payWithWallet:async ({spaceId,bookingDate,numberOfDesks,totalPrice}:{spaceId: string,bookingDate:Date,numberOfDesks:number,totalPrice:number})=>{
+  payWithWallet:async ({spaceId,bookingDate,numberOfDesks,totalPrice,discountAmount}:{spaceId: string,bookingDate:Date,numberOfDesks:number,totalPrice:number,discountAmount?:number})=>{
     try {
       const response = await clientAxiosInstance.post("/pay-with-wallet",{
         spaceId,
         bookingDate,
         numberOfDesks,
-        totalPrice
+        totalPrice,
+        discountAmount
       })
       return response.data;
     } catch (error:any) {

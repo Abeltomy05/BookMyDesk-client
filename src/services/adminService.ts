@@ -11,6 +11,7 @@ export interface LoginData {
   email: string;
   password: string;
   role:string;
+  fcmToken?:string;
 }
 
 type ClientStatus = "active" | "blocked"

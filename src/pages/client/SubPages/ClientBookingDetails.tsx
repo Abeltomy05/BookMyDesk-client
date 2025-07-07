@@ -216,6 +216,7 @@ return (
             bookingDate: new Date(booking.bookingDate),
             numberOfDesks: booking.numberOfDesks ?? 1,
             totalAmount: booking.totalPrice ?? 0,
+            discountAmount: booking.discountAmount ?? 0,
             pricePerDay: booking.space?.pricePerDay ?? 0, 
             bookingId: booking._id ,
           }}

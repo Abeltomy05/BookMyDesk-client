@@ -28,7 +28,7 @@ export const validateSpaceField = (
       if (nameValue.trim().length > 50) {
         return 'Space name must be less than 50 characters'
       }
-      // Check for duplicate names (excluding current space being edited)
+
       if (existingSpaces) {
         const isDuplicate = existingSpaces.some(
           space => space.name.toLowerCase().trim() === nameValue.toLowerCase().trim() && 

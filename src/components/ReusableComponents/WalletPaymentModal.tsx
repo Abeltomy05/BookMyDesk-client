@@ -10,6 +10,7 @@ interface BookingData {
   bookingDate: Date
   numberOfDesks: number
   totalAmount: number
+  discountAmount?:number
   pricePerDay: number
 }
 
@@ -62,7 +63,8 @@ const WalletPaymentModal: React.FC<WalletPaymentModalProps> = ({
         spaceId: bookingData.spaceId,
         bookingDate: bookingData.bookingDate,
         numberOfDesks: bookingData.numberOfDesks,
-        totalPrice: bookingData.totalAmount
+        totalPrice: bookingData.totalAmount,
+        discountAmount: bookingData.discountAmount
       })
 
       if(response.success){
@@ -149,6 +151,12 @@ const WalletPaymentModal: React.FC<WalletPaymentModalProps> = ({
                 <span className="text-gray-600">Price per desk:</span>
                 <span className="text-black">₹{bookingData.pricePerDay}</span>
               </div>
+              {bookingData.discountAmount && bookingData.discountAmount > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Discount:</span>
+                  <span className="text-green-600 font-medium">-₹{bookingData.discountAmount}</span>
+                </div>
+              )}
               <div className="border-t border-gray-200 pt-3 mt-3">
                 <div className="flex justify-between font-semibold text-lg">
                   <span className="text-black">Total Amount:</span>

@@ -8,17 +8,13 @@ import type { GetBookingResponse } from "./clientServices";
 import type { VendorHomeData } from '@/types/vendor-home.types'; 
 import { formatCurrency } from '@/utils/formatters/currency';
 import { formatDate } from '@/utils/formatters/date';
+import type { NewOfferForm } from '@/pages/vendor/SubPages/OfferManagement';
+import type { LoginData } from './adminService';
 
 interface ApiResponse {
   success: boolean;
   message: string;
   data?: any;
-}
-
-export interface LoginData {
-  email: string;
-  password: string;
-  role:string;
 }
 
 export interface VendorFormData {
@@ -479,6 +475,78 @@ downloadPdf: (data: VendorHomeData,vendorData:{username?:string,companyName?:str
     });
 
   doc.save('vendor-revenue-report.pdf');
+},
+
+fetchBuildingsForVendor: async():Promise<ApiResponse>=>{
+  try {
+    const response = await vendorAxiosInstance.get("/buildings-for-vendor");
+    return response.data;
+  } catch (error:any) {
+    console.error('Error fetching buildings for vendor:', error);
+    return {
+      success: false,
+      message: error.message || 'Failed to fetching buildings for vendor. Please try again later.',
+    };
+  }
+},
+
+fetchSpacesForBuildings: async(buildingId:string):Promise<ApiResponse>=>{
+  try {
+     const response = await vendorAxiosInstance.get(`/spaces-for-buildings/${buildingId}`);
+     return response.data;
+  } catch (error:any) {
+     console.error('Error fetching spaces for building:', error);
+    return {
+      success: false,
+      message: error.message || 'Failed to fetching spaces for buildings. Please try again later.',
+    };
+  }
+},
+
+fetchOffers: async({page=1,limit=5}:{page:number,limit:number})=>{
+  try {
+    const response = await vendorAxiosInstance.get("/get-offers",{
+      params:{page,limit}
+    });
+    return response.data;
+  } catch (error:any) {
+     console.error('Error fetching spaces for building:', error);
+    return {
+      success: false,
+      message: error.message || 'Failed to fetching spaces for buildings. Please try again later.',
+    };
+  }
+},
+
+createOffer: async(data: NewOfferForm):Promise<ApiResponse>=>{
+   try {
+     const response = await vendorAxiosInstance.post("/create-offer",data);
+     return response.data;
+   } catch (error:any) {
+     console.error('Error creating offer:', error);
+    return {
+      success: false,
+      message: error.response?.data?.message || error.message || 'Failed to create offer. Please try again later.',
+    };
+   }
+},
+
+deleteOffer: async(offerId:string):Promise<ApiResponse>=>{
+   try {
+     const response = await vendorAxiosInstance.delete("/delete-offer",{
+      params:{
+        entityType: 'offer',
+        entityId: offerId
+      }
+     })
+     return response.data;
+   } catch (error:any) {
+     console.error('Error creating offer:', error);
+    return {
+      success: false,
+      message: error.response?.data?.message || error.message || 'Failed to create offer. Please try again later.',
+    };
+   }
 },
 
  logout: async():Promise<ApiResponse>=>{
