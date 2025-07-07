@@ -9,17 +9,12 @@ import type { VendorHomeData } from '@/types/vendor-home.types';
 import { formatCurrency } from '@/utils/formatters/currency';
 import { formatDate } from '@/utils/formatters/date';
 import type { NewOfferForm } from '@/pages/vendor/SubPages/OfferManagement';
+import type { LoginData } from './adminService';
 
 interface ApiResponse {
   success: boolean;
   message: string;
   data?: any;
-}
-
-export interface LoginData {
-  email: string;
-  password: string;
-  role:string;
 }
 
 export interface VendorFormData {

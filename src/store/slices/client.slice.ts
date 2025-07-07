@@ -16,7 +16,7 @@ const clientSlice = createSlice({
 	reducers: {
 		clientLogin: (state, action: PayloadAction<IClient>) => {
 			state.client = action.payload;
-            console.log('client login',state.client)
+            // console.log('client login',state.client)
 		},
 		clientLogout: (state) => {
 			state.client = null;

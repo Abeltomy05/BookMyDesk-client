@@ -7,11 +7,12 @@ import { toast } from "react-hot-toast"
 import { useDispatch } from "react-redux"
 import { validateLoginForm } from "@/utils/validations/auth-schema.validation"
 import Loading from "@/components/Loadings/Loading"
+import { requestPermission } from "@/utils/firebase/firebaseNotification"
 
 // Services
 import { vendorService } from "@/services/vendorServices"
 import { clientService } from "@/services/clientServices"
-import { adminService } from "@/services/adminService"
+import { adminService, type LoginData } from "@/services/adminService"
 
 // Actions
 import { vendorLogin } from "@/store/slices/vendor.slice"
@@ -118,6 +119,7 @@ const ReusableLogin: React.FC<ReusableLoginProps> = ({ userType, config }) => {
     return Object.keys(validationErrors).length === 0
   }
 
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
 
@@ -125,12 +127,18 @@ const ReusableLogin: React.FC<ReusableLoginProps> = ({ userType, config }) => {
       setIsLoading(true)
 
       try {
-        const data = { ...formData, role: userType }
+        const fcmToken = await requestPermission()
+        const data: LoginData = { ...formData, role: userType }
+         if (fcmToken) {
+            // localStorage.setItem('fcm_token', fcmToken);
+            data.fcmToken = fcmToken; 
+          }
         const service = services[userType]
         const response = await service.login(data)
         
         if (response.success) {
           toast.success("Login successful!")
+
           setFormData({
             email: "",
             password: "",
@@ -140,7 +148,7 @@ const ReusableLogin: React.FC<ReusableLoginProps> = ({ userType, config }) => {
             const loginAction = loginActions[userType]
             dispatch(loginAction(response.data))
             setIsLoading(false)
-          }, 2000)
+          }, 1000)
         } else {
           toast.error(response.message || "Invalid email or password")
           setIsLoading(false)
@@ -172,7 +180,6 @@ const ReusableLogin: React.FC<ReusableLoginProps> = ({ userType, config }) => {
     }
   }
 
-  // Vendor Style Layout
   if (config.useVendorStyle) {
     return (
       <div className={`flex flex-col md:flex-row h-screen opacity-0 transition-opacity duration-1000 ease-in ${isVisible ? "opacity-100" : ""}`}>
@@ -185,7 +192,7 @@ const ReusableLogin: React.FC<ReusableLoginProps> = ({ userType, config }) => {
           </div>
         )}
 
-        {/* Left side - Image (60%) */}
+        {/* Left side - Image  */}
         <div className={`w-full md:w-3/5 bg-gray-100 transition-opacity duration-1000 ease-in-out ${isVisible ? "opacity-100" : "opacity-0"}`}>
           <div className="h-full w-full relative">
             <img src={config.imageUrl} alt={config.imageAlt} className="w-full h-full object-cover" />

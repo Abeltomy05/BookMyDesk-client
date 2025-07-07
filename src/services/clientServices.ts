@@ -2,6 +2,7 @@ import authAxiosInstance from "@/api/auth.axios";
 import { clientAxiosInstance } from "@/api/client.axios";
 import type { UserProfile } from "@/pages/client/SubPages/ClientProfile";
 import type { BookingData } from "@/types/booking.type";
+import type { LoginData } from "./adminService";
 
 interface ApiResponse {
   success: boolean;
@@ -25,12 +26,6 @@ export interface SignupData {
   phone: string;
   password: string;
   role: string;
-}
-
-export interface LoginData {
-  email: string;
-  password: string;
-  role:string;
 }
 
 export interface GetBookingResponse {

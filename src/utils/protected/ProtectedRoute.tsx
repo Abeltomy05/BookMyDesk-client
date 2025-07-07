@@ -14,7 +14,7 @@ export const ProtectedRoute = ({
 }: ProtectedRouteProps) => {
 	const location = useLocation();
 	const session = useSelector(getActiveSession);
-  console.log('the session',session)
+//   console.log('the session',session)
 
 
   const path = location.pathname.toLowerCase();
@@ -23,7 +23,7 @@ export const ProtectedRoute = ({
 	else if (path.startsWith("/admin")) inferredRole = "admin";
 	else inferredRole = "client";
 
-	console.log("inferredRole", inferredRole);
+	// console.log("inferredRole", inferredRole);
 	if (!session) {
 		const loginRedirects: Record<string, string> = {
 			client: "/login",
