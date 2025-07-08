@@ -54,8 +54,15 @@ export const listenForForegroundMessages = () => {
     console.log("📩 Foreground FCM message received:", payload);
     const title = payload.notification?.title || "New Notification";
     const body = payload.notification?.body || "You have a new message";
+    const type = payload.data?.type as 'success' | 'error' | 'warning' | 'info' || 'info';
 
-    toast.custom(<NotificationToast title={title} body={body} />,{
+    toast.custom(
+      <NotificationToast
+        title={title} 
+        body={body}
+        type={type}
+        onClose={() => toast.dismiss()} 
+      />,{
         duration: 5000,
     });
   });
