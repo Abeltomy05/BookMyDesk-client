@@ -1,6 +1,6 @@
 // AdminLayout.tsx
 import type React from "react"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   Bell,
@@ -22,6 +22,7 @@ import { adminLogout } from "@/store/slices/admin.slice"
 import { useDispatch } from "react-redux"
 import { useNavigate, useLocation } from "react-router-dom"
 import { ShieldCheck } from "lucide-react"
+import NotificationsComponent from "@/components/ReusableComponents/NotificationTab"
 
 
 const sidebarItems = [
@@ -44,7 +45,50 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const location = useLocation()
   const [userDropdownOpen, setUserDropdownOpen] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [showNotificationTooltip, setShowNotificationTooltip] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const notificationRef = useRef<HTMLDivElement>(null);
+  const limit = 3;
+  
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+        if (
+          notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
+          setShowNotifications(false);
+        }
+    };
 
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const fetchNotificationsFromAdmin = async (page: number, filter: "unread" | "all") => {
+  const response = await adminService.getNotifications(page, limit, filter);
+
+  if (!response.success || !response.data) {
+    toast.error("Failed to fetch notifications");
+    return {
+      items: [],
+      totalCount: 0,
+      unreadCount: 0,
+      hasMore: false,
+    };
+  }
+
+  return {
+    items: response.data.items || [],
+    totalCount: response.data.totalCount || 0,
+    unreadCount: response.data.unreadCount || 0,
+    hasMore: response.data.hasMore || false,
+  };
+};
+
+const handleMarkAsRead = async (id: string) => {
+  const response = await adminService.markAsRead(id);
+  return response;
+};
   const toggleUserDropdown = () => {
     setUserDropdownOpen(!userDropdownOpen)
   }
@@ -156,15 +200,39 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               </h1>
             </div>
             <div className="flex items-center space-x-4">
-              <div className="relative">
-                <button className="p-2 text-gray-400 hover:text-orange-400 focus:outline-none transition-colors">
+              <div 
+              className="relative"
+              onMouseEnter={() => setShowNotificationTooltip(true)}
+              onMouseLeave={() => setShowNotificationTooltip(false)}
+              ref={notificationRef}
+              >
+                <button 
+                className="p-2 text-gray-400 hover:text-orange-400 focus:outline-none transition-colors cursor-pointer"
+                onClick={() => setShowNotifications(!showNotifications)}
+                >
                   <Bell size={20} />
                 </button>
+                {/* Tooltip */}
+                {showNotificationTooltip && !showNotifications && (
+                  <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                    Notifications
+                  </div>
+                )}
+    
+                {/* Notification Dropdown */}
+                {showNotifications && (
+                  <div className="absolute right-0 mt-4 w-[350px] max-h-[500px] z-50">
+                    <NotificationsComponent  
+                    fetchNotifications={fetchNotificationsFromAdmin}
+                    markAsRead={handleMarkAsRead}
+                    />
+                  </div>
+                )}
               </div>
-              <div className="relative">
+              <div className="relative ">
                 <button
                   onClick={toggleUserDropdown}
-                  className="flex items-center space-x-2 text-gray-300 hover:text-white focus:outline-none transition-colors"
+                  className="flex items-center space-x-2 text-gray-300 hover:text-white focus:outline-none transition-colors cursor-pointer"
                 >
                   <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-black shadow-lg shadow-orange-500/30" style={{backgroundColor: '#f69938'}}>
                     <User size={16} />

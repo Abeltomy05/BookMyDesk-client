@@ -1,5 +1,6 @@
 import { adminAxiosInstance } from "@/api/admin.axios";
 import authAxiosInstance from "@/api/auth.axios";
+import type { NotificationResponse } from "@/types/notification.type";
 
 interface ApiResponse {
   success: boolean;
@@ -242,5 +243,48 @@ export const adminService = {
     };
     }
    },
+
+  getNotifications: async(page:number,limit:number,filter: "unread" | "all"):Promise<{ success: boolean, data?: NotificationResponse, message?: string}>=>{
+      try {
+        const response = await adminAxiosInstance.get("/get-notifications",{
+          params:{
+            page,
+            limit,
+            filter,
+          }
+        })
+        const data = response.data.data;
+          return {
+            success: true,
+            data: {
+              items: data.items,
+              totalCount: data.totalCount,
+              unreadCount: data.unreadCount,
+              hasMore: (page + 1) * limit < data.totalCount,
+            },
+          };
+      } catch (error:any) {
+           console.error('Error getting notifiactions:', error);
+         const message = error.response?.data?.message || error.message || "Unknown error occurred";
+        return {
+          success: false,
+          message,
+        };
+      }
+    }, 
+
+    markAsRead: async(id:string):Promise<ApiResponse>=>{
+      try {
+        const response = await adminAxiosInstance.patch(`/mark-as-read/${id}`);
+        return response.data;
+      } catch (error:any) {
+        console.error('Error getting notifiactions:', error);
+          const message = error.response?.data?.message || error.message || "Unknown error occurred";
+          return {
+            success: false,
+            message,
+          };
+      }
+    },
 
 }

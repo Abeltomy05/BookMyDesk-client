@@ -4,12 +4,14 @@ import { useEffect, useRef, useState } from "react";
 import { Bell, User, Settings, LogOut, Menu, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { IClient } from "@/types/user.type"; 
+import NotificationsComponent from "../ReusableComponents/NotificationTab";
+import toast from "react-hot-toast";
+import { clientService } from "@/services/clientServices";
 
 interface ClientNavbarProps {
   onMenuClick: () => void;
   onLogout: () => void;
   user: IClient | null;
-  notificationCount?: number;
   backgroundClass?: string;
 }
 
@@ -17,27 +19,63 @@ const ClientNavbar: React.FC<ClientNavbarProps> = ({
   onMenuClick,
   onLogout,
   user,
-  notificationCount = 0,
   backgroundClass = "bg-black"
 }) => {
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showNotificationTooltip, setShowNotificationTooltip] = useState(false);
   const [showAccountTooltip, setShowAccountTooltip] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const notificationRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const limit = 3;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);
       }
+
+       if (
+          notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
+          setShowNotifications(false);
+        }
     };
+
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  const fetchNotificationsFromClient = async (page: number, filter: "unread" | "all") => {
+  const response = await clientService.getNotifications(page, limit, filter);
+
+  if (!response.success || !response.data) {
+    toast.error("Failed to fetch notifications");
+    return {
+      items: [],
+      totalCount: 0,
+      unreadCount: 0,
+      hasMore: false,
+    };
+  }
+
+  return {
+    items: response.data.items || [],
+    totalCount: response.data.totalCount || 0,
+    unreadCount: response.data.unreadCount || 0,
+    hasMore: response.data.hasMore || false,
+  };
+};
+
+const handleMarkAsRead = async (id: string) => {
+  const response = await clientService.markAsRead(id);
+  return response;
+};
+
 
   const locationName = user?.location?.displayName.split(',').slice(0,1) 
   return (
@@ -80,15 +118,27 @@ const ClientNavbar: React.FC<ClientNavbarProps> = ({
             className="relative"
             onMouseEnter={() => setShowNotificationTooltip(true)}
             onMouseLeave={() => setShowNotificationTooltip(false)}
+            ref={notificationRef}
           >
             <Bell
               size={24}
               className="text-white cursor-pointer transition-transform duration-300 hover:scale-110 hover:text-[#f69938]"
+              onClick={() => setShowNotifications(!showNotifications)}
             />
             {/* Tooltip */}
-            {showNotificationTooltip && (
+            {showNotificationTooltip && !showNotifications && (
               <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap">
                 Notifications
+              </div>
+            )}
+
+            {/* Notification Dropdown */}
+            {showNotifications && (
+              <div className="absolute right-0 mt-4 w-[350px] max-h-[500px] z-50">
+                <NotificationsComponent  
+                fetchNotifications={fetchNotificationsFromClient}
+                markAsRead={handleMarkAsRead}
+                />
               </div>
             )}
           </div>

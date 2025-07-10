@@ -98,9 +98,7 @@ function LightGenericTableInner<T extends BaseItem>(
       setPagination(prev => ({ ...prev, totalPages: 0, totalItems: 0 }))
       console.error("Fetch error:", err)
     } finally {
-      setTimeout(()=>{
       setLoading(false)
-      },1000)
     }
   }
 

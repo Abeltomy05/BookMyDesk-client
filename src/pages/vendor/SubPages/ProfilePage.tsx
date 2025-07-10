@@ -236,7 +236,6 @@ const handleIdProofChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 
   return (
      <VendorLayout
-      notificationCount={5}
       backgroundClass="bg-black"
     >
     <div className="min-h-screen bg-gray-50">

@@ -265,7 +265,6 @@ const VendorManageBookings = () => {
 
   return (
     <VendorLayout
-     notificationCount={5}
      backgroundClass="bg-black"
     >
       <div className="pt-18 bg-gray-50 min-h-screen">

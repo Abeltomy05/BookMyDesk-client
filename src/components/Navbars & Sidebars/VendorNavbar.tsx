@@ -1,10 +1,13 @@
+import { vendorService } from '@/services/vendorServices';
 import { motion } from 'framer-motion';
 import { Bell, Menu } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import NotificationsComponent from '../ReusableComponents/NotificationTab';
 
 interface VendorNavbarProps {
   onMenuClick: () => void;
-  notificationCount?: number;
   logoUrl?: string;
   className?: string;
   backgroundClass?: string; 
@@ -12,13 +15,50 @@ interface VendorNavbarProps {
 
 const VendorNavbar: React.FC<VendorNavbarProps> = ({
   onMenuClick,
-  notificationCount = 0,
   logoUrl = "https://res.cloudinary.com/dnivctodr/image/upload/v1748161273/BMS-logo_hcz5ww.png",
   className = "",
   backgroundClass
 }) => {
-
+  const [showNotificationTooltip, setShowNotificationTooltip] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const notificationRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const limit = 3;
+
+  const fetchNotificationsFromVendor = async (page: number, filter: "unread" | "all") => {
+  const response = await vendorService.getNotifications(page, limit, filter);
+  if (!response.success || !response.data) {
+    toast.error("Failed to fetch notifications");
+    return {
+      items: [],
+      totalCount: 0,
+      unreadCount: 0,
+      hasMore: false,
+    };
+  }
+
+  return {
+    items: response.data.items || [],
+    totalCount: response.data.totalCount || 0,
+    unreadCount: response.data.unreadCount || 0,
+    hasMore: response.data.hasMore || false,
+  };
+  };
+const handleMarkAsRead = async (id: string) => {
+  const response = await vendorService.markAsRead(id);
+  return response;
+};
+
+  useEffect(() => {
+  const handleClickOutside = (event: MouseEvent) => {
+    if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
+      setShowNotifications(false);
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => document.removeEventListener("mousedown", handleClickOutside);
+}, []);
 
   return (
     <motion.nav
@@ -50,28 +90,39 @@ const VendorNavbar: React.FC<VendorNavbarProps> = ({
             className="flex items-center space-x-4"
           >
             {/* Notification Icon */}
-            <motion.button 
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              className="relative p-2 rounded-full text-white hover:text-black hover:bg-gray-100 transition-colors duration-200"
+            <div
+              className="relative"
+              ref={notificationRef}
+              onMouseEnter={() => setShowNotificationTooltip(true)}
+              onMouseLeave={() => setShowNotificationTooltip(false)}
             >
-              <Bell className="w-6 h-6" />
-              {notificationCount > 0 && (
-                <motion.span 
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                  className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
-                >
-                  <motion.span
-                    animate={{ scale: [1, 1.2, 1] }}
-                    transition={{ repeat: Infinity, duration: 2 }}
-                  >
-                    {notificationCount}
-                  </motion.span>
-                </motion.span>
+              <motion.div
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className="cursor-pointer"
+                onClick={() => setShowNotifications(!showNotifications)}
+              >
+                <Bell
+                  size={24}
+                  className="text-white transition-transform duration-300 hover:text-[#f69938]"
+                />
+              </motion.div>
+
+              {showNotificationTooltip && !showNotifications && (
+                <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                  Notifications
+                </div>
               )}
-            </motion.button>
+
+  {showNotifications && (
+    <div className="absolute right-0 mt-4 w-[350px] max-h-[500px] z-50">
+      <NotificationsComponent 
+      fetchNotifications={fetchNotificationsFromVendor} 
+      markAsRead={handleMarkAsRead} 
+      />
+    </div>
+  )}
+</div>
 
             {/* Menu Icon */}
             <motion.button

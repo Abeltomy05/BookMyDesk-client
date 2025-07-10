@@ -11,15 +11,15 @@ import { useDispatch } from 'react-redux';
 
 interface ClientLayoutProps {
    children: React.ReactNode;
-  notificationCount?: number;
-  backgroundClass?: string;
+   backgroundClass?: string;
+   activeMenuItem?: string;
 }
 
 
 const ClientLayout: React.FC<ClientLayoutProps> = ({
   children,
-  notificationCount = 0,
-  backgroundClass
+  backgroundClass,
+  activeMenuItem = "home"
 }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const client = useSelector((state: RootState) => state.client.client);
@@ -45,10 +45,9 @@ const ClientLayout: React.FC<ClientLayoutProps> = ({
         onMenuClick={() => setSidebarOpen(true)}
         onLogout={handleLogout}
         user={client}
-        notificationCount={notificationCount}
         backgroundClass={backgroundClass}
       />
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} activeItem={activeMenuItem}/>
       <main>{children}</main>
       <Footer/>
     </div>

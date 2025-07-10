@@ -3,6 +3,7 @@ import { clientAxiosInstance } from "@/api/client.axios";
 import type { UserProfile } from "@/pages/client/SubPages/ClientProfile";
 import type { BookingData } from "@/types/booking.type";
 import type { LoginData } from "./adminService";
+import type { Notification, NotificationResponse } from "@/types/notification.type";
 
 interface ApiResponse {
   success: boolean;
@@ -460,6 +461,48 @@ export const clientService = {
     }
   },
 
+  getNotifications: async(page:number,limit:number,filter: "unread" | "all"):Promise<{ success: boolean, data?: NotificationResponse, message?: string}>=>{
+    try {
+      const response = await clientAxiosInstance.get("/get-notifications",{
+        params:{
+          page,
+          limit,
+          filter,
+        }
+      })
+      const data = response.data.data;
+        return {
+          success: true,
+          data: {
+            items: data.items,
+            totalCount: data.totalCount,
+            unreadCount: data.unreadCount,
+            hasMore: (page + 1) * limit < data.totalCount,
+          },
+        };
+    } catch (error:any) {
+         console.error('Error getting notifiactions:', error);
+       const message = error.response?.data?.message || error.message || "Unknown error occurred";
+      return {
+        success: false,
+        message,
+      };
+    }
+  },
+
+markAsRead: async(id:string):Promise<ApiResponse>=>{
+  try {
+     const response = await clientAxiosInstance.patch(`/mark-as-read/${id}`);
+     return response.data;
+  } catch (error:any) {
+     console.error('Error getting notifiactions:', error);
+       const message = error.response?.data?.message || error.message || "Unknown error occurred";
+      return {
+        success: false,
+        message,
+      };
+  }
+},
 
 
   logout: async():Promise<ApiResponse>=>{

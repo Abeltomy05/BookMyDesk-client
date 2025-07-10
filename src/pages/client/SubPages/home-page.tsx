@@ -10,7 +10,6 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isVisible, setIsVisible] = useState<boolean>(false);
 
-
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsVisible(true);
@@ -21,8 +20,9 @@ const Home = () => {
 
 
 
+
   return (
-    <ClientLayout>
+    <ClientLayout activeMenuItem="home">
      <div className={`font-sans overflow-x-hidden transition-all duration-1000 ease-out ${
        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
      }`}>

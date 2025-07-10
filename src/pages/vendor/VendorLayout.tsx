@@ -9,7 +9,6 @@ import { useDispatch } from 'react-redux';
 
 interface VendorLayoutProps {
   children: React.ReactNode;
-  notificationCount?: number;
   title?: string;
   backgroundClass?: string;
 }
@@ -17,7 +16,6 @@ interface VendorLayoutProps {
 
 const VendorLayout: React.FC<VendorLayoutProps> = ({
   children,
-  notificationCount = 0,
   title = 'Menu',
   backgroundClass
 }) => {
@@ -42,7 +40,6 @@ const VendorLayout: React.FC<VendorLayoutProps> = ({
     <div className="min-h-screen">
       <VendorNavbar
         onMenuClick={() => setSidebarOpen(!sidebarOpen)}
-        notificationCount={notificationCount}
         backgroundClass={backgroundClass}
       />
       <VendorSidebar

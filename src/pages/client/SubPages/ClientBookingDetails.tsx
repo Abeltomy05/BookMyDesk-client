@@ -92,7 +92,7 @@ export const BookingDetailsPage: React.FC = () => {
 
    if (loading) {
     return (
-      <ClientLayout>
+      <ClientLayout >
         <div className="min-h-screen flex items-center justify-center text-gray-600">
           Loading booking details...
         </div>

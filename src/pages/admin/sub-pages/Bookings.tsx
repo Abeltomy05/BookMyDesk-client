@@ -143,9 +143,7 @@ const [totalItems, setTotalItems] = useState(0)
   } catch (error) {
     console.error('Error fetching bookings:', error)
   } finally {
-    setTimeout(()=>{
       setLoading(false);
-    },2000)
   }
 }
 

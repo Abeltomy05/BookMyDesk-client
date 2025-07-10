@@ -117,7 +117,7 @@ const VendorDashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <VendorLayout notificationCount={5}>
+      <VendorLayout >
         <div className="min-h-screen flex items-center justify-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#f69938]"></div>
         </div>
@@ -127,7 +127,7 @@ const VendorDashboard: React.FC = () => {
 
   if (error) {
     return (
-      <VendorLayout notificationCount={5}>
+      <VendorLayout >
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <p className="text-red-600 mb-4">{error}</p>
@@ -144,7 +144,7 @@ const VendorDashboard: React.FC = () => {
   }
 
   return (
-    <VendorLayout notificationCount={5}>
+    <VendorLayout >
       <div className="min-h-screen">
         {/* Hero Section */}
         <motion.section 

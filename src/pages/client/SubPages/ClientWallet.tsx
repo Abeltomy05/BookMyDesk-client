@@ -5,7 +5,7 @@ import { clientService } from '@/services/clientServices'
 
 const ClientWalletPage: React.FC = () => {
   return (
-    <ClientLayout>
+    <ClientLayout activeMenuItem="wallet">
       <WalletComponent
         title="My Wallet"
         subtitle="Manage your balance and view transaction history"

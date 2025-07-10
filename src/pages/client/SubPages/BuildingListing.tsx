@@ -155,7 +155,7 @@ export default function BuildingsListing() {
 
 
  return (
-    <ClientLayout>
+    <ClientLayout activeMenuItem="buildings">
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
       <div
