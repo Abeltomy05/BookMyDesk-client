@@ -26,6 +26,7 @@ const ClientNavbar: React.FC<ClientNavbarProps> = ({
   const [showNotificationTooltip, setShowNotificationTooltip] = useState(false);
   const [showAccountTooltip, setShowAccountTooltip] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const notificationRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -50,6 +51,18 @@ const ClientNavbar: React.FC<ClientNavbarProps> = ({
     };
   }, []);
 
+  useEffect(() => {
+  const fetchInitialNotificationData = async () => {
+    const res = await fetchNotificationsFromClient(0, "unread");
+    setUnreadCount(res.unreadCount); 
+  };
+
+  fetchInitialNotificationData();
+  const interval = setInterval(fetchInitialNotificationData, 60000);
+
+  return () => clearInterval(interval);
+}, []);
+
   const fetchNotificationsFromClient = async (page: number, filter: "unread" | "all") => {
   const response = await clientService.getNotifications(page, limit, filter);
 
@@ -62,7 +75,7 @@ const ClientNavbar: React.FC<ClientNavbarProps> = ({
       hasMore: false,
     };
   }
-
+  setUnreadCount(response.data.unreadCount);
   return {
     items: response.data.items || [],
     totalCount: response.data.totalCount || 0,
@@ -71,9 +84,22 @@ const ClientNavbar: React.FC<ClientNavbarProps> = ({
   };
 };
 
-const handleMarkAsRead = async (id: string) => {
-  const response = await clientService.markAsRead(id);
-  return response;
+const handleMarkAsRead = async (id: string): Promise<{ success: boolean }> => {
+ try {
+    const response = await clientService.markAsRead(id);
+
+    if (response?.success) {
+      setUnreadCount((prev) => prev - 1);
+      return { success: true };
+    } else {
+      toast.error("Something went wrong!");
+      return { success: false };
+    }
+  } catch (error) {
+    console.error("Error marking as read:", error);
+    toast.error("Something went wrong!");
+    return { success: false };
+  }
 };
 
 
@@ -120,11 +146,16 @@ const handleMarkAsRead = async (id: string) => {
             onMouseLeave={() => setShowNotificationTooltip(false)}
             ref={notificationRef}
           >
-            <Bell
-              size={24}
-              className="text-white cursor-pointer transition-transform duration-300 hover:scale-110 hover:text-[#f69938]"
-              onClick={() => setShowNotifications(!showNotifications)}
-            />
+             <Bell
+                size={24}
+                className="text-white cursor-pointer transition-transform duration-300 hover:scale-110 hover:text-[#f69938]"
+                onClick={() => setShowNotifications(!showNotifications)}
+              />
+              {unreadCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              )}
             {/* Tooltip */}
             {showNotificationTooltip && !showNotifications && (
               <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap">

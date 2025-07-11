@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 
   
 interface NotificationsComponentProps {
-  fetchNotifications: (page: number, filter: "unread" | "all") => Promise<NotificationResponse>;
+   fetchNotifications: (page: number, filter: "unread" | "all") => Promise<NotificationResponse>;
    markAsRead: (id: string) => Promise<{ success: boolean }>; 
 }
 
@@ -22,7 +22,6 @@ export default function NotificationsComponent({ fetchNotifications,markAsRead  
   useEffect(() => {
   loadInitialNotifications()
 }, [activeTab])
-
 
 const loadInitialNotifications = async () => {
   setInitialLoading(true)
@@ -61,16 +60,11 @@ const loadMoreNotifications = async () => {
   }
 }
 
-
 const handleMarkAsRead  = async (id: string) => {
     try {
   const response = await markAsRead(id);
   if(response.success){
-      setNotifications((prev) =>
-          prev.map((notification) =>
-           notification._id === id && !notification.isRead ? { ...notification, isRead: true } : notification
-          )
-      );
+     await loadInitialNotifications();
   }else{
       toast.error("Failed to update status of the notification. Please try again.")
   }
@@ -79,7 +73,6 @@ const handleMarkAsRead  = async (id: string) => {
   toast.error("Failed to update status of the notification. Please try again.");
   }
 }
-
 
   return (
     <div className="w-full max-w-md mx-auto bg-white rounded-lg shadow-lg border border-gray-200">

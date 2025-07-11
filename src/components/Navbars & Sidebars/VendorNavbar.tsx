@@ -21,9 +21,22 @@ const VendorNavbar: React.FC<VendorNavbarProps> = ({
 }) => {
   const [showNotificationTooltip, setShowNotificationTooltip] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const notificationRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const limit = 3;
+
+  useEffect(() => {
+  const fetchInitialNotificationData = async () => {
+    const res = await fetchNotificationsFromVendor(0, "unread");
+    setUnreadCount(res.unreadCount); 
+  };
+
+  fetchInitialNotificationData();
+  const interval = setInterval(fetchInitialNotificationData, 60000);
+
+  return () => clearInterval(interval);
+}, []);
 
   const fetchNotificationsFromVendor = async (page: number, filter: "unread" | "all") => {
   const response = await vendorService.getNotifications(page, limit, filter);
@@ -44,9 +57,22 @@ const VendorNavbar: React.FC<VendorNavbarProps> = ({
     hasMore: response.data.hasMore || false,
   };
   };
-const handleMarkAsRead = async (id: string) => {
-  const response = await vendorService.markAsRead(id);
-  return response;
+
+const handleMarkAsRead = async (id: string): Promise<{ success: boolean }> => {
+ try {
+    const response = await vendorService.markAsRead(id);
+    if (response?.success) {
+      setUnreadCount((prev) => prev - 1);
+      return { success: true };
+    } else {
+      toast.error("Something went wrong!");
+      return { success: false };
+    }
+  } catch (error) {
+    console.error("Error marking as read:", error);
+    toast.error("Something went wrong!");
+    return { success: false };
+  }
 };
 
   useEffect(() => {
@@ -96,17 +122,16 @@ const handleMarkAsRead = async (id: string) => {
               onMouseEnter={() => setShowNotificationTooltip(true)}
               onMouseLeave={() => setShowNotificationTooltip(false)}
             >
-              <motion.div
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                className="cursor-pointer"
-                onClick={() => setShowNotifications(!showNotifications)}
-              >
-                <Bell
-                  size={24}
-                  className="text-white transition-transform duration-300 hover:text-[#f69938]"
-                />
-              </motion.div>
+              <Bell
+              size={24}
+              className="text-white cursor-pointer transition-transform duration-300 hover:scale-110 hover:text-[#f69938]"
+              onClick={() => setShowNotifications(!showNotifications)}
+            />
+            {unreadCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            )}
 
               {showNotificationTooltip && !showNotifications && (
                 <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap">
@@ -114,15 +139,15 @@ const handleMarkAsRead = async (id: string) => {
                 </div>
               )}
 
-  {showNotifications && (
-    <div className="absolute right-0 mt-4 w-[350px] max-h-[500px] z-50">
-      <NotificationsComponent 
-      fetchNotifications={fetchNotificationsFromVendor} 
-      markAsRead={handleMarkAsRead} 
-      />
-    </div>
-  )}
-</div>
+            {showNotifications && (
+              <div className="absolute right-0 mt-4 w-[350px] max-h-[500px] z-50">
+                <NotificationsComponent 
+                fetchNotifications={fetchNotificationsFromVendor} 
+                markAsRead={handleMarkAsRead} 
+                />
+              </div>
+            )}
+          </div>
 
             {/* Menu Icon */}
             <motion.button
