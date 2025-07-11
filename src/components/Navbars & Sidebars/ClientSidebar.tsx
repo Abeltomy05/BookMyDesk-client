@@ -129,7 +129,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, activeItem = "home" 
             </li>
             <li>
               <a
-                href="#"
+                href="/chat"
                 className={getMenuItemClasses("chat")}
               >
                 <MessageSquare className="mr-3" size={20} />

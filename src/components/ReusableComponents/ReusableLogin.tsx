@@ -18,6 +18,7 @@ import { adminService, type LoginData } from "@/services/adminService"
 import { vendorLogin } from "@/store/slices/vendor.slice"
 import { clientLogin } from "@/store/slices/client.slice"
 import { adminLogin } from "@/store/slices/admin.slice"
+import socketService from "@/services/socketService"
 
 // Types
 export type UserType = 'vendor' | 'client' | 'admin'
@@ -135,6 +136,7 @@ const ReusableLogin: React.FC<ReusableLoginProps> = ({ userType, config }) => {
           }
         const service = services[userType]
         const response = await service.login(data)
+        console.log(response.data)
         
         if (response.success) {
           toast.success("Login successful!")
@@ -147,6 +149,13 @@ const ReusableLogin: React.FC<ReusableLoginProps> = ({ userType, config }) => {
           setTimeout(() => {
             const loginAction = loginActions[userType]
             dispatch(loginAction(response.data))
+
+            //connecting to secket when login (client and vendor only).
+            if (userType === 'client' || userType === 'vendor') {
+              const userId = response.data._id || response.data.id;
+              socketService.connect(userId, userType);
+            }
+
             setIsLoading(false)
           }, 1000)
         } else {

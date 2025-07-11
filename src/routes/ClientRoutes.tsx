@@ -16,6 +16,7 @@ import SpaceBookingPage from "@/pages/client/SubPages/BookSlot";
 import ClientBookings from "@/pages/client/SubPages/Bookings";
 import BookingDetailsPage from "@/pages/client/SubPages/ClientBookingDetails";
 import ClientWalletPage from "@/pages/client/SubPages/ClientWallet";
+import ClientChatPage from "@/pages/client/SubPages/ClientChatPage";
 
 const ClientRoutes = () => {
   return (
@@ -36,6 +37,7 @@ const ClientRoutes = () => {
         <Route path="/bookings" element={<ProtectedRoute allowedRoles={["client"]} element={<ClientBookings/>} />}/>
         <Route path="/booking-details/:bookingId" element={<ProtectedRoute allowedRoles={["client"]} element={<BookingDetailsPage/>} />}/>
         <Route path="/wallet" element={<ProtectedRoute allowedRoles={["client"]} element={<ClientWalletPage/>} />}/>
+        <Route path="/chat" element={<ProtectedRoute allowedRoles={["client"]} element={<ClientChatPage/>} />}/>
 
 
        
