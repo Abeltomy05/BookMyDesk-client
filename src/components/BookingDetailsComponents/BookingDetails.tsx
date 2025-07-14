@@ -71,7 +71,7 @@ return (
             <span className="text-gray-600">Number of Desks:</span>
             <span className="text-gray-800">x {booking.numberOfDesks || 0}</span>
           </div>
-          {booking.discountAmount && booking.discountAmount > 0 && (
+          {booking.discountAmount && booking.discountAmount > 0 &&(
             <div className="flex justify-between">
               <span className="text-green-600 font-medium">Discount Applied:</span>
               <span className="text-green-600 font-medium">-{formatCurrency(booking.discountAmount)}</span>

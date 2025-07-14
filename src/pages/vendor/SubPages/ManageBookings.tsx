@@ -2,7 +2,6 @@ import React, { useState, useRef } from 'react';
 import { Eye, MapPin, Calendar, Users, Clock, Edit, CheckCircle, XCircle, Phone, Mail, User, DollarSign } from 'lucide-react';
 import { LightGenericTable, type TableRef } from '@/components/ReusableComponents/LightGenericTable';
 import { vendorService } from '@/services/vendorServices';
-import { useNavigate } from 'react-router-dom';
 import type { TableColumn, TableAction } from '@/types/table.type';
 import type { BookingData } from '@/types/booking.type';
 import type { FetchParams } from '@/types/api.type';
@@ -15,7 +14,6 @@ import CancelBookingModal from '@/components/BookingDetailsComponents/CancelConf
 
 const VendorManageBookings = () => {
   const tableRef = useRef<TableRef<BookingData> | null>(null);
-  const navigate = useNavigate();
   const [currentFilter, setCurrentFilter] = useState<string>("all");
 
   const [showCancelModal, setShowCancelModal] = useState(false);
@@ -230,13 +228,6 @@ const VendorManageBookings = () => {
   ];
 
   const tableActions: TableAction<BookingData>[] = [
-    // {
-    //   label: 'View Details',
-    //   icon: <Eye size={16} />,
-    //   onClick: (item) => navigate(`/vendor/booking-details/${item._id}`),
-    //   variant: 'default',
-    //   refreshAfter: false
-    // },
     {
       label: 'Mark Completed',
       icon: <CheckCircle size={16} />,

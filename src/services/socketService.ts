@@ -3,9 +3,9 @@ import { io, Socket } from 'socket.io-client';
 class SocketService {
   private socket: Socket | null = null;
   private _userId: string | null = null;
-  private _userType: 'client' | 'vendor' | null = null;
+  private _userType: 'client' | 'building' | null = null;
 
-  connect(userId: string, userType: 'client' | 'vendor') {
+  connect(userId: string, userType: 'client' | 'building') {
     if (this.socket?.connected) {
       this.disconnect();
     }
@@ -56,9 +56,9 @@ class SocketService {
   }
 
   // Chat related methods
-  joinRoom(roomId: string) {
+  joinRoom(sessionId: string) {
     if (this.socket) {
-      this.socket.emit('joinRoom', roomId);
+      this.socket.emit('joinRoom', sessionId);
     }
   }
 
@@ -74,15 +74,27 @@ class SocketService {
     }
   }
 
-  onTyping(callback: (user: any) => void) {
+  onTyping(callback: (data: any) => void) {
     if (this.socket) {
-      this.socket.on('typing', callback);
+      this.socket.on("typing", callback);
     }
   }
 
-  emitTyping(roomId: string, user: any) {
+  emitTyping(sessionId: string) {
     if (this.socket) {
-      this.socket.emit('typing', roomId, user);
+      this.socket.emit('typing', { sessionId });
+    }
+  }
+
+  onStopTyping(callback: (data: any) => void) {
+    if (this.socket) {
+      this.socket.on("stopTyping", callback);
+    }
+  }
+
+  emitStopTyping(sessionId: string) {
+    if (this.socket) {
+      this.socket.emit('stopTyping', { sessionId });
     }
   }
 
@@ -92,9 +104,9 @@ class SocketService {
     }
   }
 
-  emitMessageRead(roomId: string, user: any) {
+  emitMessageRead(sessionId: string, user: any) {
     if (this.socket) {
-      this.socket.emit('messageRead', { roomId, user });
+      this.socket.emit('messageRead', { sessionId, user });
     }
   }
 

@@ -150,12 +150,6 @@ const ReusableLogin: React.FC<ReusableLoginProps> = ({ userType, config }) => {
             const loginAction = loginActions[userType]
             dispatch(loginAction(response.data))
 
-            //connecting to secket when login (client and vendor only).
-            if (userType === 'client' || userType === 'vendor') {
-              const userId = response.data._id || response.data.id;
-              socketService.connect(userId, userType);
-            }
-
             setIsLoading(false)
           }, 1000)
         } else {

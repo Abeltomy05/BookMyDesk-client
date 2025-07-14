@@ -504,8 +504,57 @@ markAsRead: async(id:string):Promise<ApiResponse>=>{
   }
 },
 
+//chat related
+createSession: async({buildingId}:{buildingId:string}):Promise<ApiResponse>=>{
+ try {
+    const response = await clientAxiosInstance.post('/create-session',{
+      buildingId,
+    });
+    return response.data;
+ } catch (error:any) {
+  console.error('Error getting notifiactions:', error);
+       const message = error.response?.data?.message || error.message || "Unknown error occurred";
+      return {
+        success: false,
+        message,
+      };
+ }
+},
 
-  logout: async():Promise<ApiResponse>=>{
+getChats: async():Promise<ApiResponse>=>{
+ try {
+   const response = await clientAxiosInstance.get('/getChats');
+   return response.data;
+ } catch (error:any) {
+  console.error('Error getting notifiactions:', error);
+       const message = error.response?.data?.message || error.message || "Unknown error occurred";
+      return {
+        success: false,
+        message,
+      };
+ }
+},
+
+getChatMessages: async(sessionId:string):Promise<ApiResponse>=>{
+  try {
+    const response = await clientAxiosInstance.get('/messages',{
+      params:{
+        sessionId
+      }
+    })
+    return response.data;
+  } catch (error:any) {
+    console.error('Error getting notifiactions:', error);
+      const message = error.response?.data?.message || error.message || "Unknown error occurred";
+    return {
+      success: false,
+      message,
+    };
+  }
+},
+
+
+logout: async():Promise<ApiResponse>=>{
     try {
       const response = await clientAxiosInstance.post("/logout");
       return response.data

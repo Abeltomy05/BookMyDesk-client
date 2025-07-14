@@ -18,6 +18,7 @@ export const BookingDetailsPage: React.FC = () => {
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [showCancelModal, setShowCancelModal] = useState(false)
   const [cancelLoading, setCancelLoading] = useState(false)
+  const [chatLoading, setChatLoading] = useState(false);
   
   useEffect(()=>{
     const fetchBookingDetails = async () => {
@@ -89,6 +90,26 @@ export const BookingDetailsPage: React.FC = () => {
   const handleGoBack = () => {
     navigate(-1) 
   }
+
+  const handleChatWithVendor = async () => {
+    if (!booking) return;
+   setChatLoading(true);
+  
+  try {
+    const response = await clientService.createSession({
+      buildingId: booking.buildingId,
+    })
+    if (!response.success) {
+      throw new Error('Failed to create chat session');
+    }
+    navigate(`/chat?sessionId=${response.data.sessionId}`)
+  }catch(error){
+    console.error('Error creating chat session:', error);
+  } 
+  finally {
+    setChatLoading(false);
+  }
+};
 
    if (loading) {
     return (
@@ -165,6 +186,24 @@ return (
             {/* Action Buttons  */}
             <div className="flex justify-end mb-4">
                 <div className="flex gap-2">
+                    {/* Chat with Vendor Button - Available for active bookings */}
+                    {(booking.status === 'confirmed') && (
+                        <button
+                            onClick={handleChatWithVendor}
+                            disabled={chatLoading}
+                            className="px-3 py-1.5 text-xs font-medium text-[#f69938] bg-orange-50 border border-orange-200 rounded-md hover:bg-orange-100 transition-colors duration-200 flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {chatLoading ? (
+                                <div className="w-3 h-3 border border-[#f69938] border-t-transparent rounded-full animate-spin"></div>
+                            ) : (
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                </svg>
+                            )}
+                            Chat with Vendor
+                        </button>
+                    )}
+
                     {booking.status === 'confirmed' && (
                         <button
                             onClick={handleCancelBooking}
@@ -230,6 +269,8 @@ return (
           onConfirm={handleConfirmCancel}
           loading={cancelLoading}
         />
+
+
     </ClientLayout>
 )
 }

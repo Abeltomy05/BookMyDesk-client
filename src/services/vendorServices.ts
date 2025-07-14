@@ -594,6 +594,40 @@ markAsRead: async(id:string):Promise<ApiResponse>=>{
   }
 },
 
+getChats: async(buildingId:string):Promise<ApiResponse>=>{
+ try {
+   const response = await vendorAxiosInstance.get('/getChats',{
+    params: { buildingId }
+   });
+   return response.data;
+ } catch (error:any) {
+  console.error('Error getting notifiactions:', error);
+       const message = error.response?.data?.message || error.message || "Unknown error occurred";
+      return {
+        success: false,
+        message,
+      };
+ }
+},
+
+getChatMessages: async(sessionId:string):Promise<ApiResponse>=>{
+  try {
+    const response = await vendorAxiosInstance.get('/messages',{
+      params:{
+        sessionId
+      }
+    })
+    return response.data;
+  } catch (error:any) {
+    console.error('Error getting notifiactions:', error);
+      const message = error.response?.data?.message || error.message || "Unknown error occurred";
+    return {
+      success: false,
+      message,
+    };
+  }
+},
+
  logout: async():Promise<ApiResponse>=>{
     try {
       const response = await vendorAxiosInstance.post("/logout");

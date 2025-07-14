@@ -1,5 +1,6 @@
 import VendorNavbar from '@/components/Navbars & Sidebars/VendorNavbar';
 import VendorSidebar from '@/components/Navbars & Sidebars/VendorSidebar';
+import socketService from '@/services/socketService';
 import { vendorService } from '@/services/vendorServices';
 import { vendorLogout } from '@/store/slices/vendor.slice';
 import { sidebarItems } from '@/utils/constants/vendorSideBarItems';
@@ -27,11 +28,13 @@ const VendorLayout: React.FC<VendorLayoutProps> = ({
           const response = await vendorService.logout();
             if(response.success){
               toast.success("Logout successful!");
+              socketService.disconnect();
               dispatch(vendorLogout());
             }else{
               toast.error(response.message || "Logout Error");
             }
       } catch (error) {
+        socketService.disconnect();
         toast.error("Logout Error")
    }
  }

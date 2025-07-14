@@ -1,22 +1,18 @@
-export interface User {
-  id: string
+export interface ChatSidebarItem  {
+  _id: string
+  userId: string
   name: string
-  avatar: string
+  avatar?: string
   isOnline: boolean
   lastMessage?: string
-  timestamp?: string
+  createdAt?: string
 }
 
 export interface Message {
-  id: string
-  senderId: string
-  content: string
-  timestamp: string
-  type: "text" | "image" | "file"
-}
-
-export interface Chat {
-  id: string
-  userId: string
-  messages: Message[]
+  _id: string;
+  senderId: string;
+  receiverId: string;
+  text?: string | null;
+  image?: string | null;
+  createdAt?: string;
 }
