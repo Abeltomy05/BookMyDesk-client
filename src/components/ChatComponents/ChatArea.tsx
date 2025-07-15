@@ -203,7 +203,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
                 style={isMyMessage(msg) ? { backgroundColor: config.primaryColor, color: '#fff' } : { backgroundColor: '#fff' }}>
                 
                 {msg.text && <p className="text-sm">{msg.text}</p>}
-                {msg.image && <img src={msg.image} alt="Shared" className="max-w-full h-auto mt-1 rounded-lg" />}
+                {msg.image && <img src={msg.image} alt="Shared" className="chat-message-image max-w-full h-auto mt-1 rounded-lg" />}
                 <p className="text-xs mt-1 text-gray-300">{msg.createdAt}</p>
 
                 {isMyMessage(msg) && (
