@@ -550,7 +550,6 @@ deleteOffer: async(offerId:string):Promise<ApiResponse>=>{
    }
 },
 
-
 getNotifications: async(page:number,limit:number,filter: "unread" | "all"):Promise<{ success: boolean, data?: NotificationResponse, message?: string}>=>{
     try {
       const response = await vendorAxiosInstance.get("/get-notifications",{
@@ -625,6 +624,19 @@ getChatMessages: async(sessionId:string):Promise<ApiResponse>=>{
       success: false,
       message,
     };
+  }
+},
+
+clearChat: async(sessionId: string):Promise<ApiResponse>=>{
+  try {
+    const response = await vendorAxiosInstance.post('/clear-chat',{sessionId});
+    return response.data;
+  } catch (error:any) {
+     const message = error.response?.data?.message || error.message || "Unknown error occurred";
+      return {
+        success: false,
+        message,
+      };
   }
 },
 

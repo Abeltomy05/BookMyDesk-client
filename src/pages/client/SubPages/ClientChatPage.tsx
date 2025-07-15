@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import ClientLayout from '../ClientLayout';
-import { defaultClientConfig, ReusableChat, type ChatConfig } from '@/components/ReusableComponents/chat';
+import { ReusableChat } from '@/components/ReusableComponents/chat';
 import { clientService } from '@/services/clientServices';
-import type { ChatSidebarItem, Message } from '@/types/chat.type';
+import { defaultClientConfig, type ChatConfig, type ChatSidebarItem, type Message } from '@/types/chat.type';
 import { formatTimeAgo } from '@/utils/formatters/time-ago';
 import toast from 'react-hot-toast';
 import ChatSkeleton from '@/components/Skeletons/ChatSkeleton';
@@ -30,6 +30,7 @@ export interface GetMessageDTO {
   receiverId: string;
   text?: string;
   image?: string;
+  isDeleted?: boolean;
   createdAt: Date;
 }
 
@@ -64,6 +65,7 @@ const ClientChatPage: React.FC = () => {
       receiverId : msg.receiverId,
       text: msg.text,
       image: msg.image,
+      isDeleted: msg.isDeleted,
       createdAt: new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) 
     }));
   };
@@ -96,9 +98,9 @@ const ClientChatPage: React.FC = () => {
     try {
       const response = await clientService.getChatMessages(sessionId);
       if (response.success && response.data) {
-        console.log(response.data)
+        // console.log("Messages",response.data)
         const transformedMessages = transformMessagesToChat(response.data);
-        console.log("transformed messages: ", transformedMessages);
+        // console.log("transformed messages: ", transformedMessages);
         setMessages(transformedMessages);
       } else {
         console.error("Failed to fetch messages:", response.message);
@@ -109,6 +111,21 @@ const ClientChatPage: React.FC = () => {
       toast.error("Failed to fetch messages");
     }
   };
+
+  const handleClearChat = async (sessionId: string) => {
+  try {
+    const response = await clientService.clearChat(sessionId);
+    if (response.success) {
+      toast.success("Chat cleared successfully");
+      setMessages([]); 
+    } else {
+      toast.error("Failed to clear chat");
+    }
+  } catch (error) {
+    console.error("Clear chat error", error);
+    toast.error("Something went wrong while clearing chat");
+  }
+};
 
 
   if (loading) {
@@ -139,6 +156,7 @@ const ClientChatPage: React.FC = () => {
                 initialUsers={users}
                 initialMessages={messages}
                 onUserSelect={handleUserSelect}
+                onClearChat={handleClearChat}
               />
             </div>
           </div>

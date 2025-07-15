@@ -88,6 +88,7 @@ class SocketService {
 
   onStopTyping(callback: (data: any) => void) {
     if (this.socket) {
+      console.log("reached frontend")
       this.socket.on("stopTyping", callback);
     }
   }
@@ -95,6 +96,18 @@ class SocketService {
   emitStopTyping(sessionId: string) {
     if (this.socket) {
       this.socket.emit('stopTyping', { sessionId });
+    }
+  }
+
+  deleteMessage(data: { messageId: string; sessionId: string }) {
+  if (this.socket) {
+    this.socket.emit("deleteMessage", data);
+  }
+  }
+
+  onMessageDeleted(callback: (data: { messageId: string }) => void) {
+    if (this.socket) {
+      this.socket.on("messageDeleted", callback);
     }
   }
 

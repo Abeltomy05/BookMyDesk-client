@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import VendorLayout from '../VendorLayout';
-import { defaultBuildingConfig, ReusableChat, type ChatConfig } from '@/components/ReusableComponents/chat';
-import type { ChatSidebarItem, Message } from '@/types/chat.type';
+import {  ReusableChat} from '@/components/ReusableComponents/chat';
+import { defaultBuildingConfig, type ChatConfig, type ChatSidebarItem, type Message } from '@/types/chat.type';
 import { formatTimeAgo } from '@/utils/formatters/time-ago';
 import toast from 'react-hot-toast';
 import ChatSkeleton from '@/components/Skeletons/ChatSkeleton';
@@ -41,6 +41,7 @@ const BuildingChatPage: React.FC = () => {
       receiverId: msg.receiverId,
       text: msg.text,
       image: msg.image,
+      isDeleted: msg.isDeleted,
       createdAt: new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) 
     }));
   };
@@ -57,9 +58,9 @@ const BuildingChatPage: React.FC = () => {
         const response = await vendorService.getChats(buildingId);
 
         if (response.success && response.data) {
-          console.log("Response",response.data)
+          // console.log("Response",response.data)
           const transformedUsers = transformChatSessionsToBuildings(response.data);
-          console.log(transformedUsers)
+          // console.log(transformedUsers)
           setUsers(transformedUsers);
         } else {
           console.error("Failed to fetch chat users:", response.message);
@@ -95,6 +96,21 @@ const BuildingChatPage: React.FC = () => {
       toast.error("Failed to fetch messages");
     }
   };
+
+  const handleClearChat = async (sessionId: string) => {
+  try {
+    const response = await vendorService.clearChat(sessionId);
+    if (response.success) {
+      toast.success("Chat cleared successfully");
+      setMessages([]); 
+    } else {
+      toast.error("Failed to clear chat");
+    }
+  } catch (error) {
+    console.error("Clear chat error", error);
+    toast.error("Something went wrong while clearing chat");
+  }
+};
 
   if (loading) {
     return (
@@ -145,6 +161,7 @@ const BuildingChatPage: React.FC = () => {
                 initialUsers={users}
                 initialMessages={messages}
                 onUserSelect={handleUserSelect}
+                onClearChat={handleClearChat}
               />
             </div>
           </div>

@@ -3,7 +3,7 @@ import { clientAxiosInstance } from "@/api/client.axios";
 import type { UserProfile } from "@/pages/client/SubPages/ClientProfile";
 import type { BookingData } from "@/types/booking.type";
 import type { LoginData } from "./adminService";
-import type { Notification, NotificationResponse } from "@/types/notification.type";
+import type { NotificationResponse } from "@/types/notification.type";
 
 interface ApiResponse {
   success: boolean;
@@ -553,6 +553,18 @@ getChatMessages: async(sessionId:string):Promise<ApiResponse>=>{
   }
 },
 
+clearChat: async(sessionId: string):Promise<ApiResponse>=>{
+  try {
+    const response = await clientAxiosInstance.post('/clear-chat',{sessionId});
+    return response.data;
+  } catch (error:any) {
+     const message = error.response?.data?.message || error.message || "Unknown error occurred";
+      return {
+        success: false,
+        message,
+      };
+  }
+},
 
 logout: async():Promise<ApiResponse>=>{
     try {
