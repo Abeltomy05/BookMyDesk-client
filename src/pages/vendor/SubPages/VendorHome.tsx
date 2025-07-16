@@ -10,6 +10,7 @@ import RevenueChart from '@/components/ReusableComponents/chart';
 import CompletedBookingsTable  from '@/components/vendorSide/CompletedBookingsTable';
 import type { RevenueDataPoint, VendorHomeData } from '@/types/vendor-home.types';
 import { useNavigate } from 'react-router-dom';
+import { getErrorMessage } from '@/utils/errors/errorHandler';
 
 const cardVariants = {
   hidden: { 
@@ -84,8 +85,8 @@ const VendorDashboard: React.FC = () => {
       } else {
         setError(response.message || 'Failed to fetch data');
       }
-    } catch (error: any) {
-      setError(error.message || 'An error occurred while fetching data');
+    } catch (error: unknown) {
+      setError(getErrorMessage(error));
       console.error('Error fetching home data:', error);
     } finally {
       setLoading(false);

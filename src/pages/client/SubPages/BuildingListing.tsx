@@ -6,7 +6,7 @@ import toast from "react-hot-toast"
 import Pagination from "@/components/ui/Pagination"
 import { LocationInput } from "@/components/ReusableComponents/LocationInput" 
 import type { LocationData } from "@/types/location.type"
-import { HandledAuthError } from "@/lib/errors/handleAuthError"
+import { HandledAuthError } from "@/utils/errors/handleAuthError"
 import { useNavigate } from "react-router-dom"
 import BuildingsListingSkeleton from "@/components/Skeletons/BuildingListingSkeleton"
 
@@ -84,7 +84,7 @@ export default function BuildingsListing() {
       setAvailablePrices(Array.from(pricesSet).sort((a, b) => a - b)); 
     }
 
-    } catch (error:any) {
+    } catch (error:unknown) {
        if (!(error instanceof HandledAuthError)) {
       toast.error("Failed to fetch buildings")
        }

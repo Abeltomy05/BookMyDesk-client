@@ -9,6 +9,7 @@ import { useParams, useNavigate } from "react-router-dom"
 import toast from "react-hot-toast"
 import StripePaymentModal from "@/components/ReusableComponents/StripeModal"
 import CancelBookingModal from "@/components/BookingDetailsComponents/CancelConfirmModal"
+import { getErrorMessage } from "@/utils/errors/errorHandler"
 
 export const BookingDetailsPage: React.FC = () => {
   const { bookingId } = useParams<{ bookingId: string }>()
@@ -56,9 +57,9 @@ export const BookingDetailsPage: React.FC = () => {
       
       const response = await clientService.getBookingDetails(bookingId);
       setBooking(response.data);
-    } catch (error:any) {
+    } catch (error:unknown) {
       console.error("Error cancelling booking:", error);
-      toast.error(error.message || "Failed to cancel booking. Please try again.");
+      toast.error(getErrorMessage(error));
     } finally {
       setCancelLoading(false);
     }

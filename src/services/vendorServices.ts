@@ -11,6 +11,7 @@ import { formatDate } from '@/utils/formatters/date';
 import type { NewOfferForm } from '@/pages/vendor/SubPages/OfferManagement';
 import type { LoginData } from './adminService';
 import type { NotificationResponse } from '@/types/notification.type';
+import { getErrorMessage } from '@/utils/errors/errorHandler';
 
 interface ApiResponse {
   success: boolean;
@@ -37,15 +38,12 @@ sendOtp: async (email: string): Promise<ApiResponse> => {
     try {
     const response = await authAxiosInstance.post('/send-otp', { email });
     return response.data;
-    } catch (error:any) {
-    console.error('Error sending OTP:', error);
-        if (error.response && error.response.data) {
-                return error.response.data
-        }
+    } catch (error:unknown) {
+        console.error('Error sending OTP:', error);
         return {
             success: false,
-            message: "Failed to connect to server"
-        }
+            message: getErrorMessage(error),
+          };
     }
 }, 
 
@@ -53,12 +51,12 @@ verifyOtp: async (email: string, otp: string): Promise<ApiResponse> => {
     try {
     const response = await authAxiosInstance.post('/verify-otp', { email, otp });
     return response.data;
-    } catch (error) {
+    } catch (error:unknown) {
     console.error('Error verifying OTP:', error);
     return {
-        success: false,
-        message: 'Failed to verify OTP',
-    };
+            success: false,
+            message: getErrorMessage(error),
+     };
     }
 },
 
@@ -66,11 +64,10 @@ signup: async (signupData: VendorFormData):Promise<ApiResponse>=>{
       try {
       const response = await authAxiosInstance.post('/signup', signupData);
       return response.data;
-    } catch (error) {
-      console.error('Error signing up:', error);
+    } catch (error:unknown) {
       return {
-        success: false,
-        message: 'Failed to create account',
+            success: false,
+            message: getErrorMessage(error),
       };
     }
 },
@@ -80,15 +77,12 @@ login: async (data: LoginData): Promise<ApiResponse> => {
       const response = await authAxiosInstance.post('/login', data);
       console.log(response.data);
       return response.data;
-    } catch (error:any) {
+    } catch (error:unknown) {
     console.error('Error logging in:', error);
-
-    const message = error?.response?.data?.message || "Something went wrong. Please try again.";
-    
     return {
-      success: false,
-      message,
-    };
+            success: false,
+            message: getErrorMessage(error),
+          };
     }
 },
 
@@ -101,11 +95,11 @@ uploadIdProof: async (idProof: string): Promise<ApiResponse> => {
     try {
       const response = await vendorAxiosInstance.post('/upload-id-proof', { idProof });
       return response.data;
-    } catch (error) {
+    } catch (error:unknown) {
       console.error('Error uploading ID proof:', error);
       return {
-        success: false,
-        message: 'Failed to upload ID proof',
+            success: false,
+            message: getErrorMessage(error),
       };
     }
 },
@@ -116,12 +110,12 @@ getSingleUser: async (): Promise<ApiResponse> => {
    try {
       const response = await vendorAxiosInstance.get("/get-user-data");
       return response.data
-     } catch (error) {
+     } catch (error:unknown) {
       console.error('Error geting user data:', error);
       return {
-        success: false,
-        message: 'User not found',
-      };
+            success: false,
+            message: getErrorMessage(error),
+       };
      }
   },
 
@@ -129,11 +123,11 @@ updateProfile: async (data: any): Promise<ApiResponse> => {
     try {
       const response = await vendorAxiosInstance.put("/update-profile", data);
       return response.data;
-    } catch (error) {
+    } catch (error:unknown) {
       console.error('Error updating profile:', error);
       return {
-        success: false,
-        message: 'Failed to update profile',
+            success: false,
+            message: getErrorMessage(error),
       };
     }
 },
@@ -145,12 +139,11 @@ updatePassword: async (currentPassword: string, newPassword: string): Promise<Ap
         newPassword
       });
       return response.data;
-    } catch (error:any) {
+    } catch (error:unknown) {
       console.error('Error updating password:', error);
-      const message = error.response?.data?.message || 'Failed to update password';
       return {
-        success: false,
-        message,
+            success: false,
+            message: getErrorMessage(error),
       };
     }
 },
@@ -162,12 +155,11 @@ getRetrydata: async (token:string): Promise<ApiResponse>=>{
      const response = await vendorAxiosInstance.get(`/get-retry-data?token=${token}`);
      console.log("Fetched retry data",response.data.data)
      return response.data;
-  } catch (error:any) {
+  } catch (error:unknown) {
     console.error('Error fetching retry data', error);
-      const message = error.response?.data?.message || 'Failed to fetch retry data';
-      return {
+     return {
         success: false,
-        message,
+        message: getErrorMessage(error),
       };
   }
 },
@@ -182,12 +174,11 @@ retryRegistration: async(data:{
    try {
      const response = await vendorAxiosInstance.post("/retry-registration",data);
      return response.data;
-   } catch (error:any) {
+   } catch (error:unknown) {
     console.error('Error retry registration:', error);
-      const message = error.response?.data?.message || 'Failed to update password';
       return {
         success: false,
-        message,
+        message: getErrorMessage(error),
       };
    }
 },
@@ -213,14 +204,14 @@ getAllBuildings: async ({
       
       console.log('Buildings response:', response.data);
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error fetching buildings:', error);
       return {
         success: false,
         buildings: [],
         totalPages: 0,
         currentPage: 0,
-        message: error.response?.data?.message || 'Failed to fetch buildings'
+        message: getErrorMessage(error),
       };
     }
 },
@@ -229,25 +220,12 @@ registerNewBuilding: async(data: BuildingRegistrationData): Promise<ApiResponse>
    try {
      const response = await vendorAxiosInstance.post('/register-building', data);
      return response.data;
-   } catch (error:any) {
+   } catch (error:unknown) {
      console.error('Register building error:', error);
-     if (error.response) {
-       return {
-          success: false,
-          message: error.response.data?.message || 'Server error occurred',
-          data: error.response.data
-        };
-     }else if (error.request) {
-        return {
-          success: false,
-          message: 'Network error - please check your connection'
-        };
-     }else {
-        return {
-          success: false,
-          message: 'An unexpected error occurred'
-        };
-      }
+     return {
+        success: false,
+        message: getErrorMessage(error),
+      };
    }
 },
 
@@ -256,20 +234,12 @@ editBuildingData: async(data:Building):Promise<ApiResponse>=>{
     console.log(data)
     const response = await vendorAxiosInstance.put("/edit-building",data);
     return response.data;
-  } catch (error:any) {
+  } catch (error:unknown) {
      console.error('Register building error:', error);
-     if (error.response) {
-       return {
-          success: false,
-          message: error.response.data?.message || 'Server error occurred',
-          data: error.response.data
-        };
-  }else{
      return {
-          success: false,
-          message: 'An unexpected error occurred'
-        };
-  }
+        success: false,
+        message: getErrorMessage(error),
+      };
 }
 },
 
@@ -277,20 +247,12 @@ getBuildingDetails:async(id: string):Promise<ApiResponse>=>{
     try {
        const response = await vendorAxiosInstance.get(`/building/${id}`);
        return response.data;
-    } catch (error:any) {
+    } catch (error:unknown) {
        console.error('get  building  detail error:', error);
-     if (error.response) {
-       return {
-          success: false,
-          message: error.response.data?.message || 'Server error occurred',
-          data: error.response.data
-        };
-  }else{
      return {
-          success: false,
-          message: 'An unexpected error occurred'
-        };
-    }
+        success: false,
+        message: getErrorMessage(error),
+      };
 }
 },
 
@@ -308,12 +270,12 @@ updateBuildingStatus: async (
           reason,
         });
         return response.data;
-      } catch (error:any) {
+      } catch (error:unknown) {
         console.error("Error updating user status:", error);
-        return {
-          success: false,
-          message: error.response?.data?.message || "Failed to update user status",
-        };
+       return {
+        success: false,
+        message: getErrorMessage(error),
+      };
       }
     },
 
@@ -323,20 +285,12 @@ getBookings: async ({page = 1, limit = 5, search='', status}:{page:number,limit:
         params: { page, limit, search, ...(status && { status }) }
       })
       return response.data;
-     } catch (error:any) {
+     } catch (error:unknown) {
       console.error('Error fetching bookings:', error);
-      if (error.response) {
-        return {
-          success: false,
-          message: error.response.data?.message || 'Server error occurred',
-          data: error.response.data
-        };
-      } else {
-        return {
-          success: false,
-          message: 'An unexpected error occurred while fetching bookings'
-        };
-      }
+      return {
+        success: false,
+        message: getErrorMessage(error),
+      };
      }
   },  
   
@@ -354,12 +308,12 @@ updateBookingStatus: async (
           reason,
         });
         return response.data;
-     } catch (error:any) {
+     } catch (error:unknown) {
       console.error("Error updating user status:", error);
         return {
-          success: false,
-          message: error.response?.data?.message || "Failed to update user status",
-        };
+        success: false,
+        message: getErrorMessage(error),
+      };
      }
  },
 
@@ -370,11 +324,11 @@ cancelBooking: async (bookingId: string, reason: string): Promise<ApiResponse> =
         bookingId
        });
       return response.data;
-     } catch (error) {
+     } catch (error:unknown) {
       console.error('Error cancelling booking:', error);
       return {
         success: false,
-        message: 'Failed to cancel booking. Please try again later.',
+        message: getErrorMessage(error),
       };
      }
   }, 
@@ -385,12 +339,12 @@ getWalletDetails: async ({page,limit}:{page:number,limit:number}): Promise<ApiRe
       params:{page,limit}
       });
       return response.data;
-  } catch (error:any) {
+  } catch (error:unknown) {
     console.error('Error fetching wallet details:', error);
     return {
-      success: false,
-      message: error.message || 'Failed to fetch wallet details. Please try again later.',
-    };
+        success: false,
+        message: getErrorMessage(error),
+      };
   }
 },  
 
@@ -398,12 +352,12 @@ getHomeData: async ()=>{
   try {
     const response = await vendorAxiosInstance.get("/get-vendor-home-data");
     return response.data;
-  } catch (error:any) {
+  } catch (error:unknown) {
     console.error('Error fetching vendor home details:', error);
     return {
-      success: false,
-      message: error.message || 'Failed to fetch vendor home details. Please try again later.',
-    };
+        success: false,
+        message: getErrorMessage(error),
+      };
   }
 },
 
@@ -482,12 +436,12 @@ fetchBuildingsForVendor: async():Promise<ApiResponse>=>{
   try {
     const response = await vendorAxiosInstance.get("/buildings-for-vendor");
     return response.data;
-  } catch (error:any) {
+  } catch (error:unknown) {
     console.error('Error fetching buildings for vendor:', error);
     return {
-      success: false,
-      message: error.message || 'Failed to fetching buildings for vendor. Please try again later.',
-    };
+        success: false,
+        message: getErrorMessage(error),
+      };
   }
 },
 
@@ -495,12 +449,12 @@ fetchSpacesForBuildings: async(buildingId:string):Promise<ApiResponse>=>{
   try {
      const response = await vendorAxiosInstance.get(`/spaces-for-buildings/${buildingId}`);
      return response.data;
-  } catch (error:any) {
+  } catch (error:unknown) {
      console.error('Error fetching spaces for building:', error);
     return {
-      success: false,
-      message: error.message || 'Failed to fetching spaces for buildings. Please try again later.',
-    };
+        success: false,
+        message: getErrorMessage(error),
+      };
   }
 },
 
@@ -510,12 +464,12 @@ fetchOffers: async({page=1,limit=5}:{page:number,limit:number})=>{
       params:{page,limit}
     });
     return response.data;
-  } catch (error:any) {
+  } catch (error:unknown) {
      console.error('Error fetching spaces for building:', error);
     return {
-      success: false,
-      message: error.message || 'Failed to fetching spaces for buildings. Please try again later.',
-    };
+        success: false,
+        message: getErrorMessage(error),
+      };
   }
 },
 
@@ -523,12 +477,12 @@ createOffer: async(data: NewOfferForm):Promise<ApiResponse>=>{
    try {
      const response = await vendorAxiosInstance.post("/create-offer",data);
      return response.data;
-   } catch (error:any) {
+   } catch (error:unknown) {
      console.error('Error creating offer:', error);
     return {
-      success: false,
-      message: error.response?.data?.message || error.message || 'Failed to create offer. Please try again later.',
-    };
+        success: false,
+        message: getErrorMessage(error),
+      };
    }
 },
 
@@ -541,12 +495,12 @@ deleteOffer: async(offerId:string):Promise<ApiResponse>=>{
       }
      })
      return response.data;
-   } catch (error:any) {
+   } catch (error:unknown) {
      console.error('Error creating offer:', error);
-    return {
-      success: false,
-      message: error.response?.data?.message || error.message || 'Failed to create offer. Please try again later.',
-    };
+     return {
+        success: false,
+        message: getErrorMessage(error),
+      };
    }
 },
 
@@ -569,12 +523,11 @@ getNotifications: async(page:number,limit:number,filter: "unread" | "all"):Promi
             hasMore: (page + 1) * limit < data.totalCount,
           },
         };
-    } catch (error:any) {
+    } catch (error:unknown) {
          console.error('Error getting notifiactions:', error);
-       const message = error.response?.data?.message || error.message || "Unknown error occurred";
       return {
         success: false,
-        message,
+        message: getErrorMessage(error),
       };
     }
   },
@@ -583,12 +536,11 @@ markAsRead: async(id:string):Promise<ApiResponse>=>{
   try {
      const response = await vendorAxiosInstance.patch(`/mark-as-read/${id}`);
      return response.data;
-  } catch (error:any) {
+  } catch (error:unknown) {
      console.error('Error getting notifiactions:', error);
-       const message = error.response?.data?.message || error.message || "Unknown error occurred";
       return {
         success: false,
-        message,
+        message: getErrorMessage(error),
       };
   }
 },
@@ -599,12 +551,11 @@ getChats: async(buildingId:string):Promise<ApiResponse>=>{
     params: { buildingId }
    });
    return response.data;
- } catch (error:any) {
+ } catch (error:unknown) {
   console.error('Error getting notifiactions:', error);
-       const message = error.response?.data?.message || error.message || "Unknown error occurred";
-      return {
+    return {
         success: false,
-        message,
+        message: getErrorMessage(error),
       };
  }
 },
@@ -617,13 +568,12 @@ getChatMessages: async(sessionId:string):Promise<ApiResponse>=>{
       }
     })
     return response.data;
-  } catch (error:any) {
+  } catch (error:unknown) {
     console.error('Error getting notifiactions:', error);
-      const message = error.response?.data?.message || error.message || "Unknown error occurred";
     return {
-      success: false,
-      message,
-    };
+        success: false,
+        message: getErrorMessage(error),
+      };
   }
 },
 
@@ -631,11 +581,10 @@ clearChat: async(sessionId: string):Promise<ApiResponse>=>{
   try {
     const response = await vendorAxiosInstance.post('/clear-chat',{sessionId});
     return response.data;
-  } catch (error:any) {
-     const message = error.response?.data?.message || error.message || "Unknown error occurred";
-      return {
+  } catch (error:unknown) {
+    return {
         success: false,
-        message,
+        message: getErrorMessage(error),
       };
   }
 },
@@ -644,11 +593,11 @@ clearChat: async(sessionId: string):Promise<ApiResponse>=>{
     try {
       const response = await vendorAxiosInstance.post("/logout");
       return response.data
-     } catch (error) {
+     } catch (error:unknown) {
       console.error('Error in logout:', error);
       return {
         success: false,
-        message: 'Logout Error',
+        message: getErrorMessage(error),
       };
      }
   }

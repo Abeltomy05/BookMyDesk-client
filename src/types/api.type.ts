@@ -8,13 +8,12 @@ export interface ApiResponse<T> {
 }
 
 
-export interface FetchParams {
-  page?: number
-  limit?: number
-  search?: string
-  filter?: string
-  sortBy?: string
-  sortOrder?: 'asc' | 'desc'
-  role?: string
-  [key: string]: any
-}
+export type FetchParams<Extras extends Record<string, unknown> = {}> = {
+  page?: number;
+  limit?: number;
+  search?: string;
+  filter?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  role?: string;
+} & Extras;

@@ -1,4 +1,6 @@
-export interface WalletTransaction {
+import type { ExtendableItem } from "./table.type"
+
+export interface WalletTransaction extends ExtendableItem {
   _id: string
   type: "topup" | "refund" | "withdrawal" | "payment" | 'platform-fee' | 'booking-income'
   amount: number

@@ -1,5 +1,5 @@
 import { GenericTable } from "@/components/ReusableComponents/GenericTable" 
-import { type TableColumn, type TableAction, type TableFilter } from "@/types/table.type"
+import { type TableColumn, type TableAction, type TableFilter, type ExtendableItem } from "@/types/table.type"
 import { adminService } from "@/services/adminService"
 import { User, Shield} from "lucide-react"
 import toast from "react-hot-toast"
@@ -7,7 +7,7 @@ import type { FetchParams, ApiResponse } from "@/types/api.type"
 import { useRef, useState } from "react"
 import type { TableRef } from "@/components/ReusableComponents/LightGenericTable"
 
-interface ClientUser {
+interface ClientUser extends ExtendableItem{
   _id: string
   username: string
   email: string

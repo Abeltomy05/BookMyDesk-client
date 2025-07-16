@@ -10,6 +10,7 @@ import type { LocationData } from "@/types/location.type"
 import { LocationInput } from "@/components/ReusableComponents/LocationInput"
 import { useDispatch } from "react-redux"
 import { clientLogin } from "@/store/slices/client.slice";
+import { getErrorMessage } from "@/utils/errors/errorHandler"
 
 export interface UserProfile {
   username: string
@@ -216,10 +217,9 @@ const handlePasswordValidation = () => {
         }else{
           toast.error(response.message);
         }
-      } catch (error:any) {
+      } catch (error:unknown) {
         console.error("Error changing password:", error);
-        const errorMessage = error.response?.data?.message;
-         toast.error(errorMessage);
+        toast.error(getErrorMessage(error));
       }
     }
   }

@@ -116,7 +116,13 @@ const [totalItems, setTotalItems] = useState(0)
   const fetchBookings = async () => {
   setLoading(true)
   try {
-   const params: any = {
+   const params: {
+    page: number, 
+    limit: number, 
+    vendorId?: string,
+    buildingId?: string,
+    status?: string;
+  } = {
       page: currentPage,
       limit: itemsPerPage,
     }

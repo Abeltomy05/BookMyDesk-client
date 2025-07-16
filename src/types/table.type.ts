@@ -1,7 +1,8 @@
 export interface BaseItem {
   _id: string
-  [key: string]: any
 }
+
+export type ExtendableItem<T = {}> = BaseItem & T;
 
 export interface TableColumn<T> {
   key: string

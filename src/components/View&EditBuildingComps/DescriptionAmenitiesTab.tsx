@@ -16,7 +16,7 @@ export function DescriptionAmenitiesStep({ building, setBuilding}: DescriptionAm
   const [imageFiles, setImageFiles] = useState<File[]>([]) 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-const updateBuilding = (field: keyof Building, value: any) => {
+const updateBuilding = (field: keyof Building, value: string) => {
   setBuilding((prev) => {
     if (!prev) return prev;
     return { ...prev, [field]: value };

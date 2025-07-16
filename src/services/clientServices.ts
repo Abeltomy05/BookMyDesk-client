@@ -4,6 +4,7 @@ import type { UserProfile } from "@/pages/client/SubPages/ClientProfile";
 import type { BookingData } from "@/types/booking.type";
 import type { LoginData } from "./adminService";
 import type { NotificationResponse } from "@/types/notification.type";
+import { getErrorMessage } from "@/utils/errors/errorHandler";
 
 interface ApiResponse {
   success: boolean;
@@ -48,15 +49,11 @@ export const clientService = {
     try {
        const response = await authAxiosInstance.post('/send-otp', { email });
        return response.data;
-    } catch (error:any) {
-      console.error('Error sending OTP:', error);
-          if (error.response && error.response.data) {
-                return error.response.data
-          }
-        return {
-            success: false,
-            message: "Failed to connect to server"
-          }
+    } catch (error:unknown) {
+       return {
+          success: false,
+          message: getErrorMessage(error),
+        };
     }
   },
 
@@ -64,11 +61,10 @@ export const clientService = {
     try {
        const response = await authAxiosInstance.post('/verify-otp', { email, otp });
        return response.data;
-    } catch (error) {
-      console.error('Error verifying OTP:', error);
+    } catch (error:unknown) {
       return {
         success: false,
-        message: 'The OTP you entered is incorrect or has expired. Please try again or request a new OTP.',
+        message: getErrorMessage(error),
       };
     }
   },
@@ -77,12 +73,11 @@ export const clientService = {
       try {
       const response = await authAxiosInstance.post('/signup', signupData);
       return response.data;
-    } catch (error) {
-      console.error('Error signing up:', error);
-      return {
-        success: false,
-        message: 'Failed to create account',
-      };
+    } catch (error:unknown) {
+       return {
+          success: false,
+          message: getErrorMessage(error),
+        };
     }
   },
 
@@ -91,12 +86,10 @@ export const clientService = {
       const response = await authAxiosInstance.post('/login', data);
       console.log(response.data);
       return response.data;
-    } catch (error:any) {
-      console.error('Error logging in:', error);
-      const message = error.response?.data?.message || "Something went wrong. Please try again.";
+    } catch (error:unknown) {
       return {
         success: false,
-        message,
+        message: getErrorMessage(error),
       };
     }
   },
@@ -107,14 +100,10 @@ export const clientService = {
         email
       });
       return response.data;
-    } catch (error: any) {
-      console.error('Error requesting password reset:', error);
-      if (error.response && error.response.data) {
-        return error.response.data;
-      }
+    } catch (error: unknown) {
       return {
         success: false,
-        message: 'Failed to send password reset email',
+        message: getErrorMessage(error),
       };
     }
   },
@@ -126,22 +115,10 @@ export const clientService = {
         password
       });
       return response.data;
-    } catch (error: any) {
-      console.error('Error resetting password:', error);
-      if (error.response && error.response.data) {
-        return error.response.data;
-      }
-
-       if (error.message?.toLowerCase().includes('token')) {
-        return {
-          success: false,
-          message: 'Invalid or expired token. Please request a new password reset link.',
-        };
-      }
-      
+    } catch (error: unknown) {
       return {
         success: false,
-        message: 'Failed to reset password. Please try again later.',
+        message: getErrorMessage(error),
       };
     }
   },
@@ -155,12 +132,11 @@ export const clientService = {
      try {
       const response = await authAxiosInstance.get("/me");
       return response.data
-     } catch (error) {
-      console.error('Error geting user data:', error);
-      return {
-        success: false,
-        message: 'User not found',
-      };
+     } catch (error:unknown) {
+       return {
+          success: false,
+          message: getErrorMessage(error),
+        };
      }
   },
 
@@ -168,11 +144,10 @@ export const clientService = {
    try {
       const response = await clientAxiosInstance.get("/get-user-data");
       return response.data
-     } catch (error) {
-      console.error('Error geting user data:', error);
+     } catch (error:unknown) {
       return {
         success: false,
-        message: 'User not found',
+        message: getErrorMessage(error),
       };
      }
   },
@@ -181,11 +156,10 @@ export const clientService = {
     try {
       const response = await clientAxiosInstance.put("/update-profile", data);
       return response.data;
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      return {
+    } catch (error:unknown) {
+       return {
         success: false,
-        message: 'Failed to update profile',
+        message: getErrorMessage(error),
       };
     }
   },
@@ -197,13 +171,11 @@ export const clientService = {
         newPassword
       });
       return response.data;
-    } catch (error:any) {
-      console.error('Error updating password:', error);
-      const message = error.response?.data?.message || 'Failed to update password';
-      return {
-        success: false,
-        message,
-      };
+    } catch (error:unknown) {
+       return {
+          success: false,
+          message: getErrorMessage(error),
+        };
     }
   },
 
@@ -221,12 +193,10 @@ export const clientService = {
          params: { page, limit, locationName: filters.locationName,  type: filters.type,  priceRange: filters.priceRange,},
       });
       return response.data;
-    } catch (error: any) {
-    console.error("Error fetching buildings:", error);
-
-    return {
+    } catch (error: unknown) {
+     return {
       success: false,
-      message: error?.response?.data?.message || "Something went wrong while fetching buildings",
+      message: getErrorMessage(error),
     };
   }
   },
@@ -238,20 +208,11 @@ export const clientService = {
       const id = buildingId;
       const response = await clientAxiosInstance.get(`/building/${id}`);
       return response.data;
-     } catch (error:any) {
-       console.error('get  building  detail error:', error);
-     if (error.response) {
-       return {
-          success: false,
-          message: error.response.data?.message || 'Server error occurred',
-          data: error.response.data
-        };
-  }else{
-     return {
-          success: false,
-          message: 'An unexpected error occurred'
-        };
-    }
+     } catch (error:unknown) {
+      return {
+        success: false,
+        message: getErrorMessage(error),
+      };
      }
   },
 
@@ -261,20 +222,11 @@ export const clientService = {
     try {
       const response = await clientAxiosInstance.get(`/get-booking-page-data/${spaceId}`);
       return response.data;
-    } catch (error:any) {
-       console.error('get  booking page details error:', error);
-     if (error.response) {
+    } catch (error:unknown) {
        return {
           success: false,
-          message: error.response.data?.message || 'Server error occurred',
-          data: error.response.data
+          message: getErrorMessage(error),
         };
-  }else{
-     return {
-          success: false,
-          message: 'An unexpected error occurred'
-        };
-    }
     }
   },
 
@@ -292,20 +244,11 @@ export const clientService = {
     try {
       const response = await clientAxiosInstance.post('/create-payment-intent', data);
       return response.data;
-    } catch (error:any) {
-       console.error('create payment intent error:', error);
-     if (error.response) {
+    } catch (error:unknown) {
        return {
-          success: false,
-          message: error.response.data?.message || 'Server error occurred',
-          data: error.response.data
-        };
-      }else{
-        return {
-              success: false,
-              message: 'An unexpected error occurred in create payment intent'
-            };
-        }
+        success: false,
+        message: getErrorMessage(error),
+      };
     }
   },
 
@@ -315,20 +258,11 @@ export const clientService = {
       try {
         const response = await clientAxiosInstance.post('/confirm-payment', data);
         return response.data;
-      } catch (error:any) {
-        console.error('confirm payment error:', error);
-        if (error.response) {
-          return {
-              success: false,
-              message: error.response.data?.message || 'Server error occurred',
-              data: error.response.data
-            };0
-          }else{
-            return {
-                  success: false,
-                  message: 'An unexpected error occurred in confirm payment'
-                };
-            }
+      } catch (error:unknown) {
+         return {
+          success: false,
+          message: getErrorMessage(error),
+        };
       }
   },
 
@@ -340,20 +274,11 @@ export const clientService = {
         params: { page, limit, search, ...(status && { status }) }
       })
       return response.data;
-     } catch (error:any) {
-      console.error('Error fetching bookings:', error);
-      if (error.response) {
-        return {
-          success: false,
-          message: error.response.data?.message || 'Server error occurred',
-          data: error.response.data
-        };
-      } else {
-        return {
-          success: false,
-          message: 'An unexpected error occurred while fetching bookings'
-        };
-      }
+     } catch (error:unknown) {
+      return {
+        success: false,
+        message: getErrorMessage(error),
+      };
      }
   },
 
@@ -361,20 +286,11 @@ export const clientService = {
     try {
       const response = await clientAxiosInstance.get(`/get-booking-details/${bookingId}`);
       return response.data;
-    } catch (error:any) {
-      console.error('Error fetching bookings:', error);
-      if (error.response) {
-        return {
-          success: false,
-          message: error.response.data?.message || 'Server error occurred',
-          data: error.response.data
-        };
-      } else {
-        return {
-          success: false,
-          message: 'An unexpected error occurred while fetching bookings'
-        };
-      }
+    } catch (error:unknown) {
+      return {
+      success: false,
+      message: getErrorMessage(error),
+    };
     }
   },
 
@@ -385,12 +301,11 @@ export const clientService = {
         bookingId
        });
       return response.data;
-     } catch (error) {
-      console.error('Error cancelling booking:', error);
-      return {
-        success: false,
-        message: 'Failed to cancel booking. Please try again later.',
-      };
+     } catch (error:unknown) {
+       return {
+          success: false,
+          message: getErrorMessage(error),
+        };
      }
   },
 
@@ -402,11 +317,10 @@ export const clientService = {
         params:{page,limit}
        });
        return response.data;
-    } catch (error:any) {
-      console.error('Error fetching wallet details:', error);
-      return {
+    } catch (error:unknown) {
+       return {
         success: false,
-        message: error.message || 'Failed to fetch wallet details. Please try again later.',
+        message: getErrorMessage(error),
       };
     }
   },
@@ -421,12 +335,10 @@ export const clientService = {
         discountAmount
       })
       return response.data;
-    } catch (error:any) {
-      console.error('Error booking with wallet:', error);
-       const message = error.response?.data?.message || error.message || "Unknown error occurred";
+    } catch (error:unknown) {
       return {
         success: false,
-        message,
+        message: getErrorMessage(error),
       };
     }
   },
@@ -437,13 +349,11 @@ export const clientService = {
     try {
       const response = await clientAxiosInstance.post('/create-topup-payment-intent',{amount,currency});
       return response.data;
-    } catch (error:any) {
-       console.error('Error creating payment intent:', error);
-       const message = error.response?.data?.message || error.message || "Unknown error occurred";
-      return {
-        success: false,
-        message,
-      };
+    } catch (error:unknown) {
+        return {
+          success: false,
+          message: getErrorMessage(error),
+        };
     }
   },
 
@@ -451,13 +361,11 @@ export const clientService = {
     try {
        const response = await clientAxiosInstance.post("/confirm-topup-payment",{ paymentIntentId });
        return response.data;
-    } catch (error:any) {
-        console.error('Error confirm topup payment intent:', error);
-       const message = error.response?.data?.message || error.message || "Unknown error occurred";
-      return {
-        success: false,
-        message,
-      };
+    } catch (error:unknown) {
+        return {
+      success: false,
+      message: getErrorMessage(error),
+    };
     }
   },
 
@@ -480,13 +388,11 @@ export const clientService = {
             hasMore: (page + 1) * limit < data.totalCount,
           },
         };
-    } catch (error:any) {
-         console.error('Error getting notifiactions:', error);
-       const message = error.response?.data?.message || error.message || "Unknown error occurred";
-      return {
-        success: false,
-        message,
-      };
+    } catch (error:unknown) {
+        return {
+      success: false,
+      message: getErrorMessage(error),
+    };
     }
   },
 
@@ -494,13 +400,11 @@ markAsRead: async(id:string):Promise<ApiResponse>=>{
   try {
      const response = await clientAxiosInstance.patch(`/mark-as-read/${id}`);
      return response.data;
-  } catch (error:any) {
-     console.error('Error getting notifiactions:', error);
-       const message = error.response?.data?.message || error.message || "Unknown error occurred";
+  } catch (error:unknown) {
       return {
-        success: false,
-        message,
-      };
+      success: false,
+      message: getErrorMessage(error),
+    };
   }
 },
 
@@ -511,13 +415,11 @@ createSession: async({buildingId}:{buildingId:string}):Promise<ApiResponse>=>{
       buildingId,
     });
     return response.data;
- } catch (error:any) {
-  console.error('Error getting notifiactions:', error);
-       const message = error.response?.data?.message || error.message || "Unknown error occurred";
-      return {
-        success: false,
-        message,
-      };
+ } catch (error:unknown) {
+   return {
+      success: false,
+      message: getErrorMessage(error),
+    };
  }
 },
 
@@ -525,13 +427,11 @@ getChats: async():Promise<ApiResponse>=>{
  try {
    const response = await clientAxiosInstance.get('/getChats');
    return response.data;
- } catch (error:any) {
-  console.error('Error getting notifiactions:', error);
-       const message = error.response?.data?.message || error.message || "Unknown error occurred";
-      return {
-        success: false,
-        message,
-      };
+ } catch (error:unknown) {
+   return {
+      success: false,
+      message: getErrorMessage(error),
+    };
  }
 },
 
@@ -543,12 +443,10 @@ getChatMessages: async(sessionId:string):Promise<ApiResponse>=>{
       }
     })
     return response.data;
-  } catch (error:any) {
-    console.error('Error getting notifiactions:', error);
-      const message = error.response?.data?.message || error.message || "Unknown error occurred";
-    return {
+  } catch (error:unknown) {
+     return {
       success: false,
-      message,
+      message: getErrorMessage(error),
     };
   }
 },
@@ -557,12 +455,11 @@ clearChat: async(sessionId: string):Promise<ApiResponse>=>{
   try {
     const response = await clientAxiosInstance.post('/clear-chat',{sessionId});
     return response.data;
-  } catch (error:any) {
-     const message = error.response?.data?.message || error.message || "Unknown error occurred";
+  } catch (error:unknown) {
       return {
-        success: false,
-        message,
-      };
+      success: false,
+      message: getErrorMessage(error),
+    };
   }
 },
 
@@ -570,11 +467,11 @@ logout: async():Promise<ApiResponse>=>{
     try {
       const response = await clientAxiosInstance.post("/logout");
       return response.data
-     } catch (error) {
+     } catch (error:unknown) {
       console.error('Error in logout:', error);
       return {
         success: false,
-        message: 'Logout Error',
+        message: getErrorMessage(error),
       };
      }
   }

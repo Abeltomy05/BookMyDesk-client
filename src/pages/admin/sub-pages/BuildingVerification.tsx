@@ -12,7 +12,7 @@ import { GenericTable } from "@/components/ReusableComponents/GenericTable"
 import RejectionModal from "@/components/ReusableComponents/RejectionModal"
 import { adminService } from "@/services/adminService"
 import toast from "react-hot-toast"
-import type { TableColumn, TableAction } from "@/types/table.type"
+import type { TableColumn, TableAction, ExtendableItem } from "@/types/table.type"
 import type { FetchParams, ApiResponse } from "@/types/api.type"
 const ImageModal = lazy(()=> import("@/components/ReusableComponents/ImageModal"))
 
@@ -24,7 +24,7 @@ interface SummarizedSpaces {
    _id: string;
 }
 
-interface Building {
+interface Building extends ExtendableItem{
   _id: string
   buildingName: string
   vendorName: string

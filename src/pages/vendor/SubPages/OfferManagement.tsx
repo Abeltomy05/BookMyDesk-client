@@ -9,6 +9,7 @@ import AddOfferModal from '@/components/OfferComponents/AddNewOfferModal'
 import { vendorService } from '@/services/vendorServices'
 import toast from 'react-hot-toast'
 import ConfirmModal from '@/components/ReusableComponents/ConfirmModal'
+import { getErrorMessage } from '@/utils/errors/errorHandler'
 
 interface Offer extends BaseItem {
   _id: string
@@ -149,7 +150,7 @@ const OfferPage: React.FC = () => {
         totalItems: response.data.total,
         message: 'Offers fetched successfully',
       };
-    } catch (error:any) {
+    } catch (error:unknown) {
          console.error("Error fetching offers:", error);
     return {
       success: false,
@@ -157,7 +158,7 @@ const OfferPage: React.FC = () => {
       currentPage: 1,
       totalPages: 0,
       totalItems: 0,
-      message: error.message || 'Failed to fetch offers',
+      message: getErrorMessage(error),
     };
     }
   }
@@ -171,9 +172,9 @@ const OfferPage: React.FC = () => {
        }
       //  toast.success("Offer deleted successfully.");
        tableRef.current?.refreshData();
-    } catch (error:any) {
+    } catch (error:unknown) {
       console.error("Delete offer error:", error);
-    toast.error(error.message || "Failed to delete offer. Please try again.");
+    toast.error(getErrorMessage(error));
     }
   }
 

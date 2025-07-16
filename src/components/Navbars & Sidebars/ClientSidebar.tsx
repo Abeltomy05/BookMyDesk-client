@@ -111,15 +111,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, activeItem = "home" 
             </li>
             <li>
               <a
-                href="#"
-                className={getMenuItemClasses("feed")}
-              >
-                <FileText className="mr-3" size={20} />
-                <span>Feed</span>
-              </a>
-            </li>
-            <li>
-              <a
                 href="/wallet"
                 className={getMenuItemClasses("wallet")}
               >
@@ -134,15 +125,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, activeItem = "home" 
               >
                 <MessageSquare className="mr-3" size={20} />
                 <span>Chat</span>
-              </a>
-            </li>
-            <li>
-              <a
-                href="#"
-                className={getMenuItemClasses("settings")}
-              >
-                <Settings className="mr-3" size={20} />
-                <span>Settings</span>
               </a>
             </li>
           </ul>

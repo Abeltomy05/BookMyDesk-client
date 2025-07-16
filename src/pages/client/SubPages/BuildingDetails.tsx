@@ -8,6 +8,7 @@ import type { BuildingData  } from "@/types/building-form.type";
 import MapSkeleton from "@/components/Skeletons/MapSkeleton";
 import BuildingDetailsPageSkeleton from "@/components/Skeletons/BuildingDetailsPageSkeleton";
 import OfferBadge from "@/components/OfferComponents/OfferBadge";
+import { getErrorMessage } from "@/utils/errors/errorHandler";
 const Map = lazy(()=> import("@/components/ReusableComponents/MapView"))
 const ImageModal = lazy(()=> import("@/components/ReusableComponents/ImageModal"))
 
@@ -41,9 +42,9 @@ export default function BuildingDetailsPage() {
                 }
                 
                 setBuildingData(response.data);
-            } catch (err: any) {
+            } catch (err: unknown) {
                 console.log(err);
-                toast.error(err.message || 'An error occurred while fetching building data');
+                toast.error(getErrorMessage(err));
             } finally {
                 setLoading(false);
             }

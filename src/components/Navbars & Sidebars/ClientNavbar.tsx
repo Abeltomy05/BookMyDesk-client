@@ -1,7 +1,6 @@
-// ClientNavbar.tsx
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
-import { Bell, User, Settings, LogOut, Menu, MapPin } from "lucide-react";
+import { Bell, User, LogOut, Menu, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { IClient } from "@/types/user.type"; 
 import NotificationsComponent from "../ReusableComponents/NotificationTab";
@@ -207,10 +206,6 @@ const handleMarkAsRead = async (id: string): Promise<{ success: boolean }> => {
                   <a href="/profile" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#f69938]">
                     <User size={16} className="mr-3" />
                     <span>Profile</span>
-                  </a>
-                  <a href="#" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#f69938]">
-                    <Settings size={16} className="mr-3" />
-                    <span>Settings</span>
                   </a>
                 </div>
                 <div className="border-t border-gray-300 py-1">

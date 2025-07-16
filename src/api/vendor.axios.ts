@@ -1,4 +1,4 @@
-import { HandledAuthError } from "@/lib/errors/handleAuthError";
+import { HandledAuthError } from "@/utils/errors/handleAuthError";
 import { vendorLogout } from "@/store/slices/vendor.slice";
 import { store } from "@/store/store";
 import axios from "axios";

@@ -5,14 +5,14 @@ import { User, Building2, Eye,} from "lucide-react"
 import { adminService } from "@/services/adminService"
 import toast from "react-hot-toast"
 import VendorDetails from "./VendorDetails"
-import type { TableColumn, TableAction, TableFilter } from "@/types/table.type"
+import type { TableColumn, TableAction, TableFilter, ExtendableItem } from "@/types/table.type"
 import type { ApiResponse, FetchParams } from "@/types/api.type"
 import type { TableRef } from "@/components/ReusableComponents/LightGenericTable"
 
 
 type VendorStatus = "approved" | "rejected" | "pending" | "blocked"
 
-interface VendorData {
+interface VendorData extends ExtendableItem{
   _id: string
   username: string
   companyName: string

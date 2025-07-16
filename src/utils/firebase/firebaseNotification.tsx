@@ -2,6 +2,7 @@ import toast from 'react-hot-toast';
 import { NotificationToast } from '@/components/ReusableComponents/NotificationToast';
 import { messaging } from './firebase';
 import { getToken,onMessage } from 'firebase/messaging';
+import { getErrorMessage } from '../errors/errorHandler';
 
 
 const vapidKey = import.meta.env.VITE_FIREBASE_VAPID_KEY
@@ -42,9 +43,10 @@ export const requestPermission = async (): Promise<string | null> => {
       toast.error("No registration token available.");
       return null;
     }
-  } catch (error:any) {
+  } catch (error:unknown) {
+     const message = getErrorMessage(error);
     console.error("🚨 Error getting FCM token:", error);
-    console.error("🚨 Error details:", error.message);
+    console.error("🚨 Error details:", message);
     return null;
   }
 };

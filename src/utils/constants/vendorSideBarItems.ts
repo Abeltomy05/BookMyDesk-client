@@ -1,4 +1,4 @@
- import { Building2, Calendar, MessageCircle, Star, User } from 'lucide-react';
+ import { Building2, Calendar, Star, User } from 'lucide-react';
  
 export const sidebarItems = [
     { icon: Building2, label: 'Manage Buildings', href: '/vendor/manage-buildings' },
@@ -6,5 +6,4 @@ export const sidebarItems = [
     { icon: Calendar, label: 'Wallet', href: '/vendor/wallet' },
     { icon: Star, label: 'Manage Offers', href: '/vendor/offer' },
     { icon: User, label: 'Profile', href: '/vendor/profile' },
-    { icon: MessageCircle, label: 'Chat', href: '/vendor/chat' }
   ];
