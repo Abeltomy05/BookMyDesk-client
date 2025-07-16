@@ -1,4 +1,3 @@
-// Dashboard.tsx - Your main dashboard component
 import React, { useState, useEffect } from "react"
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts"
 import { motion } from "framer-motion"
