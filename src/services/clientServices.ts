@@ -5,6 +5,9 @@ import type { BookingData } from "@/types/booking.type";
 import type { LoginData } from "./adminService";
 import type { NotificationResponse } from "@/types/notification.type";
 import { getErrorMessage } from "@/utils/errors/errorHandler";
+import jsPDF from 'jspdf'
+import { formatDate } from "@/utils/formatters/date"; 
+import { formatCurrency } from "@/utils/formatters/currency"
 
 interface ApiResponse {
   success: boolean;
@@ -421,6 +424,145 @@ createSession: async({buildingId}:{buildingId:string}):Promise<ApiResponse>=>{
       message: getErrorMessage(error),
     };
  }
+},
+
+handleDownloadInvoice : async(booking:BookingData, user?:{username?:string,email?:string,location?:string}):Promise<{success:true}>=>{
+  const doc = new jsPDF();
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const margin = 20;
+  let yPosition = 30;
+
+  // Header
+  doc.setFontSize(24);
+  doc.setFont('helvetica', 'bold');
+  doc.text('BOOK MY DESK', pageWidth / 2, yPosition, { align: 'center' });
+  
+  yPosition += 10;
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Invoice', pageWidth / 2, yPosition, { align: 'center' });
+  
+  yPosition += 20;
+  
+  // Invoice details
+  doc.setFontSize(10);
+  doc.text(`Invoice Date: ${formatDate(new Date())}`, margin, yPosition);
+  doc.text(`Booking ID: ${booking._id}`, pageWidth - margin - 60, yPosition);
+  
+  yPosition += 15;
+  
+  // Client Details Section
+  doc.setFontSize(14);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Client Details', margin, yPosition);
+  yPosition += 10;
+  
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Name: ${user?.username || 'N/A'}`, margin, yPosition);
+  yPosition += 6;
+  doc.text(`Email: ${user?.email || 'N/A'}`, margin, yPosition);
+  yPosition += 6;
+  doc.text(`Location: ${user?.location || 'N/A'}`, margin, yPosition);
+  
+  yPosition += 15;
+  
+  // Booking Details Section
+  doc.setFontSize(14);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Booking Details', margin, yPosition);
+  yPosition += 10;
+  
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Space: ${booking.space?.name || 'N/A'}`, margin, yPosition);
+  yPosition += 6;
+  doc.text(`Building: ${booking.building?.buildingName || 'N/A'}`, margin, yPosition);
+  yPosition += 6;
+  doc.text(`Location: ${booking.building?.location?.name || 'N/A'}`, margin, yPosition);
+  yPosition += 6;
+  doc.text(`Booking Date: ${formatDate(booking.bookingDate)}`, margin, yPosition);
+  yPosition += 6;
+  doc.text(`Number of Desks: ${booking.numberOfDesks || 0}`, margin, yPosition);
+  yPosition += 6;
+  doc.text(`Status: ${booking.status}`, margin, yPosition);
+  
+  yPosition += 15;
+  
+  // Pricing Section
+  doc.setFontSize(14);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Pricing Breakdown', margin, yPosition);
+  yPosition += 10;
+  
+  // Table header
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Description', margin, yPosition);
+  doc.text('Amount', pageWidth - margin - 40, yPosition);
+  yPosition += 8;
+  
+  // Table separator line
+ doc.line(margin, yPosition - 4, pageWidth - margin, yPosition - 4);
+  
+  // Table content
+  doc.setFont('helvetica', 'normal');
+  const pricePerDay = ((booking.totalPrice ?? 0) + (booking.discountAmount ?? 0)) / (booking.numberOfDesks || 1);
+  
+  doc.text(`Price Per Day`, margin, yPosition);
+  doc.text(`${formatCurrency(pricePerDay)}`, pageWidth - margin - 40, yPosition);
+  yPosition += 6;
+  
+  doc.text(`Number of Desks (x${booking.numberOfDesks || 0})`, margin, yPosition);
+  doc.text(`${formatCurrency(pricePerDay * (booking.numberOfDesks || 0))}`, pageWidth - margin - 40, yPosition);
+  yPosition += 6;
+  
+  // Offer/Discount section
+  if (booking.discountAmount && booking.discountAmount > 0) {
+    doc.setTextColor(0, 128, 0); // Green color for discount
+    doc.text('Offer Applied (Discount)', margin, yPosition);
+    doc.text(`-${formatCurrency(booking.discountAmount)}`, pageWidth - margin - 40, yPosition);
+    doc.setTextColor(0, 0, 0); // Reset to black
+    yPosition += 6;
+  }
+  
+  // Total line
+  doc.line(margin, yPosition, pageWidth - margin, yPosition);
+  yPosition += 8;
+  
+  // Total amount
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Total Amount:', margin, yPosition);
+  doc.text(`${formatCurrency(booking.totalPrice ?? 0)}`, pageWidth - margin - 40, yPosition);
+  
+  yPosition += 15;
+  
+  // Payment Information
+  doc.setFontSize(14);
+  doc.text('Payment Information', margin, yPosition);
+  yPosition += 10;
+  
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Payment Method: ${booking.paymentMethod || 'N/A'}`, margin, yPosition);
+  yPosition += 6;
+  doc.text(`Transaction ID: ${booking.transactionId || 'N/A'}`, margin, yPosition);
+  yPosition += 6;
+  doc.text(`Order Created: ${formatDate(booking.createdAt)}`, margin, yPosition);
+  
+  // Footer
+  yPosition = doc.internal.pageSize.getHeight() - 30;
+  doc.setFontSize(8);
+  doc.setTextColor(128, 128, 128);
+  doc.text('Thank you for choosing Book My Desk!', pageWidth / 2, yPosition, { align: 'center' });
+  doc.text('For any queries, please contact our support team.', pageWidth / 2, yPosition + 8, { align: 'center' });
+  
+  // Save the PDF
+  doc.save(`invoice-${booking._id}.pdf`);
+  return {
+    success:true
+  }
 },
 
 getChats: async():Promise<ApiResponse>=>{

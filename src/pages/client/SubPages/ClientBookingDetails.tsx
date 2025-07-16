@@ -10,6 +10,9 @@ import toast from "react-hot-toast"
 import StripePaymentModal from "@/components/ReusableComponents/StripeModal"
 import CancelBookingModal from "@/components/BookingDetailsComponents/CancelConfirmModal"
 import { getErrorMessage } from "@/utils/errors/errorHandler"
+import { useSelector } from "react-redux"
+import type { RootState } from "@/store/store"
+
 
 export const BookingDetailsPage: React.FC = () => {
   const { bookingId } = useParams<{ bookingId: string }>()
@@ -20,6 +23,8 @@ export const BookingDetailsPage: React.FC = () => {
   const [showCancelModal, setShowCancelModal] = useState(false)
   const [cancelLoading, setCancelLoading] = useState(false)
   const [chatLoading, setChatLoading] = useState(false);
+
+  const user = useSelector((state: RootState) => state.client.client);
   
   useEffect(()=>{
     const fetchBookingDetails = async () => {
@@ -84,9 +89,29 @@ export const BookingDetailsPage: React.FC = () => {
   fetchBookingDetails()
 }
 
-  const handleDownloadInvoice = () => {
-    console.log("Downloading invoice...")
+ const handleDownloadInvoice = async() => {
+  if (!booking || !booking._id) {
+    toast.error('Booking information is incomplete.');
+    return;
   }
+   try {
+    const result = await clientService.handleDownloadInvoice(booking, {
+      username: user?.username,
+      email: user?.email,
+      location: user?.location?.name,
+    });
+
+    if (!result.success) {
+      toast.error("Something went wrong, Please try again.");
+      return;
+    }
+
+    toast.success('Invoice downloaded successfully!');
+  } catch (error) {
+    console.error("Invoice download failed:", error);
+    toast.error("Failed to generate invoice. Please try again.");
+  }
+}
 
   const handleGoBack = () => {
     navigate(-1) 

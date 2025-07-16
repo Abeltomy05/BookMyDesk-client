@@ -278,4 +278,17 @@ export const adminService = {
       }
     },
 
+  monthlyStats: async():Promise<ApiResponse>=>{
+   try {
+    const response = await adminAxiosInstance.get("/monthly-stats");
+    return response.data;
+   } catch (error:unknown) {
+     console.error('Error getting monthly stats:', error);
+        return {
+            success: false,
+            message: getErrorMessage(error),
+         };
+   }
+  }  
+
 }
