@@ -102,7 +102,7 @@ const handleMarkAsRead = async (id: string): Promise<{ success: boolean }> => {
 };
 
 
-  const locationName = user?.location?.displayName.split(',').slice(0,1) 
+  const locationName = (user?.location?.displayName ?? "").split(',').slice(0,1)
   return (
     <>
       <nav className={`fixed top-0 left-0 right-0 ${backgroundClass} h-[70px] flex items-center justify-between shadow-lg z-[1000] px-6 md:px-12`}>
@@ -133,7 +133,7 @@ const handleMarkAsRead = async (id: string): Promise<{ success: boolean }> => {
             onClick={()=>navigate("/profile")}
             >
               <MapPin size={15} />
-              <h4 className="text-sm">{locationName ? locationName : "Add Location"}</h4><br />
+              <h4 className="text-sm">{locationName.length > 0 ? locationName : "Add Location"}</h4><br />
     
             </div>
           </div>

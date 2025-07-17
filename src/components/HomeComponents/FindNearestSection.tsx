@@ -3,11 +3,14 @@ import type React from "react"
 import { useState, useEffect, useRef } from "react"
 import toast from "react-hot-toast"
 import { useSelector } from "react-redux"
+import { useNavigate } from "react-router-dom"
 
 const FindNearestSection: React.FC = () => {
   const sectionRef = useRef<HTMLElement>(null)
   const [isVisible, setIsVisible] = useState(false)
   const user = useSelector((state:RootState)=>state.client.client) 
+
+  const navigate = useNavigate();
   
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -35,7 +38,9 @@ const handleFIndNearestClick = () => {
    if(!user){
     toast("Please login to find nearest coworking space.", {
       icon: "🔍",})
+      return;
    }
+   navigate('/nearby')
 }
   
   return (

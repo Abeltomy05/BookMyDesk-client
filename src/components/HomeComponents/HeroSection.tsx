@@ -2,9 +2,20 @@ import type React from "react"
 import { ArrowRight, MapPin } from "lucide-react";
 import type { RootState } from "@/store/store"
 import { useSelector } from "react-redux"
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const HeroSection: React.FC = () => {
   const user = useSelector((state:RootState)=>state.client.client) 
+  const navigate = useNavigate()
+
+  const handleBrowse = ()=>{
+    if(!user){
+      toast("Please login to find spaces",{icon:'📢'})
+      return;
+    }
+    navigate("/buildings")
+  }
 
     return (
     <section className="relative h-[750px] flex items-center bg-black">
@@ -24,8 +35,9 @@ const HeroSection: React.FC = () => {
 
         <div className="p-8 flex justify-center">
           <button 
-          className="group text-black font-semibold px-8 py-4 rounded-full flex items-center gap-3 transition-all duration-300 transform hover:scale-105 hover:shadow-xl" 
+          className="group text-white font-semibold px-8 py-4 rounded-full flex items-center gap-3 transition-all duration-300 transform hover:scale-105 hover:shadow-xl" 
           style={{ backgroundColor: '#f69938' }} 
+          onClick={handleBrowse}
           onMouseEnter={(e) => {
             (e.target as HTMLButtonElement).style.backgroundColor = '#e58829';
           }}

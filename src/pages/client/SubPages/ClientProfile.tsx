@@ -54,6 +54,7 @@ const ClientProfile: React.FC = () => {
   password: {},
   });
 
+
   const dispatch = useDispatch();
 
     useEffect(()=>{
