@@ -17,6 +17,7 @@ import ClientBookings from "@/pages/client/SubPages/Bookings";
 import BookingDetailsPage from "@/pages/client/SubPages/ClientBookingDetails";
 import ClientWalletPage from "@/pages/client/SubPages/ClientWallet";
 import ClientChatPage from "@/pages/client/SubPages/ClientChatPage";
+import NearbySpaces from "@/pages/client/SubPages/NearBy";
 
 const ClientRoutes = () => {
   return (
@@ -38,6 +39,7 @@ const ClientRoutes = () => {
         <Route path="/booking-details/:bookingId" element={<ProtectedRoute allowedRoles={["client"]} element={<BookingDetailsPage/>} />}/>
         <Route path="/wallet" element={<ProtectedRoute allowedRoles={["client"]} element={<ClientWalletPage/>} />}/>
         <Route path="/chat" element={<ProtectedRoute allowedRoles={["client"]} element={<ClientChatPage/>} />}/>
+        <Route path="/nearby" element={<ProtectedRoute allowedRoles={["client"]} element={<NearbySpaces/>} />}/>
 
 
        
