@@ -112,7 +112,12 @@ const VendorManageBookings = () => {
 
    const handleCompleteBooking = async () => {
     if (!selectedBooking) return;
-    
+    const now = new Date();
+    const bookingDate = new Date(selectedBooking.bookingDate);
+    if(bookingDate > now){
+      toast.error("Booking cannot be marked as completed before the booking date.");
+      return;
+    }
     try {
       const response = await vendorService.updateBookingStatus(
         "booking",
