@@ -18,7 +18,6 @@ import { adminService, type LoginData } from "@/services/adminService"
 import { vendorLogin } from "@/store/slices/vendor.slice"
 import { clientLogin } from "@/store/slices/client.slice"
 import { adminLogin } from "@/store/slices/admin.slice"
-import socketService from "@/services/socketService"
 
 // Types
 export type UserType = 'vendor' | 'client' | 'admin'

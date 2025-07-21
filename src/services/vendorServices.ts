@@ -12,6 +12,7 @@ import type { NewOfferForm } from '@/pages/vendor/SubPages/OfferManagement';
 import type { LoginData } from './adminService';
 import type { NotificationResponse } from '@/types/notification.type';
 import { getErrorMessage } from '@/utils/errors/errorHandler';
+import type { ReportEntry } from '@/types/report.type';
 
 interface ApiResponse {
   success: boolean;
@@ -362,9 +363,11 @@ getHomeData: async ()=>{
 },
 
 //download report
-downloadPdf: (data: VendorHomeData,vendorData:{username?:string,companyName?:string,email?:string})=>{
-   const monthlyData = Array.isArray(data.monthlyBookings) ? data.monthlyBookings : [];
-   const recentBookings = Array.isArray(data.completedBookings) ? data.completedBookings : [];
+downloadPdf: (
+  reportData: ReportEntry[],
+  vendorData:{username?:string,companyName?:string,email?:string},
+  selectedBuildingName?: string
+)=>{
    const doc = new jsPDF();
 
    //Heading
@@ -375,10 +378,8 @@ downloadPdf: (data: VendorHomeData,vendorData:{username?:string,companyName?:str
    doc.setFontSize(13);
    doc.text('Vendor Revenue Report', 69, 30);
 
-
-   doc.setFontSize(12);
-
-    // Name
+   // Vendor Info
+    doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
     doc.text('Name:', 14, 40);
     doc.setFont('helvetica', 'normal');
@@ -397,39 +398,66 @@ downloadPdf: (data: VendorHomeData,vendorData:{username?:string,companyName?:str
     doc.text(`${vendorData.email || ''}`, 40, 52);
 
 
+    let startY = 65;
+    if (selectedBuildingName) {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.text(`Building: ${selectedBuildingName}`, 14, startY);
+      startY += 10;
+    }
+
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(14);
-    doc.text('Monthly Booking', 14, 65);
+    doc.text('Monthly Booking', 14, startY);
+
+    const headColumns = selectedBuildingName
+    ? [['Booking ID', 'Customer', 'Space', 'Desks', 'Amount', 'Date']]
+    : [['Booking ID', 'Customer', 'Space', 'Building', 'Desks', 'Amount', 'Date']];
+
+    const bodyRows = reportData.map((b) =>
+    selectedBuildingName
+      ? [
+          b.bookingId.slice(0, 16),
+          b.clientId?.username || '',
+          b.spaceId?.name || '',
+          b.numberOfDesks?.toString() || '',
+          formatCurrency(b.totalPrice!),
+          formatDate(b.bookingDate),
+        ]
+      : [
+          b.bookingId.slice(0, 16),
+          b.clientId?.username || '',
+          b.spaceId?.name || '',
+          b.buildingId?.buildingName || '',
+          b.numberOfDesks?.toString() || '',
+          formatCurrency(b.totalPrice!),
+          formatDate(b.bookingDate),
+        ]
+  );
 
    autoTable(doc, {
-      startY: 70,
-      head: [['Month', 'Bookings', 'Revenue']],
-      body: monthlyData.map((m) => [
-        m.month,
-        m.bookings.toString(),
-        formatCurrency(m.revenue),
-      ]),
-    });
-
-   const startY = (doc as any).lastAutoTable.finalY + 10;
-   doc.setFontSize(14);
-   doc.text('Recent Completed Bookings', 14, startY);
-
-    autoTable(doc, {
-      startY: startY + 5,
-      head: [['Booking ID', 'Customer', 'Space', 'Building', 'Desks', 'Amount', 'Date']],
-      body: recentBookings.slice(0, 5).map((b) => [
-        b._id.slice(0,16),
-        b.client?.username || '',
-        b.space?.name || '',
-        b.building?.buildingName || '',
-        b.numberOfDesks.toString(),
-        formatCurrency(b.totalPrice),
-        formatDate(b.bookingDate),
-      ]),
-    });
-
+    startY: startY + 5,
+    head: headColumns,
+    body: bodyRows,
+  });
   doc.save('vendor-revenue-report.pdf');
+},
+
+getRevenueReport: async(buildingId?:string):Promise<ApiResponse>=>{
+  try {
+    const response = await vendorAxiosInstance.get('/revenue-report',{
+      params:{
+        buildingId,
+      }
+    })
+    return response.data;
+  } catch (error:unknown) {
+    console.error('Error geting revenue report for vendor:', error);
+    return {
+        success: false,
+        message: getErrorMessage(error),
+      };
+  }
 },
 
 fetchBuildingsForVendor: async():Promise<ApiResponse>=>{

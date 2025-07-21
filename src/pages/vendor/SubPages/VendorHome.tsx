@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Building2, Calendar, DollarSign, Users,  Download,  } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Building2, Calendar, DollarSign, Users,  Download, ChevronDown,  } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/store/store';
 import VendorLayout from '../VendorLayout';
@@ -11,6 +11,7 @@ import CompletedBookingsTable  from '@/components/vendorSide/CompletedBookingsTa
 import type { RevenueDataPoint, VendorHomeData } from '@/types/vendor-home.types';
 import { useNavigate } from 'react-router-dom';
 import { getErrorMessage } from '@/utils/errors/errorHandler';
+import Loading from '@/components/Loadings/Loading';
 
 const cardVariants = {
   hidden: { 
@@ -66,9 +67,11 @@ const textVariants = {
 
 const VendorDashboard: React.FC = () => {
   const user = useSelector((state: RootState) => state.vendor.vendor);
-  console.log("Vendor Details",user)
+
   const [loading, setLoading] = useState(true);
   const [homeData, setHomeData] = useState<VendorHomeData | null>(null);
+  const [showBuildingDropdown, setShowBuildingDropdown] = useState(false);
+  const [selectedBuilding, setSelectedBuilding] = useState<{ id: string; name: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const navigate = useNavigate()
@@ -78,10 +81,10 @@ const VendorDashboard: React.FC = () => {
     setError(null);
     try {
       const response = await vendorService.getHomeData();
-      console.log(response.data)
+      // console.log("VendorHomeData",response.data)
       if (response.success) {
         setHomeData(response.data);
-        console.log(response.data)
+        // console.log(response.data)
       } else {
         setError(response.message || 'Failed to fetch data');
       }
@@ -102,16 +105,26 @@ const VendorDashboard: React.FC = () => {
   const revenueData: RevenueDataPoint[] = Array.isArray(homeData?.monthlyBookings)
   ? homeData?.monthlyBookings
   : [];
-  console.log('CharacterData',revenueData)
 
-  const handleDownloadReport = () => {
+  const handleDownloadReport = async(buildingId?: string) => {
     if (!homeData) return;
+
+    const response = await vendorService.getRevenueReport(buildingId);
+
     const vendorData = {
       username:user?.username,
       companyName: user?.companyName,
       email: user?.email,
     }
-    vendorService.downloadPdf(homeData,vendorData);
+
+    const selectedBuildingName = buildingId
+    ? homeData.buildingIdsAndName.find(b => b._id === buildingId)?.name
+    : undefined;
+
+    vendorService.downloadPdf(response.data, vendorData, selectedBuildingName);
+
+    setShowBuildingDropdown(false);
+    setSelectedBuilding(null);
   };
 
   const completedBookings = homeData ? homeData.completedBookings  : [];
@@ -120,8 +133,8 @@ const VendorDashboard: React.FC = () => {
     return (
       <VendorLayout >
         <div className="min-h-screen flex items-center justify-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#f69938]"></div>
-        </div>
+              <Loading/>
+         </div>
       </VendorLayout>
     );
   }
@@ -302,25 +315,102 @@ const VendorDashboard: React.FC = () => {
               </motion.div>
 
               {/* Download Report Section */}
-              <motion.div
+             <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.3 }}
-                className="lg:col-span-1"
+                className="lg:col-span-1 max-w-md mx-auto"
               >
                 <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 h-full">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Download Reports</h3>
-                  <div className="space-y-3">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <Building2 className="w-5 h-5 mr-2 text-[#f69938]" />
+                    Download Reports
+                  </h3>
+                  
+                  <div className="space-y-3 relative">
+                    {/* Main Download Button */}
                     <motion.button
-                      onClick={handleDownloadReport}
+                      onClick={() => setShowBuildingDropdown(!showBuildingDropdown)}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className="w-full bg-[#f69938] text-white py-3 px-4 rounded-lg hover:bg-[#e8872e] transition-colors duration-200 flex items-center justify-center space-x-2"
+                      className="w-full bg-[#f69938] text-white py-3 px-4 rounded-lg hover:bg-[#e8872e] transition-colors duration-200 flex items-center justify-between space-x-2"
                     >
-                      <Download className="w-4 h-4" />
-                      <span>Revenue Report</span>
+                      <div className="flex items-center space-x-2">
+                        <Download className="w-4 h-4" />
+                        <span>Revenue Report</span>
+                      </div>
+                      <ChevronDown 
+                        className={`w-4 h-4 transition-transform duration-200 ${
+                          showBuildingDropdown ? 'rotate-180' : ''
+                        }`} 
+                      />
                     </motion.button>
+
+                    {/* Dropdown Menu */}
+                    <AnimatePresence>
+                      {showBuildingDropdown && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                          transition={{ duration: 0.2 }}
+                          className="absolute top-full -left-5 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-64 w-58 overflow-y-auto"
+                        >
+                          {/* All Buildings Option */}
+                          <motion.button
+                            onClick={() => handleDownloadReport()}
+                            whileHover={{ backgroundColor: '#f9fafb' }}
+                            className="w-full px-4 py-3 text-left text-gray-700 hover:bg-gray-50 border-b border-gray-100 flex items-center space-x-3"
+                          >
+                            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                              <Building2 className="w-4 h-4 text-blue-600" />
+                            </div>
+                            <div>
+                              <p className="font-medium text-gray-900">All Buildings</p>
+                              <p className="text-sm text-gray-500">Download complete report</p>
+                            </div>
+                          </motion.button>
+
+                          {/* Individual Building Options */}
+                          {homeData?.buildingIdsAndName?.map((building, index) => (
+                            <motion.button
+                              key={building._id}
+                              onClick={() => handleDownloadReport(building._id)}
+                              whileHover={{ backgroundColor: '#f9fafb' }}
+                              initial={{ opacity: 0, x: -20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: index * 0.05 }}
+                              className="w-full px-4 py-3 text-left text-gray-700 hover:bg-gray-50 flex items-center space-x-3 last:border-b-0 border-b border-gray-100"
+                            >
+                              <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                                <Building2 className="w-4 h-4 text-[#f69938]" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="font-medium text-gray-900 truncate">{building.name}</p>
+                                <p className="text-sm text-gray-500">Building-specific report</p>
+                              </div>
+                            </motion.button>
+                          ))}
+
+                          {/* No Buildings Message */}
+                          {(!homeData?.buildingIdsAndName || homeData.buildingIdsAndName.length === 0) && (
+                            <div className="px-4 py-6 text-center text-gray-500">
+                              <Building2 className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+                              <p className="text-sm">No buildings available</p>
+                            </div>
+                          )}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
+                    {/* Optional: Close dropdown when clicking outside */}
+                    {showBuildingDropdown && (
+                      <div
+                        className="fixed inset-0 z-40"
+                        onClick={() => setShowBuildingDropdown(false)}
+                      />
+                    )}
                   </div>
                 </div>
               </motion.div>
