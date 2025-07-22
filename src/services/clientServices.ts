@@ -192,11 +192,19 @@ export const clientService = {
     latitude?: string,
     longitude?: string,
     radius?: string,
+    amenities?: string[];
+    amenityMatchMode?: 'any' | 'all';
   }
   ): Promise<ApiResponseWithPagination>=>{
     try {
       const response = await clientAxiosInstance.get("/list-buildings",{
-         params: { page, limit, locationName: filters.locationName,  type: filters.type,  priceRange: filters.priceRange, latitude: filters.latitude, longitude: filters.longitude, radius: filters.radius},
+         params: { 
+          page, limit, locationName: filters.locationName,  
+          type: filters.type,  priceRange: filters.priceRange, 
+          latitude: filters.latitude, longitude: filters.longitude, 
+          radius: filters.radius, amenities: filters.amenities ? JSON.stringify(filters.amenities) : undefined,
+          amenityMatchMode: filters.amenityMatchMode,
+        },
       });
       return response.data;
     } catch (error: unknown) {

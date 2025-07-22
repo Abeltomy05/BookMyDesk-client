@@ -9,6 +9,7 @@ import { HandledAuthError } from "@/utils/errors/handleAuthError"
 import { useNavigate } from "react-router-dom"
 import BuildingsListingSkeleton from "@/components/Skeletons/BuildingListingSkeleton"
 import BuildingsList, { type Building } from "@/components/ReusableComponents/ListBuilding"
+import { availableAmenities } from "@/utils/constants/AllAmenities"
 
 
 export default function BuildingsListing() {
@@ -17,6 +18,9 @@ export default function BuildingsListing() {
   const [availablePrices, setAvailablePrices] = useState<number[]>([]);
   const [selectedType, setSelectedType] = useState("");
   const [selectedPrice, setSelectedPrice] = useState("");
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([])
+  const [showAmenities, setShowAmenities] = useState(false)
+  const [amenityMatchMode, setAmenityMatchMode] = useState<"all" | "any">("all");
   const [searchLocation, setSearchLocation] = useState<LocationData | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1);
@@ -29,6 +33,8 @@ export default function BuildingsListing() {
     locationName: undefined as string | undefined,
     type: undefined as string | undefined,
     priceRange: undefined as string | undefined,
+    amenities: undefined as string[] | undefined,
+    amenityMatchMode: "all" as "all" | "any"
   });
 
   const getHeroTitle = () => {
@@ -85,6 +91,8 @@ export default function BuildingsListing() {
       locationName: searchLocation?.name,
       type: selectedType || undefined,
       priceRange: selectedPrice || undefined,
+      amenities: selectedAmenities.length > 0 ? selectedAmenities : undefined,
+      amenityMatchMode,
     };
 
     setCurrentPage(1);
@@ -109,13 +117,41 @@ export default function BuildingsListing() {
     setSelectedType("");
     setSelectedPrice("");
     setSearchLocation(null);
+    setSelectedAmenities([]);
     setCurrentPage(1);
     setCurrentFilters({
       locationName: undefined,
       type: undefined,
       priceRange: undefined,
+      amenities: undefined,
+      amenityMatchMode: "all"
     });
   };
+
+  const toggleAmenity = (amenity: string) => {
+  setSelectedAmenities(prev => 
+    prev.includes(amenity) 
+      ? prev.filter(a => a !== amenity)
+      : [...prev, amenity]
+  );
+  };
+
+  useEffect(() => {
+  const handleClickOutside = (event: MouseEvent) => {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.relative')) {
+      setShowAmenities(false);
+    }
+  };
+
+  if (showAmenities) {
+    document.addEventListener('mousedown', handleClickOutside);
+  }
+
+  return () => {
+    document.removeEventListener('mousedown', handleClickOutside);
+  };
+}, [showAmenities]);
 
   if (isLoading) {
     return (
@@ -149,70 +185,137 @@ export default function BuildingsListing() {
         </div>
 
         {/* Filter Section */}
-        <div className="bg-[#1A1A1A] border-b border-gray-800 py-6">
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
+      <div className="bg-[#1A1A1A] border-b border-gray-800 py-6 px-16">
+            <div className="max-w-8xl">
+              <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
 
-              {/* Left side - Filters */}
-              <div className="flex flex-wrap gap-4 items-center">
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-300">Type:</span>
-                  <select
-                    value={selectedType}
-                    onChange={(e) => setSelectedType(e.target.value)}
-                    className="px-4 py-2 bg-white border border-gray-600 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#f69938]"
+                {/* Left side - Filters */}
+                <div className="flex flex-wrap gap-4 items-center">
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-300">Type:</span>
+                    <select
+                      value={selectedType}
+                      onChange={(e) => setSelectedType(e.target.value)}
+                      className="px-4 py-2 bg-white border border-gray-600 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#f69938]"
+                    >
+                      <option value="">All types</option>
+                      {availableTypes.map((type) => (
+                        <option key={type} value={type}>{type}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-300">Price:</span>
+                    <select
+                      value={selectedPrice}
+                      onChange={(e) => setSelectedPrice(e.target.value)}
+                      className="px-4 py-2 bg-white border border-gray-600 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#f69938]"
+                    >
+                      <option value="">Any price</option>
+                      {getPriceRangeOptions().map((range) => (
+                        <option key={range.value} value={range.value}>{range.label}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Amenities Filter */}
+                  <div className="relative flex items-center gap-2">
+                    <span className="text-gray-300">Amenities:</span>
+                    <div className="relative">
+                      <button
+                        onClick={() => setShowAmenities(!showAmenities)}
+                        className="px-4 py-2 bg-white border border-gray-600 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#f69938] min-w-32 text-left flex items-center justify-between"
+                      >
+                        <span>
+                          {selectedAmenities.length === 0 
+                            ? "Select amenities"
+                            : `${selectedAmenities.length} selected`
+                          }
+                        </span>
+                        <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+
+                      {/* Amenities Dropdown  */}
+                     {showAmenities && (
+                      <div className="absolute top-full left-0 mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10 w-80">
+                        
+                        {/* Match Mode Selection */}
+                        <div className="flex items-center justify-around px-3 py-2 border-b border-gray-200">
+                          <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-700">
+                            <input
+                              type="radio"
+                              value="all"
+                              checked={amenityMatchMode === "all"}
+                              onChange={() => setAmenityMatchMode("all")}
+                              className="form-radio text-[#f69938] focus:ring-[#f69938]"
+                            />
+                            Match All
+                          </label>
+                          <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-700">
+                            <input
+                              type="radio"
+                              value="any"
+                              checked={amenityMatchMode === "any"}
+                              onChange={() => setAmenityMatchMode("any")}
+                              className="form-radio text-[#f69938] focus:ring-[#f69938]"
+                            />
+                            Match Any
+                          </label>
+                        </div>
+
+                        {/* Amenities Checkboxes */}
+                        <div className="grid grid-cols-2">
+                          {availableAmenities.map((amenity) => (
+                            <label key={amenity} className="flex items-center px-3 py-2 hover:bg-gray-100 cursor-pointer border-r border-b border-gray-100 last:border-r-0">
+                              <input
+                                type="checkbox"
+                                checked={selectedAmenities.includes(amenity)}
+                                onChange={() => toggleAmenity(amenity)}
+                                className="mr-2 text-[#f69938] focus:ring-[#f69938]"
+                              />
+                              <span className="text-gray-900 text-sm">{amenity}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    </div>
+                  </div>
+
+
+                  {/* Clear filters button */}
+                  <button
+                    onClick={handleClearFilters}
+                    className="text-gray-400 hover:text-white text-sm underline"
                   >
-                    <option value="">All types</option>
-                    {availableTypes.map((type) => (
-                      <option key={type} value={type}>{type}</option>
-                    ))}
-                  </select>
+                    Clear filters
+                  </button>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-300">Price:</span>
-                  <select
-                    value={selectedPrice}
-                    onChange={(e) => setSelectedPrice(e.target.value)}
-                    className="px-4 py-2 bg-white border border-gray-600 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#f69938]"
+                {/* Right side - Location Search */}
+                <div className="flex gap-2 w-full lg:w-auto lg:min-w-96">
+                  <div className="flex-1">
+                    <LocationInput
+                      value={searchLocation}
+                      onChange={handleLocationChange}
+                      placeholder="Type city, country or any place you love"
+                      className="w-full"
+                    />
+                  </div>
+                  <button
+                    onClick={handleSearch}
+                    disabled={isLoading}
+                    className="bg-[#f69938] hover:bg-[#de851e] text-white px-6 py-2 rounded-md font-semibold transition-colors whitespace-nowrap disabled:opacity-50"
                   >
-                    <option value="">Any price</option>
-                    {getPriceRangeOptions().map((range) => (
-                      <option key={range.value} value={range.value}>{range.label}</option>
-                    ))}
-                  </select>
+                    {isLoading ? 'SEARCHING...' : 'SEARCH'}
+                  </button>
                 </div>
-
-                {/* Clear filters button */}
-                <button
-                  onClick={handleClearFilters}
-                  className="text-gray-400 hover:text-white text-sm underline"
-                >
-                  Clear filters
-                </button>
-              </div>
-
-              {/* Right side - Location Search */}
-              <div className="flex gap-2 w-full lg:w-auto lg:min-w-96">
-                <div className="flex-1">
-                  <LocationInput
-                    value={searchLocation}
-                    onChange={handleLocationChange}
-                    placeholder="Type city, country or any place you love"
-                    className="w-full"
-                  />
-                </div>
-                <button
-                  onClick={handleSearch}
-                  disabled={isLoading}
-                  className="bg-[#f69938] hover:bg-[#de851e] text-white px-6 py-2 rounded-md font-semibold transition-colors whitespace-nowrap disabled:opacity-50"
-                >
-                  {isLoading ? 'SEARCHING...' : 'SEARCH'}
-                </button>
               </div>
             </div>
-          </div>
-        </div>
+      </div>
 
         {/* Buildings List Component */}
         <BuildingsList

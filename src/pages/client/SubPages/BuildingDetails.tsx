@@ -54,9 +54,9 @@ export default function BuildingDetailsPage() {
     }, [buildingId]);
 
     const amenityIcons: Record<string, { icon: any; label: string }> = {
-        normalParking: { icon: Car, label: "Parking Available" },
+        NormalParking: { icon: Car, label: "Parking Available" },
         cafeteria: { icon: Coffee, label: "Cafeteria" },
-        wifi: { icon: Wifi, label: "High-speed WiFi" },
+        wifi: { icon: Wifi, label: "WiFi" },
         printer: { icon: Printer, label: "Printer Access" },
         lockers: { icon: ShieldCheck, label: "Personal Lockers" },
         security: { icon: ShieldCheck, label: "24/7 Security" },
