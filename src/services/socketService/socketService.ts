@@ -123,6 +123,10 @@ class SocketService {
     }
   }
 
+   onNotification(callback: () => void) {
+    this.socket?.on("newNotification", callback);
+  }
+
   // Clean up listeners
   removeAllListeners() {
     if (this.socket) {

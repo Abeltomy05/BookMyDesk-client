@@ -2,7 +2,7 @@ import Footer from '@/components/HomeComponents/Footer';
 import PageNavbar from '@/components/Navbars & Sidebars/ClientNavbar';
 import Sidebar from '@/components/Navbars & Sidebars/ClientSidebar';
 import { clientService } from '@/services/clientServices';
-import socketService from '@/services/socketService';
+import socketService from '@/services/socketService/socketService';
 import { clientLogout } from '@/store/slices/client.slice';
 import type { RootState } from '@/store/store';
 import React, { useState } from 'react';

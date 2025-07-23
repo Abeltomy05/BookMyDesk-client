@@ -6,6 +6,7 @@ import type { IClient } from "@/types/user.type";
 import NotificationsComponent from "../ReusableComponents/NotificationTab";
 import toast from "react-hot-toast";
 import { clientService } from "@/services/clientServices";
+import socketService from "@/services/socketService/socketService";
 
 interface ClientNavbarProps {
   onMenuClick: () => void;
@@ -50,17 +51,34 @@ const ClientNavbar: React.FC<ClientNavbarProps> = ({
     };
   }, []);
 
-  useEffect(() => {
-  const fetchInitialNotificationData = async () => {
-    const res = await fetchNotificationsFromClient(0, "unread");
-    setUnreadCount(res.unreadCount); 
+useEffect(() => {
+  if (!user?._id) return;
+
+  socketService.connect(user._id, "client");
+  socketService.getSocket()?.emit("requestOnlineUsers");
+
+  socketService.onNotification(() => {
+    setUnreadCount((prev) => prev + 1);
+  });
+
+  const fetchInitialUnreadCount = async () => {
+    try {
+      const response = await clientService.getNotifications(1, limit, "unread");
+      if (response.success && response.data?.unreadCount) {
+        setUnreadCount(response.data.unreadCount);
+      }
+    } catch (error) {
+      console.error("Failed to fetch initial unread count", error);
+    }
   };
 
-  fetchInitialNotificationData();
-  const interval = setInterval(fetchInitialNotificationData, 60000);
+  fetchInitialUnreadCount();
 
-  return () => clearInterval(interval);
-}, []);
+  return () => {
+    socketService.removeAllListeners();
+    socketService.disconnect();
+  };
+}, [user?._id]);
 
   const fetchNotificationsFromClient = async (page: number, filter: "unread" | "all") => {
   const response = await clientService.getNotifications(page, limit, filter);
@@ -187,7 +205,7 @@ const handleMarkAsRead = async (id: string): Promise<{ success: boolean }> => {
               <img
                 src={user?.avatar || "https://res.cloudinary.com/dnivctodr/image/upload/v1748161444/default-user_rbydkc.png"}
                 alt="User avatar"
-                className="w-auto h-10 object-cover rounded-full border-3 border-[#f69938]"
+                className="w-10 h-10 object-cover rounded-full border-3 border-[#f69938]"
               />
             </div>
 

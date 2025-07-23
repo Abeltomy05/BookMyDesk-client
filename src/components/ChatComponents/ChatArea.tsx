@@ -1,4 +1,4 @@
-import socketService from "@/services/socketService";
+import socketService from "@/services/socketService/socketService";
 import type { ChatConfig, ChatSidebarItem, Message } from "@/types/chat.type";
 import { MessageCircle, MoreVertical, Paperclip, Send, Trash2, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";

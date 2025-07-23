@@ -5,11 +5,14 @@ import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import NotificationsComponent from '../ReusableComponents/NotificationTab';
+import type { IVendor } from '@/types/user.type';
+import notificationSocketService from '@/services/socketService/notificationSocketService';
 
 interface VendorNavbarProps {
   onMenuClick: () => void;
   logoUrl?: string;
   className?: string;
+  user: IVendor | null;
   backgroundClass?: string; 
 }
 
@@ -17,6 +20,7 @@ const VendorNavbar: React.FC<VendorNavbarProps> = ({
   onMenuClick,
   logoUrl = "https://res.cloudinary.com/dnivctodr/image/upload/v1748161273/BMS-logo_hcz5ww.png",
   className = "",
+  user,
   backgroundClass
 }) => {
   const [showNotificationTooltip, setShowNotificationTooltip] = useState(false);
@@ -27,16 +31,34 @@ const VendorNavbar: React.FC<VendorNavbarProps> = ({
   const limit = 3;
 
   useEffect(() => {
-  const fetchInitialNotificationData = async () => {
-    const res = await fetchNotificationsFromVendor(0, "unread");
-    setUnreadCount(res.unreadCount); 
+  if (!user?._id) return;
+
+  notificationSocketService.connect(user._id, 'vendor'); 
+
+  notificationSocketService.onNotification(() => {
+    setUnreadCount((prev) => prev + 1);
+  });
+
+  const fetchInitialUnreadCount = async () => {
+    try {
+      const response = await vendorService.getNotifications(1, limit, "unread");
+      if (response.success && response.data?.unreadCount) {
+        setUnreadCount(response.data.unreadCount);
+      }
+    } catch (error) {
+      console.error("Failed to fetch initial unread count", error);
+    }
   };
 
-  fetchInitialNotificationData();
-  const interval = setInterval(fetchInitialNotificationData, 60000);
+  fetchInitialUnreadCount();
 
-  return () => clearInterval(interval);
-}, []);
+
+  return () => {
+    notificationSocketService.removeAllListeners();
+    notificationSocketService.disconnect();
+  };
+}, [user?._id]);
+
 
   const fetchNotificationsFromVendor = async (page: number, filter: "unread" | "all") => {
   const response = await vendorService.getNotifications(page, limit, filter);

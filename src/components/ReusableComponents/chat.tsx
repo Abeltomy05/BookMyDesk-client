@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { type Message, type ChatSidebarItem, type ChatConfig, defaultClientConfig } from '@/types/chat.type';
-import socketService from '@/services/socketService';
+import socketService from '@/services/socketService/socketService';
 import { uploadImageCloudinary } from '@/utils/cloudinary/cloudinary';
 import toast from 'react-hot-toast';
 import { Sidebar } from '../ChatComponents/ChatSideBar';
@@ -34,7 +34,7 @@ const ReusableChat: React.FC<ReusableChatProps> = ({
 
 //connection useEffect
  useEffect(() => {
-    if (!socketService.isConnected()) {
+    if (config.userType === "building" && !socketService.isConnected()) {
       socketService.connect(currentUserId, config.userType);
     }
 
@@ -72,19 +72,24 @@ const ReusableChat: React.FC<ReusableChatProps> = ({
     socketService.onReceiveMessage(handleReceiveMessage);
 
     return () => {
+      if (config.userType === "building") {
+        socketService.disconnect();
+      }
       socketService.getSocket()?.off("receiveMessage", handleReceiveMessage);
     };
   }, [currentUserId, config.userType, selectedSessionId]);
 
   // online presence useEffect
  useEffect(() => {
-    if (!socketService.isConnected()) {
-      socketService.connect(currentUserId, config.userType);
-    }
+   const socket = socketService.getSocket();
 
-    const socket = socketService.getSocket();
-    if (!socket) {
-      return;
+    if (socket) {
+    socket.emit("requestOnlineUsers");
+  }
+
+    if (config.userType === "building" && !socketService.isConnected()) {
+      socketService.connect(currentUserId, config.userType);
+      // socketService.getSocket()?.emit("requestOnlineUsers");
     }
 
     const handleOnlineUsers = (userIds: string[]) => {
@@ -100,14 +105,14 @@ const ReusableChat: React.FC<ReusableChatProps> = ({
       setOnlineUserIds((prev) => prev.filter((id) => id !== userId));
     };
 
-    socket.on("onlineUsers", handleOnlineUsers);
-    socket.on("userOnline", handleUserOnline);
-    socket.on("userOffline", handleUserOffline);
+    socket?.on("onlineUsers", handleOnlineUsers);
+    socket?.on("userOnline", handleUserOnline);
+    socket?.on("userOffline", handleUserOffline);
 
     return () => {
-      socket.off("onlineUsers", handleOnlineUsers);
-      socket.off("userOnline", handleUserOnline);
-      socket.off("userOffline", handleUserOffline);
+      socket?.off("onlineUsers", handleOnlineUsers);
+      socket?.off("userOnline", handleUserOnline);
+      socket?.off("userOffline", handleUserOffline);
     };
   }, [currentUserId, config.userType]);
 

@@ -257,19 +257,19 @@ const handlePasswordValidation = () => {
           )}
 
           {/* Overlay must be on top and transparent initially */}
-          <div className="absolute inset-0 z-10 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
-            <Upload size={28} className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+          <div className="absolute inset-0 z-10  group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
+            <Upload size={38} className="text-white bg-gradient-to-r from-green-500 to-teal-600 rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow" />
           </div>
         </div>
 
-  <input
-    type="file"
-    ref={avatarInputRef}
-    onChange={handleAvatarUpload}
-    accept="image/*"
-    className="hidden"
-  />
-</div>
+          <input
+            type="file"
+            ref={avatarInputRef}
+            onChange={handleAvatarUpload}
+            accept="image/*"
+            className="hidden"
+          />
+        </div>
       </div>
 
       {/* Two Column Layout */}
