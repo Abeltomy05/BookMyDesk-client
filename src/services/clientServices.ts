@@ -215,6 +215,18 @@ export const clientService = {
   }
   },
 
+  fetchFilters: async(): Promise<ApiResponse> => {
+  try {
+    const response = await clientAxiosInstance.get("/fetch-filters");
+    return response.data;
+  } catch (error:unknown) {
+    return {
+        success: false,
+        message: getErrorMessage(error),
+      };
+  }
+  },
+
   //building details
 
   getBuildingDetails: async(buildingId:string): Promise<ApiResponse>=>{

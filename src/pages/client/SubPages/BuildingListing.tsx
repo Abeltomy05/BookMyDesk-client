@@ -48,6 +48,11 @@ export default function BuildingsListing() {
     fetchBuildings()
   }, [currentPage, currentFilters])
 
+  useEffect(() => {
+  fetchFilters();
+  }, []);
+  
+
   const fetchBuildings = async () => {
     setIsLoading(true)
     try {
@@ -56,21 +61,6 @@ export default function BuildingsListing() {
 
       setBuildings(response?.data || []);
       setTotalPages(response.totalPages || 1);
-
-      if (currentPage === 1) {
-        const typesSet = new Set<string>(availableTypes); 
-        const pricesSet = new Set<number>(availablePrices); 
-
-        response.data.forEach((building: Building) => {
-          building.summarizedSpaces?.forEach(space => {
-            if (space.name) typesSet.add(space.name);
-            if (typeof space.price === "number") pricesSet.add(space.price);
-          });
-        });
-
-        setAvailableTypes(Array.from(typesSet));
-        setAvailablePrices(Array.from(pricesSet).sort((a, b) => a - b)); 
-      }
 
     } catch (error: unknown) {
       if (!(error instanceof HandledAuthError)) {
@@ -81,6 +71,18 @@ export default function BuildingsListing() {
       setIsLoading(false)
     }
   }
+
+  const fetchFilters = async () => {
+  try {
+    const response = await clientService.fetchFilters();
+    console.log("Filter options:", response.data);
+    setAvailableTypes(response.data.spaceNames || []);
+    setAvailablePrices((response.data.prices || []).sort((a:number, b:number) => a - b));
+  } catch (error) {
+    toast.error("Failed to load filter options");
+    console.error("Error fetching filter data:", error);
+  }
+};
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
