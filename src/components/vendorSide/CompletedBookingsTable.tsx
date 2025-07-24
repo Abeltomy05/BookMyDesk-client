@@ -6,6 +6,7 @@ import { formatDate } from '@/utils/formatters/date';
 
 export type CompletedBooking = {
   _id: string;
+  bookingId: string;
   client: { username: string; email: string };
   space: { name: string; pricePerDay: number };
   building: { buildingName: string; location: { name: string; displayName: string } };
@@ -136,7 +137,7 @@ const CompletedBookingsTable: React.FC<{
                   className="hover:bg-gray-50 transition-colors duration-200"
                 >
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {booking._id}
+                    {booking.bookingId}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     <div>

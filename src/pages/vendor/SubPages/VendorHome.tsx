@@ -81,7 +81,7 @@ const VendorDashboard: React.FC = () => {
     setError(null);
     try {
       const response = await vendorService.getHomeData();
-      // console.log("VendorHomeData",response.data)
+      console.log("VendorHomeData",response.data)
       if (response.success) {
         setHomeData(response.data);
         // console.log(response.data)

@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect  } from "react"
+import { useState, useEffect  } from "react"
 import { TableLoadingSkeleton } from "@/components/Skeletons/TableLoadingSkeleton"
 import { motion } from "framer-motion"
 import {
@@ -9,7 +9,6 @@ import {
   Building,
   User,
   CheckCircle,
-  Clock,
   XCircle,
 } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -20,6 +19,7 @@ import { adminService } from "@/services/adminService"
 
 interface BookingData {
   _id: string
+  bookingId: string
   bookingDate: string
   totalPrice: number
   status: string
@@ -140,6 +140,7 @@ const [totalItems, setTotalItems] = useState(0)
     }  
     
     const response = await adminService.getBookingsForAdmin(params)
+    console.log("Bookings response", response.data)
 
     if (response.success) {
       setBookings(response.data.bookings)
@@ -166,8 +167,6 @@ useEffect(() => {
   fetchBookings()
 }, [currentPage, selectedVendor, selectedBuilding, selectedStatus])
 
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
@@ -311,7 +310,7 @@ useEffect(() => {
                         animate="visible"
                         transition={{ delay: index * 0.05 }}
                       >
-                        <td className="p-4 text-white font-medium">{booking._id}</td>
+                        <td className="p-4 text-white font-medium">{booking.bookingId}</td>
                         <td className="p-4 text-white">
                           <div className="flex flex-col leading-tight">
                             <span className="font-medium">{booking.clientName}</span>

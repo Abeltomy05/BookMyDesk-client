@@ -11,6 +11,7 @@ import VendorVerification from '@/pages/admin/sub-pages/VendorVerification'
 import BuildingVerification from '@/pages/admin/sub-pages/BuildingVerification'
 import AdminWalletPage from '@/pages/admin/sub-pages/AdminWallet'
 import AdminBookingsPage from '@/pages/admin/sub-pages/Bookings'
+import BuildingManagement from '@/pages/admin/sub-pages/BuildingListing'
 
 const AdminRoutes = () => {
   return (
@@ -23,7 +24,8 @@ const AdminRoutes = () => {
          <Route path="/users" element={<ProtectedRoute allowedRoles={["admin"]}  element={<AdminLayout><ClientManagement /></AdminLayout>} />}/>
           <Route path="/vendors" element={<ProtectedRoute allowedRoles={["admin"]}  element={<AdminLayout><VendorManagement /></AdminLayout>} />}/>
           <Route path="/vendor-verification" element={<ProtectedRoute allowedRoles={["admin"]}  element={<AdminLayout><VendorVerification /></AdminLayout>} />}/>
-          <Route path="/buildings" element={<ProtectedRoute allowedRoles={["admin"]}  element={<AdminLayout><BuildingVerification /></AdminLayout>} />}/>
+          <Route path="/building-verification" element={<ProtectedRoute allowedRoles={["admin"]}  element={<AdminLayout><BuildingVerification /></AdminLayout>} />}/>
+          <Route path="/buildings" element={<ProtectedRoute allowedRoles={["admin"]}  element={<AdminLayout><BuildingManagement /></AdminLayout>} />}/>
           <Route path="/wallet" element={<ProtectedRoute allowedRoles={["admin"]}  element={<AdminLayout><AdminWalletPage /></AdminLayout>} />}/>
           <Route path="/bookings" element={<ProtectedRoute allowedRoles={["admin"]}  element={<AdminLayout><AdminBookingsPage /></AdminLayout>} />}/>
     </Routes>

@@ -10,6 +10,7 @@ export interface VendorHomeData {
   };
   completedBookings: Array<{
     _id: string;
+    bookingId: string;
     clientId: string;
     spaceId: string;
     buildingId: string;
