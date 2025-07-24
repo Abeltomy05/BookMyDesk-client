@@ -31,6 +31,7 @@ const sidebarItems = [
   { icon: ShoppingBag, label: "Vendors", route: "/admin/vendors" },
   { icon: ShieldCheck, label: "Vendor Verification", route: "/admin/vendor-verification" },
   { icon: Briefcase, label: "Buildings & Spaces", route: "/admin/buildings" },
+  { icon: Briefcase, label: "Buildings Verification", route: "/admin/building-verification" },
   { icon: Calendar, label: "Bookings", route: "/admin/bookings" },
   { icon: DollarSign, label: "Wallet", route: "/admin/wallet" },
 ]

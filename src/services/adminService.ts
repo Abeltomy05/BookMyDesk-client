@@ -1,5 +1,6 @@
 import { adminAxiosInstance } from "@/api/admin.axios";
 import authAxiosInstance from "@/api/auth.axios";
+import type { AllBuildingsData } from "@/pages/admin/sub-pages/BuildingListing";
 import type { NotificationResponse } from "@/types/notification.type";
 import { getErrorMessage } from "@/utils/errors/errorHandler";
 
@@ -34,6 +35,15 @@ interface GetAllUsersResponse {
   totalPages: number;
   currentPage: number;
   message?: string
+}
+
+interface GetAllBuildingResponse{
+  success: boolean;
+  buildings: AllBuildingsData[];
+  totalPages: number;
+  currentPage: number;
+  totalItems?: number;
+  message?: string;
 }
 
 interface VendorData {
@@ -289,6 +299,30 @@ export const adminService = {
             message: getErrorMessage(error),
          };
    }
-  }  
+  },
+
+  getAllBuildings: async(params:{ page?: number; limit?: number; search?: string; status?:string}):Promise<GetAllBuildingResponse>=>{
+    try {
+      const response = await adminAxiosInstance.get("/get-every-building",{
+        params: {
+          page: params.page,
+          limit: params.limit,
+          search: params.search,
+          status: params.status,
+        },
+      })
+      return response.data;
+    } catch (error:unknown) {
+      console.error('Error getting monthly stats:', error);
+        return {
+            success: false,
+            message: getErrorMessage(error),
+            buildings:[],
+            totalPages: 0,
+            currentPage: 0,
+            totalItems: 0,
+         };
+    }
+  }
 
 }

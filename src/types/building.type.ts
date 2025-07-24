@@ -63,5 +63,5 @@ export interface BuildingRegistrationData {
   }>;
 }
 
-// BuildingDetails 
+export type BuildingStatus = "pending" | "approved" | "archived" | "rejected"
 
