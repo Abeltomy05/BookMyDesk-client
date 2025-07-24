@@ -116,7 +116,13 @@ const [totalItems, setTotalItems] = useState(0)
   const fetchBookings = async () => {
   setLoading(true)
   try {
-   const params: any = {
+   const params: {
+    page: number, 
+    limit: number, 
+    vendorId?: string,
+    buildingId?: string,
+    status?: string;
+  } = {
       page: currentPage,
       limit: itemsPerPage,
     }
@@ -143,9 +149,7 @@ const [totalItems, setTotalItems] = useState(0)
   } catch (error) {
     console.error('Error fetching bookings:', error)
   } finally {
-    setTimeout(()=>{
       setLoading(false);
-    },2000)
   }
 }
 

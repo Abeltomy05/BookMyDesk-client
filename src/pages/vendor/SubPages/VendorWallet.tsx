@@ -6,7 +6,6 @@ import { vendorService } from '@/services/vendorServices'
 const VendorWalletPage: React.FC = () => {
   return (
     <VendorLayout
-      notificationCount={5}
       backgroundClass="bg-black"
     >
     <div className='mt-13'>

@@ -5,6 +5,7 @@ import toast from "react-hot-toast"
 import { uploadImageCloudinary } from "@/utils/cloudinary/cloudinary"
 import { vendorService } from "@/services/vendorServices"
 import { validateVendorProfileForm, validatePasswordForm, type PasswordErrors, type VendorProfileErrors } from "@/utils/validations/profile-update.validation"
+import { getErrorMessage } from "@/utils/errors/errorHandler"
 
 interface ProfileData {
   username: string
@@ -212,10 +213,9 @@ const handleIdProofChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         }else{
           toast.error(response.message);
         }
-     } catch (error:any) {
+     } catch (error:unknown) {
        console.error("Error changing password:", error);
-        const errorMessage = error.response?.data?.message;
-         toast.error(errorMessage);
+       toast.error(getErrorMessage(error));
      }
   }
 
@@ -236,7 +236,6 @@ const handleIdProofChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 
   return (
      <VendorLayout
-      notificationCount={5}
       backgroundClass="bg-black"
     >
     <div className="min-h-screen bg-gray-50">

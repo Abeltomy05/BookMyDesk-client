@@ -1,24 +1,112 @@
+import { vendorService } from '@/services/vendorServices';
 import { motion } from 'framer-motion';
 import { Bell, Menu } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import NotificationsComponent from '../ReusableComponents/NotificationTab';
+import type { IVendor } from '@/types/user.type';
+import notificationSocketService from '@/services/socketService/notificationSocketService';
 
 interface VendorNavbarProps {
   onMenuClick: () => void;
-  notificationCount?: number;
   logoUrl?: string;
   className?: string;
+  user: IVendor | null;
   backgroundClass?: string; 
 }
 
 const VendorNavbar: React.FC<VendorNavbarProps> = ({
   onMenuClick,
-  notificationCount = 0,
   logoUrl = "https://res.cloudinary.com/dnivctodr/image/upload/v1748161273/BMS-logo_hcz5ww.png",
   className = "",
+  user,
   backgroundClass
 }) => {
-
+  const [showNotificationTooltip, setShowNotificationTooltip] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const notificationRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const limit = 3;
+
+  useEffect(() => {
+  if (!user?._id) return;
+
+  notificationSocketService.connect(user._id, 'vendor'); 
+
+  notificationSocketService.onNotification(() => {
+    setUnreadCount((prev) => prev + 1);
+  });
+
+  const fetchInitialUnreadCount = async () => {
+    try {
+      const response = await vendorService.getNotifications(1, limit, "unread");
+      if (response.success && response.data?.unreadCount) {
+        setUnreadCount(response.data.unreadCount);
+      }
+    } catch (error) {
+      console.error("Failed to fetch initial unread count", error);
+    }
+  };
+
+  fetchInitialUnreadCount();
+
+
+  return () => {
+    notificationSocketService.removeAllListeners();
+    notificationSocketService.disconnect();
+  };
+}, [user?._id]);
+
+
+  const fetchNotificationsFromVendor = async (page: number, filter: "unread" | "all") => {
+  const response = await vendorService.getNotifications(page, limit, filter);
+  if (!response.success || !response.data) {
+    toast.error("Failed to fetch notifications");
+    return {
+      items: [],
+      totalCount: 0,
+      unreadCount: 0,
+      hasMore: false,
+    };
+  }
+
+  return {
+    items: response.data.items || [],
+    totalCount: response.data.totalCount || 0,
+    unreadCount: response.data.unreadCount || 0,
+    hasMore: response.data.hasMore || false,
+  };
+  };
+
+const handleMarkAsRead = async (id: string): Promise<{ success: boolean }> => {
+ try {
+    const response = await vendorService.markAsRead(id);
+    if (response?.success) {
+      setUnreadCount((prev) => prev - 1);
+      return { success: true };
+    } else {
+      toast.error("Something went wrong!");
+      return { success: false };
+    }
+  } catch (error) {
+    console.error("Error marking as read:", error);
+    toast.error("Something went wrong!");
+    return { success: false };
+  }
+};
+
+  useEffect(() => {
+  const handleClickOutside = (event: MouseEvent) => {
+    if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
+      setShowNotifications(false);
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => document.removeEventListener("mousedown", handleClickOutside);
+}, []);
 
   return (
     <motion.nav
@@ -50,28 +138,38 @@ const VendorNavbar: React.FC<VendorNavbarProps> = ({
             className="flex items-center space-x-4"
           >
             {/* Notification Icon */}
-            <motion.button 
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              className="relative p-2 rounded-full text-white hover:text-black hover:bg-gray-100 transition-colors duration-200"
+            <div
+              className="relative"
+              ref={notificationRef}
+              onMouseEnter={() => setShowNotificationTooltip(true)}
+              onMouseLeave={() => setShowNotificationTooltip(false)}
             >
-              <Bell className="w-6 h-6" />
-              {notificationCount > 0 && (
-                <motion.span 
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                  className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
-                >
-                  <motion.span
-                    animate={{ scale: [1, 1.2, 1] }}
-                    transition={{ repeat: Infinity, duration: 2 }}
-                  >
-                    {notificationCount}
-                  </motion.span>
-                </motion.span>
+              <Bell
+              size={24}
+              className="text-white cursor-pointer transition-transform duration-300 hover:scale-110 hover:text-[#f69938]"
+              onClick={() => setShowNotifications(!showNotifications)}
+            />
+            {unreadCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            )}
+
+              {showNotificationTooltip && !showNotifications && (
+                <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                  Notifications
+                </div>
               )}
-            </motion.button>
+
+            {showNotifications && (
+              <div className="absolute right-0 mt-4 w-[350px] max-h-[500px] z-50">
+                <NotificationsComponent 
+                fetchNotifications={fetchNotificationsFromVendor} 
+                markAsRead={handleMarkAsRead} 
+                />
+              </div>
+            )}
+          </div>
 
             {/* Menu Icon */}
             <motion.button

@@ -33,6 +33,10 @@ export interface VendorHomeData {
       }
     }
   }>;
+  buildingIdsAndName:{
+    _id: string,
+    name: string,
+  }[];
 }
 
 //revenur chart component

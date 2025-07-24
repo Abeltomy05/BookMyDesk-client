@@ -11,6 +11,7 @@ import { vendorService } from "@/services/vendorServices"
 import toast from "react-hot-toast"
 import { useNavigate } from "react-router-dom"
 import Loading from "@/components/Loadings/Loading"
+import { getErrorMessage } from "@/utils/errors/errorHandler"
 
 export default function RegisterBuilding() {
   const navigate = useNavigate();
@@ -140,9 +141,9 @@ export default function RegisterBuilding() {
       }else{
         toast.error(response.message || "Registration Failed")
       }
-    } catch (error:any) {
+    } catch (error:unknown) {
        console.error('Registration error:', error);
-    toast.error(error?.response?.data?.message || "An error occurred during registration");
+    toast.error(getErrorMessage(error) || "An error occurred during registration");
     }finally {
     setIsLoading(false);
   }
@@ -193,7 +194,6 @@ export default function RegisterBuilding() {
     {/* {isLoading && <Loading/>} */}
 
   <VendorLayout
-     notificationCount={5}
       backgroundClass="bg-black"
     >
     <div className="min-h-[calc(100vh-4rem)] bg-gray-50 py-4">

@@ -371,7 +371,7 @@ const ReusableSignup: React.FC<ReusableSignupProps> = ({ config }) => {
 
     if (field.isPassword) {
       return (
-        <div key={field.name} className={field.gridSpan === 'full' ? 'col-span-full' : 'relative'}>
+        <div key={field.name} className={`relative ${field.gridSpan === 'full' ? 'col-span-full' : ''} group`}>
           <FloatingLabelInput
             id={field.name}
             name={field.name}

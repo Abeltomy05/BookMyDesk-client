@@ -1,4 +1,4 @@
-import { Phone, Mail, Car, Bike, TreePine, Waves, Dumbbell, Coffee, Wifi, Wind, AlertCircle } from "lucide-react"
+import { Phone, Mail, Car, Bike, TreePine, Waves, Dumbbell, Coffee, Wifi, Wind, AlertCircle, Printer, Users, Video, Shield, Zap, BookOpen, Calendar, Headphones } from "lucide-react"
 import type { Facilities, ContactInfo } from "@/types/building-form.type"
 import { validateContactInfo, getContactFieldError, hasContactFieldError, type ContactValidationErrors } from "@/utils/validations/facilities-register-building.validation"
 import { useEffect, useState } from "react"
@@ -20,6 +20,7 @@ export function FacilitiesContactStep({
 }: FacilitiesContactStepProps) {
   const [errors, setErrors] = useState<ContactValidationErrors>({})
   const [touched, setTouched] = useState<Record<string, boolean>>({})
+  const [showAllFacilities, setShowAllFacilities] = useState(false)
 
   // Validation effect
   useEffect(() => {
@@ -28,15 +29,26 @@ export function FacilitiesContactStep({
     onValidationChange?.(validationResult.isValid)
   }, [contactInfo, onValidationChange])
 
-  const facilityOptions = [
-    { key: "bicycleParking", label: "Bicycle Parking", icon: Bike },
-    { key: "normalParking", label: "Parking Lot", icon: Car },
-    { key: "garden", label: "Garden", icon: TreePine },
-    { key: "swimmingPool", label: "Pool", icon: Waves },
-    { key: "gym", label: "Gym", icon: Dumbbell },
-    { key: "cafeteria", label: "Cafeteria", icon: Coffee },
-    { key: "wifi", label: "WiFi", icon: Wifi },
-    { key: "airConditioning", label: "AC", icon: Wind },
+  const basicFacilityOptions = [
+    { key: "Bicycle Parking", label: "Bicycle Parking", icon: Bike },
+    { key: "Normal Parking", label: "Normal Parking", icon: Car },
+    { key: "Garden", label: "Garden", icon: TreePine },
+    { key: "Pool", label: "Pool", icon: Waves },
+    { key: "Gym", label: "Gym", icon: Dumbbell },
+    { key: "Cafeteria", label: "Cafeteria", icon: Coffee },
+    { key: "WiFi", label: "WiFi", icon: Wifi },
+    { key: "AC", label: "AC", icon: Wind },
+  ]
+
+  const additionalFacilityOptions = [
+    { key: "Printing Services", label: "Printing Services", icon: Printer },
+    { key: "Wheel Chair", label: "Wheel Chair", icon: Users },
+    { key: "Video Conferencing", label: "Video Conferencing", icon: Video },
+    { key: "Security", label: "Security", icon: Shield },
+    { key: "Power Backup", label: "Power Backup", icon: Zap },
+    { key: "Library", label: "Library", icon: BookOpen },
+    { key: "Event Space", label: "Event Space", icon: Calendar },
+    { key: "Phone Booth", label: "Phone Booth", icon: Headphones },
   ]
 
   const handleFacilityChange = (key: keyof Facilities, checked: boolean) => {
@@ -60,6 +72,38 @@ export function FacilitiesContactStep({
     return shouldShowError(fieldName) ? getContactFieldError(errors, fieldName) : undefined
   }
 
+  const renderFacilityOption = ({ key, label, icon: Icon }: { key: string; label: string; icon: any }) => (
+    <div
+      key={key}
+      className={`p-2 border rounded-lg cursor-pointer transition-all text-center ${
+        facilities[key as keyof Facilities]
+          ? "border-[#f69938] bg-orange-50"
+          : "border-gray-200 hover:border-gray-300"
+      }`}
+      onClick={() => handleFacilityChange(key as keyof Facilities, !facilities[key as keyof Facilities])}
+    >
+      <Icon
+        className={`w-5 h-5 mx-auto mb-1 ${
+          facilities[key as keyof Facilities] ? "text-[#f69938]" : "text-gray-400"
+        }`}
+      />
+      <span
+        className={`text-xs font-medium block ${
+          facilities[key as keyof Facilities] ? "text-[#f69938]" : "text-gray-600"
+        }`}
+      >
+        {label}
+      </span>
+      <input
+        type="checkbox"
+        checked={facilities[key as keyof Facilities]}
+        onChange={() => {}}
+        className="mt-1 w-3 h-3 text-[#f69938] border-gray-300 rounded focus:ring-[#f69938]"
+      />
+    </div>
+  )
+
+
   return (
     <div className="space-y-4">
       {/* Compact Header */}
@@ -77,37 +121,39 @@ export function FacilitiesContactStep({
         <div>
           <h3 className="text-base font-medium text-gray-900 mb-3">Available Facilities</h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-            {facilityOptions.map(({ key, label, icon: Icon }) => (
-              <div
-                key={key}
-                className={`p-2 border rounded-lg cursor-pointer transition-all text-center ${
-                  facilities[key as keyof Facilities]
-                    ? "border-[#f69938] bg-orange-50"
-                    : "border-gray-200 hover:border-gray-300"
-                }`}
-                onClick={() => handleFacilityChange(key as keyof Facilities, !facilities[key as keyof Facilities])}
-              >
-                <Icon
-                  className={`w-5 h-5 mx-auto mb-1 ${
-                    facilities[key as keyof Facilities] ? "text-[#f69938]" : "text-gray-400"
-                  }`}
-                />
-                <span
-                  className={`text-xs font-medium block ${
-                    facilities[key as keyof Facilities] ? "text-[#f69938]" : "text-gray-600"
-                  }`}
-                >
-                  {label}
-                </span>
-                <input
-                  type="checkbox"
-                  checked={facilities[key as keyof Facilities]}
-                  onChange={() => {}}
-                  className="mt-1 w-3 h-3 text-[#f69938] border-gray-300 rounded focus:ring-[#f69938]"
-                />
-              </div>
-            ))}
+            {basicFacilityOptions.map(renderFacilityOption)}
           </div>
+
+          {!showAllFacilities && (
+            <div className="text-center mt-3">
+              <button
+                type="button"
+                onClick={() => setShowAllFacilities(true)}
+                className="text-[#f69938] hover:text-orange-600 text-sm font-medium underline focus:outline-none focus:ring-2 focus:ring-[#f69938] focus:ring-offset-2 rounded"
+              >
+                View More
+              </button>
+            </div>
+          )}
+
+           {showAllFacilities && (
+            <div className="mt-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                {additionalFacilityOptions.map(renderFacilityOption)}
+              </div>
+              
+              {/* Show Less Link */}
+              <div className="text-center mt-3">
+                <button
+                  type="button"
+                  onClick={() => setShowAllFacilities(false)}
+                  className="text-gray-600 hover:text-gray-700 text-sm font-medium underline focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 rounded"
+                >
+                  Show Less
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Contact Information Section */}

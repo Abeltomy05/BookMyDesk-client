@@ -4,12 +4,12 @@ import { Home, ShoppingBag, Calendar, FileText, Wallet, MessageSquare, Settings,
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  activeItem?: string;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, activeItem = "home" }) => {
   const sidebarRef = useRef<HTMLDivElement>(null);
 
-  // Handle clicks outside the sidebar to close it
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -27,7 +27,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     };
   }, [isOpen, onClose]);
 
-  // Prevent body scrolling when sidebar is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -39,7 +38,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     };
   }, [isOpen]);
 
-  return (
+ const getMenuItemClasses = (itemKey: string) => {
+    const baseClasses = "flex items-center px-4 py-3 transition-colors duration-200 rounded-r-full mb-1";
+    const activeClasses = "text-white bg-[#f69938]";
+    const inactiveClasses = "text-gray-400 hover:text-white hover:bg-gray-800";
+    
+    return `${baseClasses} ${activeItem === itemKey ? activeClasses : inactiveClasses}`;
+  };
+
+ return (
     <>
       <div
         className={`fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300 ${
@@ -63,11 +70,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
               alt="BookMyDesk"
               className="h-15"
             />
-            {/* <span className="ml-2 text-xl font-bold">Trimly</span> */}
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors duration-200 "
+            className="text-gray-400 hover:text-white transition-colors duration-200"
           >
             <X size={20} />
           </button>
@@ -79,7 +85,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             <li>
               <a
                 href="/home"
-                className="flex items-center px-4 py-3 text-white bg-[#f69938] rounded-r-full mb-1"
+                className={getMenuItemClasses("home")}
               >
                 <Home className="mr-3" size={20} />
                 <span>Home</span>
@@ -88,7 +94,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             <li>
               <a
                 href="/buildings"
-                className="flex items-center px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 transition-colors duration-200 rounded-r-full mb-1"
+                className={getMenuItemClasses("buildings")}
               >
                 <ShoppingBag className="mr-3" size={20} />
                 <span>Buildings</span>
@@ -97,7 +103,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             <li>
               <a
                 href="/bookings"
-                className="flex items-center px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 transition-colors duration-200 rounded-r-full mb-1"
+                className={getMenuItemClasses("bookings")}
               >
                 <Calendar className="mr-3" size={20} />
                 <span>My Bookings</span>
@@ -105,17 +111,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             </li>
             <li>
               <a
-                href="#"
-                className="flex items-center px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 transition-colors duration-200 rounded-r-full mb-1"
-              >
-                <FileText className="mr-3" size={20} />
-                <span>Feed</span>
-              </a>
-            </li>
-            <li>
-              <a
                 href="/wallet"
-                className="flex items-center px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 transition-colors duration-200 rounded-r-full mb-1"
+                className={getMenuItemClasses("wallet")}
               >
                 <Wallet className="mr-3" size={20} />
                 <span>Wallet</span>
@@ -123,20 +120,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             </li>
             <li>
               <a
-                href="#"
-                className="flex items-center px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 transition-colors duration-200 rounded-r-full mb-1"
+                href="/chat"
+                className={getMenuItemClasses("chat")}
               >
                 <MessageSquare className="mr-3" size={20} />
                 <span>Chat</span>
-              </a>
-            </li>
-            <li>
-              <a
-                href="#"
-                className="flex items-center px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 transition-colors duration-200 rounded-r-full mb-1"
-              >
-                <Settings className="mr-3" size={20} />
-                <span>Settings</span>
               </a>
             </li>
           </ul>

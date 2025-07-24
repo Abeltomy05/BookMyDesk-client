@@ -3,6 +3,11 @@ import { clientAxiosInstance } from "@/api/client.axios";
 import type { UserProfile } from "@/pages/client/SubPages/ClientProfile";
 import type { BookingData } from "@/types/booking.type";
 import type { LoginData } from "./adminService";
+import type { NotificationResponse } from "@/types/notification.type";
+import { getErrorMessage } from "@/utils/errors/errorHandler";
+import jsPDF from 'jspdf'
+import { formatDate } from "@/utils/formatters/date"; 
+import { formatCurrency } from "@/utils/formatters/currency"
 
 interface ApiResponse {
   success: boolean;
@@ -47,15 +52,11 @@ export const clientService = {
     try {
        const response = await authAxiosInstance.post('/send-otp', { email });
        return response.data;
-    } catch (error:any) {
-      console.error('Error sending OTP:', error);
-          if (error.response && error.response.data) {
-                return error.response.data
-          }
-        return {
-            success: false,
-            message: "Failed to connect to server"
-          }
+    } catch (error:unknown) {
+       return {
+          success: false,
+          message: getErrorMessage(error),
+        };
     }
   },
 
@@ -63,11 +64,10 @@ export const clientService = {
     try {
        const response = await authAxiosInstance.post('/verify-otp', { email, otp });
        return response.data;
-    } catch (error) {
-      console.error('Error verifying OTP:', error);
+    } catch (error:unknown) {
       return {
         success: false,
-        message: 'The OTP you entered is incorrect or has expired. Please try again or request a new OTP.',
+        message: getErrorMessage(error),
       };
     }
   },
@@ -76,12 +76,11 @@ export const clientService = {
       try {
       const response = await authAxiosInstance.post('/signup', signupData);
       return response.data;
-    } catch (error) {
-      console.error('Error signing up:', error);
-      return {
-        success: false,
-        message: 'Failed to create account',
-      };
+    } catch (error:unknown) {
+       return {
+          success: false,
+          message: getErrorMessage(error),
+        };
     }
   },
 
@@ -90,12 +89,10 @@ export const clientService = {
       const response = await authAxiosInstance.post('/login', data);
       console.log(response.data);
       return response.data;
-    } catch (error:any) {
-      console.error('Error logging in:', error);
-      const message = error.response?.data?.message || "Something went wrong. Please try again.";
+    } catch (error:unknown) {
       return {
         success: false,
-        message,
+        message: getErrorMessage(error),
       };
     }
   },
@@ -106,14 +103,10 @@ export const clientService = {
         email
       });
       return response.data;
-    } catch (error: any) {
-      console.error('Error requesting password reset:', error);
-      if (error.response && error.response.data) {
-        return error.response.data;
-      }
+    } catch (error: unknown) {
       return {
         success: false,
-        message: 'Failed to send password reset email',
+        message: getErrorMessage(error),
       };
     }
   },
@@ -125,22 +118,10 @@ export const clientService = {
         password
       });
       return response.data;
-    } catch (error: any) {
-      console.error('Error resetting password:', error);
-      if (error.response && error.response.data) {
-        return error.response.data;
-      }
-
-       if (error.message?.toLowerCase().includes('token')) {
-        return {
-          success: false,
-          message: 'Invalid or expired token. Please request a new password reset link.',
-        };
-      }
-      
+    } catch (error: unknown) {
       return {
         success: false,
-        message: 'Failed to reset password. Please try again later.',
+        message: getErrorMessage(error),
       };
     }
   },
@@ -154,12 +135,11 @@ export const clientService = {
      try {
       const response = await authAxiosInstance.get("/me");
       return response.data
-     } catch (error) {
-      console.error('Error geting user data:', error);
-      return {
-        success: false,
-        message: 'User not found',
-      };
+     } catch (error:unknown) {
+       return {
+          success: false,
+          message: getErrorMessage(error),
+        };
      }
   },
 
@@ -167,11 +147,10 @@ export const clientService = {
    try {
       const response = await clientAxiosInstance.get("/get-user-data");
       return response.data
-     } catch (error) {
-      console.error('Error geting user data:', error);
+     } catch (error:unknown) {
       return {
         success: false,
-        message: 'User not found',
+        message: getErrorMessage(error),
       };
      }
   },
@@ -180,11 +159,10 @@ export const clientService = {
     try {
       const response = await clientAxiosInstance.put("/update-profile", data);
       return response.data;
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      return {
+    } catch (error:unknown) {
+       return {
         success: false,
-        message: 'Failed to update profile',
+        message: getErrorMessage(error),
       };
     }
   },
@@ -196,13 +174,11 @@ export const clientService = {
         newPassword
       });
       return response.data;
-    } catch (error:any) {
-      console.error('Error updating password:', error);
-      const message = error.response?.data?.message || 'Failed to update password';
-      return {
-        success: false,
-        message,
-      };
+    } catch (error:unknown) {
+       return {
+          success: false,
+          message: getErrorMessage(error),
+        };
     }
   },
 
@@ -213,20 +189,41 @@ export const clientService = {
     locationName?: string;
     type?: string;
     priceRange?: string;
+    latitude?: string,
+    longitude?: string,
+    radius?: string,
+    amenities?: string[];
+    amenityMatchMode?: 'any' | 'all';
   }
   ): Promise<ApiResponseWithPagination>=>{
     try {
       const response = await clientAxiosInstance.get("/list-buildings",{
-         params: { page, limit, locationName: filters.locationName,  type: filters.type,  priceRange: filters.priceRange,},
+         params: { 
+          page, limit, locationName: filters.locationName,  
+          type: filters.type,  priceRange: filters.priceRange, 
+          latitude: filters.latitude, longitude: filters.longitude, 
+          radius: filters.radius, amenities: filters.amenities ? JSON.stringify(filters.amenities) : undefined,
+          amenityMatchMode: filters.amenityMatchMode,
+        },
       });
       return response.data;
-    } catch (error: any) {
-    console.error("Error fetching buildings:", error);
-
-    return {
+    } catch (error: unknown) {
+     return {
       success: false,
-      message: error?.response?.data?.message || "Something went wrong while fetching buildings",
+      message: getErrorMessage(error),
     };
+  }
+  },
+
+  fetchFilters: async(): Promise<ApiResponse> => {
+  try {
+    const response = await clientAxiosInstance.get("/fetch-filters");
+    return response.data;
+  } catch (error:unknown) {
+    return {
+        success: false,
+        message: getErrorMessage(error),
+      };
   }
   },
 
@@ -237,20 +234,11 @@ export const clientService = {
       const id = buildingId;
       const response = await clientAxiosInstance.get(`/building/${id}`);
       return response.data;
-     } catch (error:any) {
-       console.error('get  building  detail error:', error);
-     if (error.response) {
-       return {
-          success: false,
-          message: error.response.data?.message || 'Server error occurred',
-          data: error.response.data
-        };
-  }else{
-     return {
-          success: false,
-          message: 'An unexpected error occurred'
-        };
-    }
+     } catch (error:unknown) {
+      return {
+        success: false,
+        message: getErrorMessage(error),
+      };
      }
   },
 
@@ -260,20 +248,11 @@ export const clientService = {
     try {
       const response = await clientAxiosInstance.get(`/get-booking-page-data/${spaceId}`);
       return response.data;
-    } catch (error:any) {
-       console.error('get  booking page details error:', error);
-     if (error.response) {
+    } catch (error:unknown) {
        return {
           success: false,
-          message: error.response.data?.message || 'Server error occurred',
-          data: error.response.data
+          message: getErrorMessage(error),
         };
-  }else{
-     return {
-          success: false,
-          message: 'An unexpected error occurred'
-        };
-    }
     }
   },
 
@@ -291,20 +270,11 @@ export const clientService = {
     try {
       const response = await clientAxiosInstance.post('/create-payment-intent', data);
       return response.data;
-    } catch (error:any) {
-       console.error('create payment intent error:', error);
-     if (error.response) {
+    } catch (error:unknown) {
        return {
-          success: false,
-          message: error.response.data?.message || 'Server error occurred',
-          data: error.response.data
-        };
-      }else{
-        return {
-              success: false,
-              message: 'An unexpected error occurred in create payment intent'
-            };
-        }
+        success: false,
+        message: getErrorMessage(error),
+      };
     }
   },
 
@@ -314,20 +284,11 @@ export const clientService = {
       try {
         const response = await clientAxiosInstance.post('/confirm-payment', data);
         return response.data;
-      } catch (error:any) {
-        console.error('confirm payment error:', error);
-        if (error.response) {
-          return {
-              success: false,
-              message: error.response.data?.message || 'Server error occurred',
-              data: error.response.data
-            };0
-          }else{
-            return {
-                  success: false,
-                  message: 'An unexpected error occurred in confirm payment'
-                };
-            }
+      } catch (error:unknown) {
+         return {
+          success: false,
+          message: getErrorMessage(error),
+        };
       }
   },
 
@@ -339,20 +300,11 @@ export const clientService = {
         params: { page, limit, search, ...(status && { status }) }
       })
       return response.data;
-     } catch (error:any) {
-      console.error('Error fetching bookings:', error);
-      if (error.response) {
-        return {
-          success: false,
-          message: error.response.data?.message || 'Server error occurred',
-          data: error.response.data
-        };
-      } else {
-        return {
-          success: false,
-          message: 'An unexpected error occurred while fetching bookings'
-        };
-      }
+     } catch (error:unknown) {
+      return {
+        success: false,
+        message: getErrorMessage(error),
+      };
      }
   },
 
@@ -360,20 +312,11 @@ export const clientService = {
     try {
       const response = await clientAxiosInstance.get(`/get-booking-details/${bookingId}`);
       return response.data;
-    } catch (error:any) {
-      console.error('Error fetching bookings:', error);
-      if (error.response) {
-        return {
-          success: false,
-          message: error.response.data?.message || 'Server error occurred',
-          data: error.response.data
-        };
-      } else {
-        return {
-          success: false,
-          message: 'An unexpected error occurred while fetching bookings'
-        };
-      }
+    } catch (error:unknown) {
+      return {
+      success: false,
+      message: getErrorMessage(error),
+    };
     }
   },
 
@@ -384,12 +327,11 @@ export const clientService = {
         bookingId
        });
       return response.data;
-     } catch (error) {
-      console.error('Error cancelling booking:', error);
-      return {
-        success: false,
-        message: 'Failed to cancel booking. Please try again later.',
-      };
+     } catch (error:unknown) {
+       return {
+          success: false,
+          message: getErrorMessage(error),
+        };
      }
   },
 
@@ -401,11 +343,10 @@ export const clientService = {
         params:{page,limit}
        });
        return response.data;
-    } catch (error:any) {
-      console.error('Error fetching wallet details:', error);
-      return {
+    } catch (error:unknown) {
+       return {
         success: false,
-        message: error.message || 'Failed to fetch wallet details. Please try again later.',
+        message: getErrorMessage(error),
       };
     }
   },
@@ -420,12 +361,10 @@ export const clientService = {
         discountAmount
       })
       return response.data;
-    } catch (error:any) {
-      console.error('Error booking with wallet:', error);
-       const message = error.response?.data?.message || error.message || "Unknown error occurred";
+    } catch (error:unknown) {
       return {
         success: false,
-        message,
+        message: getErrorMessage(error),
       };
     }
   },
@@ -436,13 +375,11 @@ export const clientService = {
     try {
       const response = await clientAxiosInstance.post('/create-topup-payment-intent',{amount,currency});
       return response.data;
-    } catch (error:any) {
-       console.error('Error creating payment intent:', error);
-       const message = error.response?.data?.message || error.message || "Unknown error occurred";
-      return {
-        success: false,
-        message,
-      };
+    } catch (error:unknown) {
+        return {
+          success: false,
+          message: getErrorMessage(error),
+        };
     }
   },
 
@@ -450,27 +387,256 @@ export const clientService = {
     try {
        const response = await clientAxiosInstance.post("/confirm-topup-payment",{ paymentIntentId });
        return response.data;
-    } catch (error:any) {
-        console.error('Error confirm topup payment intent:', error);
-       const message = error.response?.data?.message || error.message || "Unknown error occurred";
-      return {
-        success: false,
-        message,
-      };
+    } catch (error:unknown) {
+        return {
+      success: false,
+      message: getErrorMessage(error),
+    };
     }
   },
 
+  getNotifications: async(page:number,limit:number,filter: "unread" | "all"):Promise<{ success: boolean, data?: NotificationResponse, message?: string}>=>{
+    try {
+      const response = await clientAxiosInstance.get("/get-notifications",{
+        params:{
+          page,
+          limit,
+          filter,
+        }
+      })
+      const data = response.data.data;
+        return {
+          success: true,
+          data: {
+            items: data.items,
+            totalCount: data.totalCount,
+            unreadCount: data.unreadCount,
+            hasMore: (page + 1) * limit < data.totalCount,
+          },
+        };
+    } catch (error:unknown) {
+        return {
+      success: false,
+      message: getErrorMessage(error),
+    };
+    }
+  },
 
+markAsRead: async(id:string):Promise<ApiResponse>=>{
+  try {
+     const response = await clientAxiosInstance.patch(`/mark-as-read/${id}`);
+     return response.data;
+  } catch (error:unknown) {
+      return {
+      success: false,
+      message: getErrorMessage(error),
+    };
+  }
+},
 
-  logout: async():Promise<ApiResponse>=>{
+//chat related
+createSession: async({buildingId}:{buildingId:string}):Promise<ApiResponse>=>{
+ try {
+    const response = await clientAxiosInstance.post('/create-session',{
+      buildingId,
+    });
+    return response.data;
+ } catch (error:unknown) {
+   return {
+      success: false,
+      message: getErrorMessage(error),
+    };
+ }
+},
+
+handleDownloadInvoice : async(booking:BookingData, user?:{username?:string,email?:string,location?:string}):Promise<{success:true}>=>{
+  const doc = new jsPDF();
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const margin = 20;
+  let yPosition = 30;
+
+  // Header
+  doc.setFontSize(24);
+  doc.setFont('helvetica', 'bold');
+  doc.text('BOOK MY DESK', pageWidth / 2, yPosition, { align: 'center' });
+  
+  yPosition += 10;
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Invoice', pageWidth / 2, yPosition, { align: 'center' });
+  
+  yPosition += 20;
+  
+  // Invoice details
+  doc.setFontSize(10);
+  doc.text(`Invoice Date: ${formatDate(new Date())}`, margin, yPosition);
+  doc.text(`Booking ID: ${booking._id}`, pageWidth - margin - 60, yPosition);
+  
+  yPosition += 15;
+  
+  // Client Details Section
+  doc.setFontSize(14);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Client Details', margin, yPosition);
+  yPosition += 10;
+  
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Name: ${user?.username || 'N/A'}`, margin, yPosition);
+  yPosition += 6;
+  doc.text(`Email: ${user?.email || 'N/A'}`, margin, yPosition);
+  yPosition += 6;
+  doc.text(`Location: ${user?.location || 'N/A'}`, margin, yPosition);
+  
+  yPosition += 15;
+  
+  // Booking Details Section
+  doc.setFontSize(14);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Booking Details', margin, yPosition);
+  yPosition += 10;
+  
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Space: ${booking.space?.name || 'N/A'}`, margin, yPosition);
+  yPosition += 6;
+  doc.text(`Building: ${booking.building?.buildingName || 'N/A'}`, margin, yPosition);
+  yPosition += 6;
+  doc.text(`Location: ${booking.building?.location?.name || 'N/A'}`, margin, yPosition);
+  yPosition += 6;
+  doc.text(`Booking Date: ${formatDate(booking.bookingDate)}`, margin, yPosition);
+  yPosition += 6;
+  doc.text(`Number of Desks: ${booking.numberOfDesks || 0}`, margin, yPosition);
+  yPosition += 6;
+  doc.text(`Status: ${booking.status}`, margin, yPosition);
+  
+  yPosition += 15;
+  
+  // Pricing Section
+  doc.setFontSize(14);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Pricing Breakdown', margin, yPosition);
+  yPosition += 10;
+  
+  // Table header
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Description', margin, yPosition);
+  doc.text('Amount', pageWidth - margin - 40, yPosition);
+  yPosition += 8;
+  
+  // Table separator line
+ doc.line(margin, yPosition - 4, pageWidth - margin, yPosition - 4);
+  
+  // Table content
+  doc.setFont('helvetica', 'normal');
+  const pricePerDay = ((booking.totalPrice ?? 0) + (booking.discountAmount ?? 0)) / (booking.numberOfDesks || 1);
+  
+  doc.text(`Price Per Day`, margin, yPosition);
+  doc.text(`${formatCurrency(pricePerDay)}`, pageWidth - margin - 40, yPosition);
+  yPosition += 6;
+  
+  doc.text(`Number of Desks (x${booking.numberOfDesks || 0})`, margin, yPosition);
+  doc.text(`${formatCurrency(pricePerDay * (booking.numberOfDesks || 0))}`, pageWidth - margin - 40, yPosition);
+  yPosition += 6;
+  
+  // Offer/Discount section
+  if (booking.discountAmount && booking.discountAmount > 0) {
+    doc.setTextColor(0, 128, 0); // Green color for discount
+    doc.text('Offer Applied (Discount)', margin, yPosition);
+    doc.text(`-${formatCurrency(booking.discountAmount)}`, pageWidth - margin - 40, yPosition);
+    doc.setTextColor(0, 0, 0); // Reset to black
+    yPosition += 6;
+  }
+  
+  // Total line
+  doc.line(margin, yPosition, pageWidth - margin, yPosition);
+  yPosition += 8;
+  
+  // Total amount
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Total Amount:', margin, yPosition);
+  doc.text(`${formatCurrency(booking.totalPrice ?? 0)}`, pageWidth - margin - 40, yPosition);
+  
+  yPosition += 15;
+  
+  // Payment Information
+  doc.setFontSize(14);
+  doc.text('Payment Information', margin, yPosition);
+  yPosition += 10;
+  
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Payment Method: ${booking.paymentMethod || 'N/A'}`, margin, yPosition);
+  yPosition += 6;
+  doc.text(`Transaction ID: ${booking.transactionId || 'N/A'}`, margin, yPosition);
+  yPosition += 6;
+  doc.text(`Order Created: ${formatDate(booking.createdAt)}`, margin, yPosition);
+  
+  // Footer
+  yPosition = doc.internal.pageSize.getHeight() - 30;
+  doc.setFontSize(8);
+  doc.setTextColor(128, 128, 128);
+  doc.text('Thank you for choosing Book My Desk!', pageWidth / 2, yPosition, { align: 'center' });
+  doc.text('For any queries, please contact our support team.', pageWidth / 2, yPosition + 8, { align: 'center' });
+  
+  // Save the PDF
+  doc.save(`invoice-${booking._id}.pdf`);
+  return {
+    success:true
+  }
+},
+
+getChats: async():Promise<ApiResponse>=>{
+ try {
+   const response = await clientAxiosInstance.get('/getChats');
+   return response.data;
+ } catch (error:unknown) {
+   return {
+      success: false,
+      message: getErrorMessage(error),
+    };
+ }
+},
+
+getChatMessages: async(sessionId:string):Promise<ApiResponse>=>{
+  try {
+    const response = await clientAxiosInstance.get('/messages',{
+      params:{
+        sessionId
+      }
+    })
+    return response.data;
+  } catch (error:unknown) {
+     return {
+      success: false,
+      message: getErrorMessage(error),
+    };
+  }
+},
+
+clearChat: async(sessionId: string):Promise<ApiResponse>=>{
+  try {
+    const response = await clientAxiosInstance.post('/clear-chat',{sessionId});
+    return response.data;
+  } catch (error:unknown) {
+      return {
+      success: false,
+      message: getErrorMessage(error),
+    };
+  }
+},
+
+logout: async():Promise<ApiResponse>=>{
     try {
       const response = await clientAxiosInstance.post("/logout");
       return response.data
-     } catch (error) {
+     } catch (error:unknown) {
       console.error('Error in logout:', error);
       return {
         success: false,
-        message: 'Logout Error',
+        message: getErrorMessage(error),
       };
      }
   }

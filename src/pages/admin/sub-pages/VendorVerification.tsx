@@ -11,14 +11,14 @@ import { GenericTable } from "@/components/ReusableComponents/GenericTable"
 import RejectionModal from "@/components/ReusableComponents/RejectionModal"
 import { adminService } from "@/services/adminService"
 import toast from "react-hot-toast"
-import type { TableColumn, TableAction } from "@/types/table.type"
+import type { TableColumn, TableAction, ExtendableItem } from "@/types/table.type"
 import type { FetchParams, ApiResponse } from "@/types/api.type"
 
 const ImageModal = lazy(() => import("@/components/ReusableComponents/ImageModal"))
 
 type VendorStatus = "approved" | "rejected" | "pending" 
 
-interface Vendor {
+interface Vendor extends ExtendableItem{
   _id: string
   username: string
   email: string

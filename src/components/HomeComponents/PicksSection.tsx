@@ -3,6 +3,7 @@ import type React from "react"
 import { useState, useEffect, useRef } from "react"
 import toast from "react-hot-toast"
 import { useSelector } from "react-redux"
+import { useNavigate } from "react-router-dom"
 
 interface PickCardProps {
   title: string
@@ -71,6 +72,8 @@ const PicksSection: React.FC = () => {
     const sectionRef = useRef<HTMLElement>(null)
     const [isSectionVisible, setIsSectionVisible] = useState(false)
 
+    const navigate = useNavigate();
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -98,7 +101,10 @@ const PicksSection: React.FC = () => {
     if(!user){
     toast("Please login to find best spaces", {
       icon: "🔍",})
+      return;
    }
+   navigate("/buildings")
+
   };
 
 

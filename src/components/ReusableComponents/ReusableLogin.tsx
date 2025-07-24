@@ -135,6 +135,7 @@ const ReusableLogin: React.FC<ReusableLoginProps> = ({ userType, config }) => {
           }
         const service = services[userType]
         const response = await service.login(data)
+        console.log(response.data)
         
         if (response.success) {
           toast.success("Login successful!")
@@ -147,6 +148,7 @@ const ReusableLogin: React.FC<ReusableLoginProps> = ({ userType, config }) => {
           setTimeout(() => {
             const loginAction = loginActions[userType]
             dispatch(loginAction(response.data))
+
             setIsLoading(false)
           }, 1000)
         } else {

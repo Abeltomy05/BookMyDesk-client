@@ -1,7 +1,7 @@
 import { useState, useRef } from "react"
 import { LightGenericTable } from "@/components/ReusableComponents/LightGenericTable" 
 import type { TableColumn, TableAction, TableFilter } from "@/types/table.type"
-import { Plus, Eye, Building2, Users, Calendar, MapPin, Archive } from "lucide-react"
+import { Plus, Eye, Building2, Users, Calendar, MapPin, Archive, MessageCircle } from "lucide-react"
 import type { ApiResponse, FetchParams } from "@/types/api.type"
 import VendorLayout from "../VendorLayout"
 import type {  Building } from "@/types/building.type"
@@ -210,6 +210,14 @@ export default function BuildingManagement() {
       refreshAfter: true,
       variant: "warning",
     },
+    {
+      label: "View Chats",
+      icon: <MessageCircle className="w-4 h-4" />,
+      onClick: (building) => {
+        navigate(`/vendor/chat/${building._id}`)
+      },
+       refreshAfter: false
+    },
   ]
 
   const filters: TableFilter[] = [
@@ -259,7 +267,6 @@ export default function BuildingManagement() {
 
   return (
     <VendorLayout
-      notificationCount={5}
       backgroundClass="bg-black"
     >
       <div className="min-h-screen bg-gray-50 p-4">

@@ -8,6 +8,7 @@ import type { BuildingData  } from "@/types/building-form.type";
 import MapSkeleton from "@/components/Skeletons/MapSkeleton";
 import BuildingDetailsPageSkeleton from "@/components/Skeletons/BuildingDetailsPageSkeleton";
 import OfferBadge from "@/components/OfferComponents/OfferBadge";
+import { getErrorMessage } from "@/utils/errors/errorHandler";
 const Map = lazy(()=> import("@/components/ReusableComponents/MapView"))
 const ImageModal = lazy(()=> import("@/components/ReusableComponents/ImageModal"))
 
@@ -41,9 +42,9 @@ export default function BuildingDetailsPage() {
                 }
                 
                 setBuildingData(response.data);
-            } catch (err: any) {
+            } catch (err: unknown) {
                 console.log(err);
-                toast.error(err.message || 'An error occurred while fetching building data');
+                toast.error(getErrorMessage(err));
             } finally {
                 setLoading(false);
             }
@@ -53,9 +54,9 @@ export default function BuildingDetailsPage() {
     }, [buildingId]);
 
     const amenityIcons: Record<string, { icon: any; label: string }> = {
-        normalParking: { icon: Car, label: "Parking Available" },
+        NormalParking: { icon: Car, label: "Parking Available" },
         cafeteria: { icon: Coffee, label: "Cafeteria" },
-        wifi: { icon: Wifi, label: "High-speed WiFi" },
+        wifi: { icon: Wifi, label: "WiFi" },
         printer: { icon: Printer, label: "Printer Access" },
         lockers: { icon: ShieldCheck, label: "Personal Lockers" },
         security: { icon: ShieldCheck, label: "24/7 Security" },

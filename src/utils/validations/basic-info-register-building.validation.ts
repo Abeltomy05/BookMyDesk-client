@@ -22,6 +22,7 @@ export interface ValidationResult {
   errors: ValidationErrors
 }
 
+
 const validateTimeRange = (openTime: string, closeTime: string): string | null => {
   if (!openTime || !closeTime) {
     return "Both open and close times are required"
@@ -138,11 +139,11 @@ export const validateBasicInfo = (data: BasicInfo): ValidationResult => {
 // to get error message for a specific field
 export const getFieldError = (errors: ValidationErrors, fieldPath: string): string | undefined => {
   const pathArray = fieldPath.split('.')
-  let current: any = errors
+  let current: unknown = errors
 
   for (const path of pathArray) {
     if (current && typeof current === 'object' && path in current) {
-      current = current[path]
+      current = (current as Record<string, unknown>)[path];
     } else {
       return undefined
     }

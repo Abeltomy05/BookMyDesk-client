@@ -1,15 +1,17 @@
-// ClientNavbar.tsx
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
-import { Bell, User, Settings, LogOut, Menu, MapPin } from "lucide-react";
+import { Bell, User, LogOut, Menu, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { IClient } from "@/types/user.type"; 
+import NotificationsComponent from "../ReusableComponents/NotificationTab";
+import toast from "react-hot-toast";
+import { clientService } from "@/services/clientServices";
+import socketService from "@/services/socketService/socketService";
 
 interface ClientNavbarProps {
   onMenuClick: () => void;
   onLogout: () => void;
   user: IClient | null;
-  notificationCount?: number;
   backgroundClass?: string;
 }
 
@@ -17,21 +19,31 @@ const ClientNavbar: React.FC<ClientNavbarProps> = ({
   onMenuClick,
   onLogout,
   user,
-  notificationCount = 0,
   backgroundClass = "bg-black"
 }) => {
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showNotificationTooltip, setShowNotificationTooltip] = useState(false);
   const [showAccountTooltip, setShowAccountTooltip] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const notificationRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const limit = 3;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);
       }
+
+       if (
+          notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
+          setShowNotifications(false);
+        }
     };
+
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
@@ -39,7 +51,76 @@ const ClientNavbar: React.FC<ClientNavbarProps> = ({
     };
   }, []);
 
-  const locationName = user?.location?.displayName.split(',').slice(0,1) 
+useEffect(() => {
+  if (!user?._id) return;
+
+  socketService.connect(user._id, "client");
+  socketService.getSocket()?.emit("requestOnlineUsers");
+
+  socketService.onNotification(() => {
+    setUnreadCount((prev) => prev + 1);
+  });
+
+  const fetchInitialUnreadCount = async () => {
+    try {
+      const response = await clientService.getNotifications(1, limit, "unread");
+      if (response.success && response.data?.unreadCount) {
+        setUnreadCount(response.data.unreadCount);
+      }
+    } catch (error) {
+      console.error("Failed to fetch initial unread count", error);
+    }
+  };
+
+  fetchInitialUnreadCount();
+
+  return () => {
+    socketService.removeAllListeners();
+    socketService.disconnect();
+  };
+}, [user?._id]);
+
+  const fetchNotificationsFromClient = async (page: number, filter: "unread" | "all") => {
+  const response = await clientService.getNotifications(page, limit, filter);
+
+  if (!response.success || !response.data) {
+    toast.error("Failed to fetch notifications");
+    return {
+      items: [],
+      totalCount: 0,
+      unreadCount: 0,
+      hasMore: false,
+    };
+  }
+  setUnreadCount(response.data.unreadCount);
+  return {
+    items: response.data.items || [],
+    totalCount: response.data.totalCount || 0,
+    unreadCount: response.data.unreadCount || 0,
+    hasMore: response.data.hasMore || false,
+  };
+};
+
+const handleMarkAsRead = async (id: string): Promise<{ success: boolean }> => {
+ try {
+    const response = await clientService.markAsRead(id);
+
+    if (response?.success) {
+      setUnreadCount((prev) => prev - 1);
+      return { success: true };
+    } else {
+      toast.error("Something went wrong!");
+      return { success: false };
+    }
+  } catch (error) {
+    console.error("Error marking as read:", error);
+    toast.error("Something went wrong!");
+    return { success: false };
+  }
+};
+
+
+  const locationName = (user?.location?.displayName ?? "").split(',').slice(0,1)
   return (
     <>
       <nav className={`fixed top-0 left-0 right-0 ${backgroundClass} h-[70px] flex items-center justify-between shadow-lg z-[1000] px-6 md:px-12`}>
@@ -70,7 +151,7 @@ const ClientNavbar: React.FC<ClientNavbarProps> = ({
             onClick={()=>navigate("/profile")}
             >
               <MapPin size={15} />
-              <h4 className="text-sm">{locationName ? locationName : "Add Location"}</h4><br />
+              <h4 className="text-sm">{locationName.length > 0 ? locationName : "Add Location"}</h4><br />
     
             </div>
           </div>
@@ -80,15 +161,32 @@ const ClientNavbar: React.FC<ClientNavbarProps> = ({
             className="relative"
             onMouseEnter={() => setShowNotificationTooltip(true)}
             onMouseLeave={() => setShowNotificationTooltip(false)}
+            ref={notificationRef}
           >
-            <Bell
-              size={24}
-              className="text-white cursor-pointer transition-transform duration-300 hover:scale-110 hover:text-[#f69938]"
-            />
+             <Bell
+                size={24}
+                className="text-white cursor-pointer transition-transform duration-300 hover:scale-110 hover:text-[#f69938]"
+                onClick={() => setShowNotifications(!showNotifications)}
+              />
+              {unreadCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              )}
             {/* Tooltip */}
-            {showNotificationTooltip && (
+            {showNotificationTooltip && !showNotifications && (
               <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap">
                 Notifications
+              </div>
+            )}
+
+            {/* Notification Dropdown */}
+            {showNotifications && (
+              <div className="absolute right-0 mt-4 w-[350px] max-h-[500px] z-50">
+                <NotificationsComponent  
+                fetchNotifications={fetchNotificationsFromClient}
+                markAsRead={handleMarkAsRead}
+                />
               </div>
             )}
           </div>
@@ -107,7 +205,7 @@ const ClientNavbar: React.FC<ClientNavbarProps> = ({
               <img
                 src={user?.avatar || "https://res.cloudinary.com/dnivctodr/image/upload/v1748161444/default-user_rbydkc.png"}
                 alt="User avatar"
-                className="w-auto h-10 object-cover rounded-full border-3 border-[#f69938]"
+                className="w-10 h-10 object-cover rounded-full border-3 border-[#f69938]"
               />
             </div>
 
@@ -126,10 +224,6 @@ const ClientNavbar: React.FC<ClientNavbarProps> = ({
                   <a href="/profile" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#f69938]">
                     <User size={16} className="mr-3" />
                     <span>Profile</span>
-                  </a>
-                  <a href="#" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#f69938]">
-                    <Settings size={16} className="mr-3" />
-                    <span>Settings</span>
                   </a>
                 </div>
                 <div className="border-t border-gray-300 py-1">

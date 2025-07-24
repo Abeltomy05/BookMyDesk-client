@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { X, CreditCard, Lock, Loader2 } from "lucide-react"
-import { loadStripe } from "@stripe/stripe-js"
+import { loadStripe, type StripeCardElementChangeEvent } from "@stripe/stripe-js"
 import {
   Elements,
   CardElement,
@@ -12,6 +12,7 @@ import toast from "react-hot-toast"
 import { useSelector } from "react-redux"
 import type { RootState } from "@/store/store"
 import { formatDate } from "@/utils/formatters/date"
+import { getErrorMessage } from "@/utils/errors/errorHandler"
 
 interface PaymentModalProps {
   isOpen: boolean
@@ -119,10 +120,11 @@ function PaymentForm({
             toast.error(confirmResponse.message || "Payment processed but booking confirmation failed. Please contact support.")
             onError(confirmResponse.message || "Booking confirmation failed")
           }
-        } catch (confirmError: any) {
-          console.error("Confirmation error:", confirmError)
-          toast.error("Payment processed but booking confirmation failed. Please contact support.")
-          onError("Booking confirmation failed")
+        } catch (confirmError: unknown) {
+          const message = getErrorMessage(confirmError);
+          console.error("Confirmation error:", confirmError);
+          toast.error("Payment processed but booking confirmation failed. Please contact support.");
+          onError(message);
         }
       } else if (paymentIntent.status === 'succeeded') {
         toast.success("Payment successful!")
@@ -132,18 +134,18 @@ function PaymentForm({
         toast.error("Payment completed but with unexpected status. Please contact support.")
         onError("Unexpected payment status")
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = getErrorMessage(error);
       console.error("Payment error:", error)
-      const errorMessage = error.message || "An unexpected error occurred"
-      setCardError(errorMessage)
-      toast.error(errorMessage)
-      onError(errorMessage)
+      setCardError(message)
+      toast.error(message)
+      onError(message)
     } finally {
       setIsProcessing(false)
     }
   }
 
-  const handleCardChange = (event: any) => {
+  const handleCardChange = (event: StripeCardElementChangeEvent) => {
     if (event.error) {
       setCardError(event.error.message)
     } else {
@@ -285,11 +287,11 @@ export default function StripePaymentModal({
         setError(response.message || "Failed to initialize payment")
         toast.error(response.message || "Failed to initialize payment")
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error initializing payment:", error)
-      const errorMessage = error.message || "Failed to initialize payment"
-      setError(errorMessage)
-      toast.error(errorMessage)
+      const message = getErrorMessage(error);
+      setError(message)
+      toast.error(message)
     } finally {
       setIsLoading(false)
     }

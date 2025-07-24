@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { X, CreditCard, Lock, Loader2, Wallet } from "lucide-react"
-import { loadStripe } from "@stripe/stripe-js"
+import { loadStripe, type StripeCardElementChangeEvent  } from "@stripe/stripe-js"
 import {
   Elements,
   CardElement,
@@ -108,10 +108,11 @@ function TopUpPaymentForm({
             toast.error(response.message || "Payment authorized but processing failed. Please contact support.")
             onError(response.message || "Payment processing failed")
           }
-        } catch (authError: any) {
-          console.error("Top-up authorization handling error:", authError)
-          toast.error("Payment authorized but processing failed. Please contact support.")
-          onError("Payment processing failed")
+        } catch (authError: unknown) {
+          const message = authError instanceof Error ? authError.message : "Payment processing failed";
+          console.error("Top-up authorization handling error:", authError);
+          toast.error("Payment authorized but processing failed. Please contact support.");
+          onError(message);
         }
       } else if (paymentIntent.status === 'succeeded') {
         console.warn("Payment succeeded immediately — investigate manual capture settings")
@@ -122,18 +123,18 @@ function TopUpPaymentForm({
         toast.error("Payment completed but with unexpected status. Please contact support.")
         onError("Unexpected payment status")
       }
-    } catch (error: any) {
-      console.error("Top-up payment error:", error)
-      const errorMessage = error.message || "An unexpected error occurred"
-      setCardError(errorMessage)
-      toast.error(errorMessage)
-      onError(errorMessage)
+    } catch (error: unknown) {
+       const message = error instanceof Error ? error.message : "An unexpected error occurred";
+        console.error("Top-up payment error:", error);
+        setCardError(message);
+        toast.error(message);
+        onError(message);
     } finally {
       setIsProcessing(false)
     }
   }
 
-  const handleCardChange = (event: any) => {
+  const handleCardChange = (event: StripeCardElementChangeEvent) => {
     if (event.error) {
       setCardError(event.error.message)
     } else {
@@ -242,11 +243,13 @@ export default function StripeTopUpModal({
         setError(response.message || "Failed to initialize payment")
         toast.error(response.message || "Failed to initialize payment")
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error initializing top-up payment:", error)
-      const errorMessage = error.message || "Failed to initialize payment"
-      setError(errorMessage)
-      toast.error(errorMessage)
+       const errorMessage =
+      error instanceof Error ? error.message : "Failed to initialize payment";
+
+    setError(errorMessage);
+    toast.error(errorMessage);
     } finally {
       setIsLoading(false)
     }

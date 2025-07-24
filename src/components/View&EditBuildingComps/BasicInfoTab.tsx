@@ -21,7 +21,7 @@ export function BasicInfoStep({ building, setBuilding, onValidationChange }: Bas
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({})
   const [touched, setTouched] = useState<Record<string, boolean>>({})
 
-  const updateBuilding = (field: keyof Building, value: any) => {
+  const updateBuilding = <K extends keyof Building> (field: K, value: Building[K]) => {
     setBuilding((prev) => {
       if (!prev) return prev; 
       return {
@@ -34,7 +34,14 @@ export function BasicInfoStep({ building, setBuilding, onValidationChange }: Bas
     setTouched(prev => ({ ...prev, [field]: true }))
   }
 
-  const updateOpeningHours = (period: "weekdays" | "weekends", field: keyof OpeningHours, value: any) => {
+  const updateOpeningHours = <
+  P extends "weekdays" | "weekends",
+  K extends keyof OpeningHours
+>(
+  period: P, 
+  field: K, 
+  value:  OpeningHours[K]
+) => {
     setBuilding((prev) => {
       if (!prev) return prev;
       return {

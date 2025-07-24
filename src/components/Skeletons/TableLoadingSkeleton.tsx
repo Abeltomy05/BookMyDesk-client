@@ -7,6 +7,14 @@ interface TableLoadingSkeletonProps {
   variant?: "light" | "dark"
 }
 
+interface SkeletonColors {
+  border: string
+  hover: string
+  skeletonBase: string
+  skeletonHighlight: string
+  actionButton: string
+}
+
 export const TableLoadingSkeleton = ({ 
   rows = 4, 
   columns = 4, 
@@ -106,7 +114,7 @@ const SkeletonLine = ({
   height?: string
   delay?: number
   variant?: "light" | "dark"
-  colors: any
+  colors: SkeletonColors
 }) => {
   return (
     <motion.div 

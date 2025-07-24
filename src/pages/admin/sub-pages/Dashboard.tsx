@@ -1,60 +1,15 @@
-// Dashboard.tsx - Your main dashboard component
 import React, { useState, useEffect } from "react"
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts"
 import { motion } from "framer-motion"
 import { Users, ShoppingBag, Briefcase } from "react-feather"
 import { adminService } from "@/services/adminService"
 
-const chartData = [
-  { name: "Jan", bookings: 65, revenue: 4000 },
-  { name: "Feb", bookings: 59, revenue: 3800 },
-  { name: "Mar", bookings: 80, revenue: 5200 },
-  { name: "Apr", bookings: 81, revenue: 5100 },
-  { name: "May", bookings: 56, revenue: 3600 },
-  { name: "Jun", bookings: 55, revenue: 3500 },
-  { name: "Jul", bookings: 40, revenue: 2800 },
-]
-
-const bookingsData = [
-  {
-    id: 1,
-    client: "Acme Corp",
-    space: "Conference Room A",
-    date: "2023-05-23",
-    time: "09:00 - 11:00",
-    status: "Confirmed",
-  },
-  {
-    id: 2,
-    client: "TechStart Inc",
-    space: "Meeting Room 3",
-    date: "2023-05-23",
-    time: "13:00 - 14:30",
-    status: "Pending",
-  },
-  {
-    id: 3,
-    client: "Global Solutions",
-    space: "Auditorium",
-    date: "2023-05-24",
-    time: "10:00 - 16:00",
-    status: "Confirmed",
-  },
-  { id: 4, client: "Innovate LLC", space: "Office Suite 5", date: "2023-05-25", time: "All day", status: "Confirmed" },
-  {
-    id: 5,
-    client: "Creative Studios",
-    space: "Photo Studio",
-    date: "2023-05-26",
-    time: "14:00 - 18:00",
-    status: "Pending",
-  },
-]
 
 const Dashboard: React.FC = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [clientCount, setClientCount] = useState(0);
   const [vendorCount, setVendorCount] = useState(0);
+  const [monthlyStats, setMonthlyStats] = useState<{ month: string; totalBookings: number; totalRevenue: number }[]>([]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -75,9 +30,35 @@ const Dashboard: React.FC = () => {
        console.error("Error fetching user count:", error)
      }
   }
+
+  const getmonthlyStats = async()=>{
+      try{
+      const response = await adminService.monthlyStats();
+      if(response.success){
+        setMonthlyStats(response.data);
+      }else{
+        console.error("Failed to fetch user count:", response.message);
+      }
+     }catch(error){
+       console.error("Error fetching user count:", error)
+     }
+  }
   useEffect(()=>{
     getUserCount();
+    getmonthlyStats();
   },[])
+
+  const formatMonth = (monthStr: string) => {
+    const [year, month] = monthStr.split("-");
+    const date = new Date(Number(year), Number(month) - 1);
+    return date.toLocaleString("default", { month: "short" });
+  };
+
+  const chartData = monthlyStats.map(({ month, totalBookings, totalRevenue }) => ({
+    name: formatMonth(month),
+    bookings: totalBookings,
+    revenue: totalRevenue,
+  }));
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: isLoaded ? 1 : 0 }} transition={{ duration: 0.5 }}>
@@ -98,7 +79,7 @@ const Dashboard: React.FC = () => {
             <div>
               <p className="text-sm text-gray-400 font-medium">Total Clients</p>
               <h3 className="text-2xl font-bold text-white">{clientCount}</h3>
-              <p className="text-xs text-cyan-400">+12% from last month</p>
+              {/* <p className="text-xs text-cyan-400">+12% from last month</p> */}
             </div>
           </div>
         </motion.div>
@@ -116,7 +97,7 @@ const Dashboard: React.FC = () => {
             <div>
               <p className="text-sm text-gray-400 font-medium">Total Vendors</p>
               <h3 className="text-2xl font-bold text-white">{vendorCount}</h3>
-              <p className="text-xs text-cyan-400">+5% from last month</p>
+              {/* <p className="text-xs text-cyan-400">+5% from last month</p> */}
             </div>
           </div>
         </motion.div>
@@ -133,8 +114,8 @@ const Dashboard: React.FC = () => {
             </div>
             <div>
               <p className="text-sm text-gray-400 font-medium">Total Buildings</p>
-              <h3 className="text-2xl font-bold text-white">56</h3>
-              <p className="text-xs text-cyan-400">+2 new this month</p>
+              <h3 className="text-2xl font-bold text-white">12</h3>
+              {/* <p className="text-xs text-cyan-400">+2 new this month</p> */}
             </div>
           </div>
         </motion.div>
@@ -162,7 +143,7 @@ const Dashboard: React.FC = () => {
         </div>
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData}>
+            <LineChart data={chartData.length ? chartData : []}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
               <XAxis dataKey="name" stroke="#9CA3AF" />
               <YAxis yAxisId="left" orientation="left" stroke="#f69938" />
@@ -198,69 +179,6 @@ const Dashboard: React.FC = () => {
         </div>
       </motion.div>
 
-      {/* Latest Bookings */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 20 }}
-        transition={{ duration: 0.5, delay: 0.5 }}
-        className="bg-gray-800 rounded-lg shadow-lg border border-gray-700 overflow-hidden"
-      >
-        <div className="p-6 border-b border-gray-700">
-          <h3 className="text-lg font-semibold text-white">Latest Bookings</h3>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-gray-900">
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                  Client
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                  Space
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                  Date
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                  Time
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                  Status
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-700">
-              {bookingsData.map((booking, index) => (
-                <motion.tr
-                  key={booking.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 * index }}
-                  className="hover:bg-gray-700 transition-colors"
-                >
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
-                    {booking.client}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{booking.space}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{booking.date}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{booking.time}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`px-3 py-1 text-xs rounded-full font-medium ${
-                        booking.status === "Confirmed"
-                          ? "bg-cyan-400 text-black shadow-lg shadow-cyan-400/30"
-                          : "bg-yellow-400 text-black shadow-lg shadow-yellow-400/30"
-                      }`}
-                    >
-                      {booking.status}
-                    </span>
-                  </td>
-                </motion.tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </motion.div>
     </motion.div>
   )
 }

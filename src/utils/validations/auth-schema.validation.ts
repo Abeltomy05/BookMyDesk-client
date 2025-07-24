@@ -75,8 +75,8 @@ export interface VendorTouchedFields {
 
 export const validateVendorField = (
   name: string, 
-  value: any,
-  formData?: any
+  value: unknown,
+  formData?: VendorFormData
 ): string | undefined => {
   switch (name as keyof VendorFormData) {
     case "username":
@@ -147,7 +147,7 @@ export const validateVendorSignupForm = (
   formData: VendorFormData,
   setErrors: React.Dispatch<React.SetStateAction<VendorFormErrors>>,
   setTouched: React.Dispatch<React.SetStateAction<VendorTouchedFields>>,
-  validateField: ((name: string, value: any) => string | undefined) = 
+  validateField: ((name: keyof VendorFormData, value: unknown) => string | undefined) = 
   (name, value) => validateVendorField(name, value, formData)
 ): boolean => {
   const newErrors: VendorFormErrors = {}
@@ -229,8 +229,8 @@ export const validateResetPasswordForm = (formData: ResetPasswordFormData): Rese
 
 export const validateClientField = (
   name: string, 
-  value: any,
-  formData?: any
+  value: unknown,
+  formData?: FormData
 ): string | undefined => {
   switch (name as keyof FormData) {
     case "username":
@@ -280,7 +280,7 @@ export const validateClientSignupForm = (
   formData: FormData,
   setErrors: React.Dispatch<React.SetStateAction<ValidationErrors>>,
   setTouched: React.Dispatch<React.SetStateAction<Record<string, boolean>>>,
-  validateField: ((name: string, value: any) => string | undefined) = 
+  validateField: ((name: keyof FormData, value: unknown) => string | undefined) = 
     (name, value) => validateClientField(name, value, formData)
 ): boolean => {
   const newErrors: ValidationErrors = {}

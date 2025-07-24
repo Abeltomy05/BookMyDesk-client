@@ -3,9 +3,13 @@ import {Toaster} from 'react-hot-toast'
 import ClientRoutes from "./routes/ClientRoutes"
 import AdminRoutes from "./routes/AdminRoutes"
 import VendorRoutes from "./routes/VendorRoutes"
+import { useEffect } from "react"
+import { listenForForegroundMessages } from "./utils/firebase/firebaseNotification"
 
 function App() {
-
+useEffect(() => {
+  listenForForegroundMessages();
+}, []);
 
   return (
     <>

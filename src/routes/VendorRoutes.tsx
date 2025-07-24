@@ -14,6 +14,7 @@ import BuildingDetailsEdit from "@/pages/vendor/SubPages/View&EndBuildings"
 import VendorManageBookings from "@/pages/vendor/SubPages/ManageBookings"
 import VendorWalletPage from "@/pages/vendor/SubPages/VendorWallet"
 import OfferPage from "@/pages/vendor/SubPages/OfferManagement"
+import BuildingChatPage from "@/pages/vendor/SubPages/BuildingChatPage"
 
 
 const VendorRoutes = () => {
@@ -32,6 +33,7 @@ const VendorRoutes = () => {
         <Route path="/bookings" element={<ProtectedRoute allowedRoles={["vendor"]} element={<VendorManageBookings/>} />}/>
         <Route path="/wallet" element={<ProtectedRoute allowedRoles={["vendor"]} element={<VendorWalletPage/>} />}/>
         <Route path="/offer" element={<ProtectedRoute allowedRoles={["vendor"]} element={<OfferPage/>} />}/>
+        <Route path="/chat/:buildingId" element={<ProtectedRoute allowedRoles={["vendor"]} element={<BuildingChatPage/>} />}/>
         
 
         <Route path="/*" element={<NotFoundPage/>}/>

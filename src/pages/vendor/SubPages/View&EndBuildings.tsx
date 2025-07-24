@@ -132,7 +132,7 @@ export default function BuildingDetailsWizard() {
 
   if (!building) {
     return (
-      <VendorLayout notificationCount={5} backgroundClass="bg-black">
+      <VendorLayout backgroundClass="bg-black">
         <div className="min-h-screen flex items-center justify-center text-gray-600">
           <Loading/>
         </div>
@@ -142,7 +142,6 @@ export default function BuildingDetailsWizard() {
 
   return (
      <VendorLayout
-      notificationCount={5}
       backgroundClass="bg-black"
     >
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">

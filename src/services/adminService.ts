@@ -1,5 +1,7 @@
 import { adminAxiosInstance } from "@/api/admin.axios";
 import authAxiosInstance from "@/api/auth.axios";
+import type { NotificationResponse } from "@/types/notification.type";
+import { getErrorMessage } from "@/utils/errors/errorHandler";
 
 interface ApiResponse {
   success: boolean;
@@ -61,21 +63,17 @@ interface ClientData {
   updatedAt?: string;
 }
 
-
-
-
 export const adminService = {
     login: async (data: LoginData): Promise<ApiResponse> => {
        try {
       const response = await authAxiosInstance.post('/login', data);
       console.log(response.data);
       return response.data;
-    } catch (error) {
-      console.error('Error logging in:', error);
-      return {
-        success: false,
-        message: 'Invalid email or password',
-      };
+    } catch (error:unknown) {
+       return {
+          success: false,
+          message: getErrorMessage(error),
+        };
     }
     },
 
@@ -83,12 +81,11 @@ export const adminService = {
        try {
          const response = await adminAxiosInstance.post("/logout");
          return response.data
-        } catch (error) {
-         console.error('Error in logout:', error);
-         return {
-           success: false,
-           message: 'Logout Error',
-         };
+        } catch (error:unknown) {
+          return {
+            success: false,
+            message: getErrorMessage(error),
+          };
      } 
     },
 
@@ -113,14 +110,14 @@ export const adminService = {
                         });
            console.log(response.data);             
            return response.data;             
-        } catch (error:any) {
-          console.error('Error fetching users:', error);
-          return {
-            success: false,
-            users: [],
-            totalPages: 0,
-            currentPage: 0,
-          };
+        } catch (error:unknown) {
+           return {
+              success: false,
+              message: getErrorMessage(error),
+              users: [],
+              totalPages: 0,
+              currentPage: 0,
+            };
         }
     },
 
@@ -130,15 +127,15 @@ export const adminService = {
           params: { page, limit },
        });
         return response.data;
-      } catch (error) {
+      } catch (error:unknown) {
          console.error("Failed to fetch pending buildings", error);
-    return {
-      success: false,
-      buildings: [],
-      totalPages: 0,
-      currentPage: 1,
-      message: "Error fetching buildings"
-    };
+        return {
+          success: false,
+          buildings: [],
+          totalPages: 0,
+          currentPage: 1,
+          message: getErrorMessage(error)
+        };
       }
     },
 
@@ -156,12 +153,12 @@ export const adminService = {
           reason,
         });
         return response.data;
-      } catch (error:any) {
+      } catch (error:unknown) {
         console.error("Error updating user status:", error);
         return {
-          success: false,
-          message: error.response?.data?.message || "Failed to update user status",
-        };
+            success: false,
+            message: getErrorMessage(error),
+          };
       }
     },
 
@@ -169,12 +166,11 @@ export const adminService = {
     try{
       const response = await adminAxiosInstance.get('/get-user-count');
       return response.data;
-    }catch(error:any){
+    }catch(error:unknown){
       console.error("Error fetching user count:", error);
       return {
-        success: false,
-        message: error.response?.data?.message || "Failed to fetch user count",
-        data: null
+            success: false,
+            message: getErrorMessage(error),
       };
     }
    },
@@ -185,11 +181,11 @@ export const adminService = {
          params:{page,limit}
          });
          return response.data;
-     } catch (error:any) {
+     } catch (error:unknown) {
        console.error('Error fetching wallet details:', error);
        return {
-         success: false,
-         message: error.message || 'Failed to fetch wallet details. Please try again later.',
+            success: false,
+            message: getErrorMessage(error),
        };
      }
    },
@@ -198,11 +194,11 @@ export const adminService = {
     try {
        const response = await adminAxiosInstance.get("/get-vendor-buildings");
        return response.data;
-    } catch (error:any) {
+    } catch (error:unknown) {
      console.error('Error fetching wallet details:', error);
-       return {
-         success: false,
-         message: error.message || 'Failed to fetch wallet details. Please try again later.',
+      return {
+            success: false,
+            message: getErrorMessage(error),
        };
     }
    },
@@ -219,13 +215,12 @@ export const adminService = {
       },
        })
        return response.data;
-    } catch (error) {
+    } catch (error:unknown) {
       console.error("Error fetching bookings:", error);
-    return {
-      success: false,
-      message: "Failed to fetch bookings.",
-      data: null, 
-    };
+      return {
+            success: false,
+            message: getErrorMessage(error),
+       };
     }
    },
 
@@ -233,14 +228,67 @@ export const adminService = {
     try {
       const response = await adminAxiosInstance.get(`/get-single-vendor/${vendorId}`);
       return response.data;
-    } catch (error) {
+    } catch (error:unknown) {
        console.error("Error fetching vendor data:", error);
-    return {
-      success: false,
-      message: "Failed to fetch vendor data.",
-      data: null, 
-    };
+       return {
+            success: false,
+            message: getErrorMessage(error),
+        };
     }
    },
+
+  getNotifications: async(page:number,limit:number,filter: "unread" | "all"):Promise<{ success: boolean, data?: NotificationResponse, message?: string}>=>{
+      try {
+        const response = await adminAxiosInstance.get("/get-notifications",{
+          params:{
+            page,
+            limit,
+            filter,
+          }
+        })
+        const data = response.data.data;
+          return {
+            success: true,
+            data: {
+              items: data.items,
+              totalCount: data.totalCount,
+              unreadCount: data.unreadCount,
+              hasMore: (page + 1) * limit < data.totalCount,
+            },
+          };
+      } catch (error:unknown) {
+        console.error('Error getting notifiactions:', error);
+         return {
+            success: false,
+            message: getErrorMessage(error),
+          };
+      }
+    }, 
+
+    markAsRead: async(id:string):Promise<ApiResponse>=>{
+      try {
+        const response = await adminAxiosInstance.patch(`/mark-as-read/${id}`);
+        return response.data;
+      } catch (error:unknown) {
+        console.error('Error getting notifiactions:', error);
+        return {
+            success: false,
+            message: getErrorMessage(error),
+         };
+      }
+    },
+
+  monthlyStats: async():Promise<ApiResponse>=>{
+   try {
+    const response = await adminAxiosInstance.get("/monthly-stats");
+    return response.data;
+   } catch (error:unknown) {
+     console.error('Error getting monthly stats:', error);
+        return {
+            success: false,
+            message: getErrorMessage(error),
+         };
+   }
+  }  
 
 }
