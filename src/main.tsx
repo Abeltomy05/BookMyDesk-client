@@ -8,7 +8,7 @@ import { PersistGate } from 'redux-persist/integration/react'
 import ErrorBoundary from './utils/errors/ErrorBoundary.tsx'
 
 createRoot(document.getElementById('root')!).render(
-  // <StrictMode>
+  <StrictMode>
   <ErrorBoundary>
     <Provider store={store}>
       <PersistGate persistor={persistor}>
@@ -16,5 +16,5 @@ createRoot(document.getElementById('root')!).render(
     </PersistGate>
     </Provider>
   </ErrorBoundary>
-  // </StrictMode>
+ </StrictMode>
 )

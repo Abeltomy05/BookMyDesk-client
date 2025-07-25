@@ -6,7 +6,6 @@ import { MapPin, Search } from "lucide-react"
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
 import { useSelector } from "react-redux"
-import ClientLayout from "../ClientLayout"
 
 
 export default function NearbySpaces() {
@@ -97,7 +96,6 @@ const handleRadiusChange = (radius: number) => {
   }
 
   return (
-    <ClientLayout>
     <div className="w-full max-w-6xl mx-auto px-4 py-6  min-h-screen">
       {/* Header */}
       <div className="mb-8 ">
@@ -169,6 +167,5 @@ const handleRadiusChange = (radius: number) => {
         </div>
       )}
     </div>
-    </ClientLayout>
   )
 }

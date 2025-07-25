@@ -3,7 +3,6 @@ import { useEffect, useState } from "react"
 import { StatusTracker } from "@/components/BookingDetailsComponents/StatusTracker" 
 import { BookingDetails } from "@/components/BookingDetailsComponents/BookingDetails" 
 import type { BookingData } from "@/types/booking.type" 
-import ClientLayout from "../ClientLayout"
 import { clientService } from "@/services/clientServices"
 import { useParams, useNavigate } from "react-router-dom"
 import toast from "react-hot-toast"
@@ -139,26 +138,22 @@ export const BookingDetailsPage: React.FC = () => {
 
    if (loading) {
     return (
-      <ClientLayout >
         <div className="min-h-screen flex items-center justify-center text-gray-600">
           Loading booking details...
         </div>
-      </ClientLayout>
     )
   }
 
    if (!booking) {
     return (
-      <ClientLayout>
         <div className="min-h-screen flex items-center justify-center text-red-600">
           Booking not found.
         </div>
-      </ClientLayout>
     )
   }
 
 return (
-    <ClientLayout>
+  <>
         <div className="min-h-screen bg-gray-50 py-8 px-4">
         <div className="max-w-4xl mx-auto">
 
@@ -296,8 +291,7 @@ return (
           loading={cancelLoading}
         />
 
-
-    </ClientLayout>
+</>
 )
 }
 

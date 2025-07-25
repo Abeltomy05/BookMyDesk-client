@@ -5,12 +5,10 @@ import { BasicInfoStep } from "@/components/RegisterBuildingComps/BasicInfo"
 import { FacilitiesContactStep } from "@/components/RegisterBuildingComps/Facilities"
 import { PricingPlansStep } from "@/components/RegisterBuildingComps/Pricing&Plans"
 import type { BuildingFormData } from "@/types/building-form.type"
-import VendorLayout from "../VendorLayout"
 import { uploadImageCloudinary } from "@/utils/cloudinary/cloudinary"
 import { vendorService } from "@/services/vendorServices"
 import toast from "react-hot-toast"
 import { useNavigate } from "react-router-dom"
-import Loading from "@/components/Loadings/Loading"
 import { getErrorMessage } from "@/utils/errors/errorHandler"
 
 export default function RegisterBuilding() {
@@ -83,8 +81,8 @@ export default function RegisterBuilding() {
       }
 
        const selectedFacilities = Object.entries(formData.facilities)
-      .filter(([key, value]) => value === true)
-      .map(([key, value]) => key);
+      .filter(([, value]) => value === true)
+      .map(([key]) => key);
 
 
        let data = {
@@ -193,9 +191,6 @@ export default function RegisterBuilding() {
     <>
     {/* {isLoading && <Loading/>} */}
 
-  <VendorLayout
-      backgroundClass="bg-black"
-    >
     <div className="min-h-[calc(100vh-4rem)] bg-gray-50 py-4">
       <div className="max-w-4xl mx-auto px-4 h-full flex flex-col pt-16">
         {/* Header - Compact */}
@@ -274,7 +269,6 @@ export default function RegisterBuilding() {
         </div>
       </div>
     </div>
-    </VendorLayout>
     </>
   )
 }

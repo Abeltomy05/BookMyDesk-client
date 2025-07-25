@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import ClientLayout from '../ClientLayout';
 import { ReusableChat } from '@/components/ReusableComponents/chat';
 import { clientService } from '@/services/clientServices';
 import { defaultClientConfig, type ChatConfig, type ChatSidebarItem, type Message } from '@/types/chat.type';
@@ -130,7 +129,6 @@ const ClientChatPage: React.FC = () => {
 
   if (loading) {
     return (
-      <ClientLayout activeMenuItem="messages">
         <div className="min-h-screen bg-gray-50 py-1 px-4">
           <div className="max-w-7xl mx-auto py-9">
             <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
@@ -140,12 +138,10 @@ const ClientChatPage: React.FC = () => {
             </div>
           </div>
         </div>
-      </ClientLayout>
     );
   }
 
   return (
-    <ClientLayout activeMenuItem="chat">
       <div className="min-h-screen bg-gray-50 py-1 px-4">
         <div className="max-w-7xl mx-auto py-9">
           <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
@@ -162,7 +158,7 @@ const ClientChatPage: React.FC = () => {
           </div>
         </div>
       </div>
-    </ClientLayout>
+
   );
 };
 

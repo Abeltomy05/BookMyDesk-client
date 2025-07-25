@@ -7,7 +7,6 @@ import {type VendorRetryFormData, type VendorRetryFormErrors, validateVendorRetr
 import { useParams } from "react-router-dom"
 import toast from "react-hot-toast"
 import { vendorService } from "@/services/vendorServices"
-import { uploadImageCloudinary } from "@/utils/cloudinary/cloudinary"
 import { uploadFileToUploadThing } from "@/utils/uploadThing/FileUploader"
 
 

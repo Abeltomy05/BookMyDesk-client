@@ -1,5 +1,5 @@
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Plus, X, Users, DollarSign, AlertCircle } from "lucide-react"
 import type { Building, Space } from "@/types/view&editBuilding"
 import { 
@@ -352,7 +352,7 @@ export function SpaceDetailsStep({ building, setBuilding }: SpaceDetailsStepProp
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-600 mb-1 flex items-center gap-1">
+                  <label className="text-xs font-semibold text-gray-600 mb-1 flex items-center gap-1">
                     <Users className="w-3 h-3" />
                     Capacity
                   </label>
@@ -369,7 +369,7 @@ export function SpaceDetailsStep({ building, setBuilding }: SpaceDetailsStepProp
                   <ValidationError error={spaceErrors[space._id]?.capacity} />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-600 mb-1 flex items-center gap-1">
+                  <label className="text-xs font-semibold text-gray-600 mb-1 flex items-center gap-1">
                     <DollarSign className="w-3 h-3" />
                     Price/Day
                   </label>

@@ -131,7 +131,7 @@ export const adminService = {
         }
     },
 
-    getPendingBuildings: async({page=1,limit=5,search="",})=>{
+    getPendingBuildings: async({page=1,limit=5,})=>{
       try {
         const response = await adminAxiosInstance.get("/get-pending-buildings", {
           params: { page, limit },

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { Home, ShoppingBag, Calendar, FileText, Wallet, MessageSquare, Settings, X } from "lucide-react";
+import { Home, ShoppingBag, Calendar, Wallet, MessageSquare, X } from "lucide-react";
 
 interface SidebarProps {
   isOpen: boolean;

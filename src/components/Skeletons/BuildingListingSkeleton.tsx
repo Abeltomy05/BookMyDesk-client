@@ -1,8 +1,7 @@
-import ClientLayout from "@/pages/client/ClientLayout" 
 
 export default function BuildingsListingSkeleton() {
   return (
-    <ClientLayout>
+    <>
       <div className="min-h-screen bg-gray-50">
         {/* Hero Section Skeleton */}
         <div className="relative h-96 overflow-hidden">
@@ -222,6 +221,6 @@ export default function BuildingsListingSkeleton() {
           animation-delay: 2200ms;
         }
       `}</style>
-    </ClientLayout>
+      </>
   )
 }

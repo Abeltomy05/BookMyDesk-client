@@ -26,7 +26,7 @@ export const TableLoadingSkeleton = ({
     return widths[Math.floor(Math.random() * widths.length)]
   }
 
-  const getColumnSpan = (index: number, totalColumns: number) => {
+  const getColumnSpan = (_index: number, totalColumns: number) => {
     if (totalColumns <= 3) return "col-span-4"
     if (totalColumns === 4) return "col-span-3"
     return "col-span-2"
@@ -107,7 +107,6 @@ const SkeletonLine = ({
   width = "w-24", 
   height = "h-4",
   delay = 0,
-  variant = "light",
   colors
 }: { 
   width?: string

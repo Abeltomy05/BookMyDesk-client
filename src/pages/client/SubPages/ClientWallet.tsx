@@ -1,11 +1,9 @@
 import React from 'react'
-import ClientLayout from '../ClientLayout'
 import WalletComponent from '@/components/ReusableComponents/Wallet' 
 import { clientService } from '@/services/clientServices'
 
 const ClientWalletPage: React.FC = () => {
   return (
-    <ClientLayout activeMenuItem="wallet">
       <WalletComponent
         title="My Wallet"
         subtitle="Manage your balance and view transaction history"
@@ -17,7 +15,6 @@ const ClientWalletPage: React.FC = () => {
         itemsPerPage={5}
         enableWithdrawal={false}
       />
-    </ClientLayout>
   )
 }
 

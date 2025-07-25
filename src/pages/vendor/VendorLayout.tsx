@@ -10,22 +10,23 @@ import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
+import { Outlet, useLocation } from 'react-router-dom';
 
 interface VendorLayoutProps {
-  children: React.ReactNode;
   title?: string;
-  backgroundClass?: string;
 }
 
 
 const VendorLayout: React.FC<VendorLayoutProps> = ({
-  children,
   title = 'Menu',
-  backgroundClass
 }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const vendor = useSelector((state: RootState) => state.vendor.vendor);
   const dispatch  = useDispatch();
+   const location = useLocation();
+
+   const isHomePage = location.pathname === '/vendor/home';
+   const navbarBgClass = isHomePage ? 'bg-transparent' : 'bg-black';
 
     const handleLogout = async()=>{
       try {
@@ -48,7 +49,7 @@ const VendorLayout: React.FC<VendorLayoutProps> = ({
     <div className="min-h-screen">
       <VendorNavbar
         onMenuClick={() => setSidebarOpen(!sidebarOpen)}
-        backgroundClass={backgroundClass}
+        backgroundClass={navbarBgClass}
         user={vendor}
       />
       <VendorSidebar
@@ -58,7 +59,9 @@ const VendorLayout: React.FC<VendorLayoutProps> = ({
         onLogout={handleLogout}
         title={title}
       />
-      <main>{children}</main>
+      <main>
+        <Outlet />
+      </main>
     </div>
   );
 };

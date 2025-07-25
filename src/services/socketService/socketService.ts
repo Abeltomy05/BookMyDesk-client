@@ -22,6 +22,7 @@ class SocketService {
 
     this._userId = userId;
     this._userType = userType;
+    console.debug("Socket connected with:", this._userId, this._userType);
 
     this.socket.on('connect', () => {
       console.log('Connected to socket server:', this.socket?.id);

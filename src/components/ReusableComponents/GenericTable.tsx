@@ -24,7 +24,6 @@ function GenericTableInner<T extends BaseItem>({
   enablePagination = true,
   enableActions = true,
   emptyMessage = "No data found",
-  loadingMessage = "Loading...",
   fetchData,
   onRefresh,
   className = "",
@@ -133,7 +132,7 @@ ref: React.Ref<TableRef<T>>) {
   }
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = () => {
       if (activeDropdown) {
         setActiveDropdown(null)
       }

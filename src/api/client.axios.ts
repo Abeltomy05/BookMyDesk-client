@@ -1,4 +1,3 @@
-import { HandledAuthError } from "@/utils/errors/handleAuthError";
 import { clientLogout } from "@/store/slices/client.slice";
 import { store } from "@/store/store";
 import axios from "axios";

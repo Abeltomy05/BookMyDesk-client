@@ -5,26 +5,40 @@ import { clientService } from '@/services/clientServices';
 import socketService from '@/services/socketService/socketService';
 import { clientLogout } from '@/store/slices/client.slice';
 import type { RootState } from '@/store/store';
-import React, { useState } from 'react';
+import React, {  useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
+import { Outlet, useLocation  } from 'react-router-dom';
 
 interface ClientLayoutProps {
-   children: React.ReactNode;
    backgroundClass?: string;
-   activeMenuItem?: string;
 }
 
-
 const ClientLayout: React.FC<ClientLayoutProps> = ({
-  children,
   backgroundClass,
-  activeMenuItem = "home"
 }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const client = useSelector((state: RootState) => state.client.client);
   const dispatch  = useDispatch();
+  const location = useLocation();
+
+  useEffect(() => {
+  console.log("ClientLayout mounted");
+}, []);
+
+const activeItem = useMemo(() => {
+    if (location.pathname.includes("/home")) return "home";
+    if (location.pathname.includes("/profile")) return "profile";
+    if (location.pathname.includes("/buildings")) return "buildings";
+    if (location.pathname.includes("/building-details")) return "buildings";
+    if (location.pathname.includes("/book-space")) return "bookings";
+    if (location.pathname.includes("/bookings")) return "bookings";
+    if (location.pathname.includes("/wallet")) return "wallet";
+    if (location.pathname.includes("/chat")) return "chat";
+    if (location.pathname.includes("/nearby")) return "buildings"; 
+    return "home";
+  }, [location.pathname]);
 
     const handleLogout = async () => {
         try {
@@ -50,8 +64,8 @@ const ClientLayout: React.FC<ClientLayoutProps> = ({
         user={client}
         backgroundClass={backgroundClass}
       />
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} activeItem={activeMenuItem}/>
-      <main>{children}</main>
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} activeItem={activeItem}/>
+      <main><Outlet /></main>
       <Footer/>
     </div>
   );

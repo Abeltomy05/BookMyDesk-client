@@ -29,6 +29,7 @@ const ClientNavbar: React.FC<ClientNavbarProps> = ({
   const [unreadCount, setUnreadCount] = useState(0);
   const notificationRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const fetchedRef = useRef(false);
 
   const limit = 3;
 
@@ -52,7 +53,9 @@ const ClientNavbar: React.FC<ClientNavbarProps> = ({
   }, []);
 
 useEffect(() => {
-  if (!user?._id) return;
+  console.log("Navbar mounted");
+  if (!user?._id || fetchedRef.current) return;
+  fetchedRef.current = true;
 
   socketService.connect(user._id, "client");
   socketService.getSocket()?.emit("requestOnlineUsers");
@@ -63,6 +66,7 @@ useEffect(() => {
 
   const fetchInitialUnreadCount = async () => {
     try {
+      console.log("Fetching notifications...");
       const response = await clientService.getNotifications(1, limit, "unread");
       if (response.success && response.data?.unreadCount) {
         setUnreadCount(response.data.unreadCount);

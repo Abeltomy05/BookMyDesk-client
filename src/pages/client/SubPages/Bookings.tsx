@@ -1,12 +1,11 @@
-import React, { useState, useRef } from 'react';
-import { Eye, MapPin, Calendar, Users, Clock } from 'lucide-react';
+import  { useState, useRef } from 'react';
+import { Eye, MapPin, Calendar, Users } from 'lucide-react';
 import { LightGenericTable } from '@/components/ReusableComponents/LightGenericTable';
 import { clientService } from '@/services/clientServices';
 import { useNavigate } from 'react-router-dom';
 import type { TableColumn } from '@/types/table.type';
 import type { BookingData } from '@/types/booking.type';
 import type { FetchParams } from '@/types/api.type';
-import ClientLayout from '../ClientLayout';
 import { formatDate } from '@/utils/formatters/date';
 
 const ClientBookings = () => {
@@ -151,7 +150,6 @@ const ClientBookings = () => {
   ];
 
   return (
-    <ClientLayout activeMenuItem="bookings">
     <div className="p-6 bg-gray-50 min-h-screen">
       <LightGenericTable
         ref={tableRef}
@@ -170,7 +168,6 @@ const ClientBookings = () => {
       />
 
     </div>
-    </ClientLayout>
   );
 };
 

@@ -1,11 +1,10 @@
-import React, { useState, useRef } from 'react';
-import { Eye, MapPin, Calendar, Users, Clock, Edit, CheckCircle, XCircle, Phone, Mail, User, DollarSign } from 'lucide-react';
+import  { useState, useRef } from 'react';
+import {  MapPin, Calendar, Users, CheckCircle, XCircle, Phone, Mail, User } from 'lucide-react';
 import { LightGenericTable, type TableRef } from '@/components/ReusableComponents/LightGenericTable';
 import { vendorService } from '@/services/vendorServices';
 import type { TableColumn, TableAction } from '@/types/table.type';
 import type { BookingData } from '@/types/booking.type';
 import type { FetchParams } from '@/types/api.type';
-import VendorLayout from '../VendorLayout';
 import { formatCurrency } from '@/utils/formatters/currency';
 import toast from 'react-hot-toast';
 import { formatDate } from '@/utils/formatters/date';
@@ -260,9 +259,7 @@ const VendorManageBookings = () => {
   ];
 
   return (
-    <VendorLayout
-     backgroundClass="bg-black"
-    >
+    <>
       <div className="pt-18 bg-gray-50 min-h-screen">
         <LightGenericTable
           ref={tableRef}
@@ -312,7 +309,7 @@ const VendorManageBookings = () => {
         cancelText="Not Yet"
         variant="warning"
       />
-    </VendorLayout>
+      </>
   );
 };
 
