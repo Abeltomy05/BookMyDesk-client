@@ -5,6 +5,7 @@ import { clientService } from '@/services/clientServices';
 import socketService from '@/services/socketService/socketService';
 import { clientLogout } from '@/store/slices/client.slice';
 import type { RootState } from '@/store/store';
+import { fetchedRef } from '@/utils/helpers/socketState';
 import React, {  useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useSelector } from 'react-redux';
@@ -46,12 +47,14 @@ const activeItem = useMemo(() => {
             if (response.success) {
                 toast.success("Logout successful!");
                 socketService.disconnect();
+                fetchedRef.current = false;
                 dispatch(clientLogout());
             } else {
                 toast.error(response.message || "Logout Error");
             }
         } catch (error) {
             socketService.disconnect();
+            fetchedRef.current = false;
             toast.error("Logout Error")
         }
     }

@@ -7,6 +7,7 @@ import NotificationsComponent from "../ReusableComponents/NotificationTab";
 import toast from "react-hot-toast";
 import { clientService } from "@/services/clientServices";
 import socketService from "@/services/socketService/socketService";
+import { fetchedRef } from "@/utils/helpers/socketState";
 
 interface ClientNavbarProps {
   onMenuClick: () => void;
@@ -29,7 +30,6 @@ const ClientNavbar: React.FC<ClientNavbarProps> = ({
   const [unreadCount, setUnreadCount] = useState(0);
   const notificationRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const fetchedRef = useRef(false);
 
   const limit = 3;
 
@@ -81,6 +81,7 @@ useEffect(() => {
   return () => {
     socketService.removeAllListeners();
     socketService.disconnect();
+    fetchedRef.current = false;
   };
 }, [user?._id]);
 
