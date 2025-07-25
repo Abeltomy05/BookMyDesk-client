@@ -46,31 +46,10 @@ export default function VendorVerification() {
     "Company information does not match documentation"
   ]
 
-  const isImageUrl = (url: string): boolean => {
-    return url.includes('/image/upload/') || url.includes('/upload/') && !url.includes('/raw/upload/')
-  }
-
   const getFileExtension = (url: string): string => {
     const parts = url.split('.')
     return parts[parts.length - 1]?.toLowerCase() || ''
   }
-
-    const getFileType = (url: string): 'image' | 'pdf' | 'doc' => {
-    if (isImageUrl(url)) {
-      return 'image'
-    }
-    
-    const extension = getFileExtension(url)
-    if (extension === 'pdf') {
-      return 'pdf'
-    } else if (['doc', 'docx'].includes(extension)) {
-      return 'doc'
-    }
-    
-    return 'pdf'
-  }
-
-
 
   const fetchVendors = async (params: FetchParams): Promise<ApiResponse<Vendor>> => {
     try {
@@ -163,13 +142,6 @@ export default function VendorVerification() {
   const closeRejectModal = () => {
     setShowRejectModal(false)
     setSelectedVendorId(null)
-  }
-
-  // Updated image modal functions
-  const openImageModal = (imageUrl: string, vendorName: string) => {
-    setSelectedImages([imageUrl]) // Convert single image to array
-    setSelectedVendorName(vendorName)
-    setShowImageModal(true)
   }
 
   const closeImageModal = () => {

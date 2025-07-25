@@ -1,7 +1,6 @@
 import { Phone, Wifi, Car, Coffee, Users, ShieldCheck, Printer, MapPin, Clock } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect, lazy, Suspense } from "react";
-import ClientLayout from "../ClientLayout";
 import { clientService } from "@/services/clientServices";
 import toast from "react-hot-toast";
 import type { BuildingData  } from "@/types/building-form.type";
@@ -81,7 +80,6 @@ export default function BuildingDetailsPage() {
 
     if (!buildingData) {
         return (
-            <ClientLayout>
                 <div className="min-h-screen bg-white flex items-center justify-center">
                     <div className="text-center">
                         <p className="text-gray-600 mb-4">Building not found</p>
@@ -93,7 +91,6 @@ export default function BuildingDetailsPage() {
                         </button>
                     </div>
                 </div>
-            </ClientLayout>
         );
     }
 
@@ -106,7 +103,6 @@ export default function BuildingDetailsPage() {
         : [mainImage];
 
     return (
-        <ClientLayout>
             <div className="min-h-screen bg-white">
                 {/* Hero Section - Reduced height */}
                 <div className="relative h-[300px] w-full">
@@ -374,6 +370,5 @@ export default function BuildingDetailsPage() {
                 />
                 </Suspense>
             </div>
-        </ClientLayout>
     );
 }

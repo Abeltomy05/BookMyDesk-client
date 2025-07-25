@@ -4,7 +4,6 @@ import { Plus, Calendar, Building, MapPin, Trash2 } from 'lucide-react'
 import { LightGenericTable, type TableRef } from '@/components/ReusableComponents/LightGenericTable'
 import type { BaseItem, TableAction, TableConfiguration } from '@/types/table.type'
 import type { ApiResponse, FetchParams } from '@/types/api.type'
-import VendorLayout from '../VendorLayout' 
 import AddOfferModal from '@/components/OfferComponents/AddNewOfferModal'
 import { vendorService } from '@/services/vendorServices'
 import toast from 'react-hot-toast'
@@ -200,9 +199,6 @@ const OfferPage: React.FC = () => {
   }
 
   return (
-    <VendorLayout
-      backgroundClass="bg-black"
-    >
       <div className="min-h-screen bg-gray-50 pt-18">
         <div className="max-w-7xl mx-auto">
           <div className='flex justify-between items-center'>
@@ -282,7 +278,6 @@ const OfferPage: React.FC = () => {
           />
         )}
       </div>
-    </VendorLayout>
   )
 }
 

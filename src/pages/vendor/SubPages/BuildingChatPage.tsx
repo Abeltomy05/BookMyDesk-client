@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import VendorLayout from '../VendorLayout';
 import {  ReusableChat} from '@/components/ReusableComponents/chat';
 import { defaultBuildingConfig, type ChatConfig, type ChatSidebarItem, type Message } from '@/types/chat.type';
 import { formatTimeAgo } from '@/utils/formatters/time-ago';
@@ -114,7 +113,6 @@ const BuildingChatPage: React.FC = () => {
 
   if (loading) {
     return (
-      <VendorLayout backgroundClass="bg-black">
         <div className="min-h-screen bg-gray-50 py-13 px-4">
           <div className="max-w-7xl mx-auto py-9">
             <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
@@ -124,13 +122,11 @@ const BuildingChatPage: React.FC = () => {
             </div>
           </div>
         </div>
-      </VendorLayout>
     );
   }
 
   if (!buildingId) {
     return (
-      <VendorLayout backgroundClass="bg-black">
         <div className="min-h-screen bg-gray-50 py-13 px-4">
           <div className="max-w-7xl mx-auto py-9">
             <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
@@ -143,14 +139,10 @@ const BuildingChatPage: React.FC = () => {
             </div>
           </div>
         </div>
-      </VendorLayout>
     );
   }
 
   return (
-    <VendorLayout 
-    backgroundClass="bg-black"
-    >
       <div className="min-h-screen bg-gray-50 py-13 px-4">
         <div className="max-w-7xl mx-auto py-9">
           <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
@@ -167,7 +159,6 @@ const BuildingChatPage: React.FC = () => {
           </div>
         </div>
       </div>
-    </VendorLayout>
   );
 };
 

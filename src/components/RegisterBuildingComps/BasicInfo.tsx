@@ -1,6 +1,6 @@
 import type React from "react"
 import { Upload, Clock, MapPin, AlertCircle } from "lucide-react"
-import type { BasicInfo, UpdatedBasicInfo } from "@/types/building-form.type"
+import type { UpdatedBasicInfo } from "@/types/building-form.type"
 import { validateBasicInfo, getFieldError, hasFieldError, type ValidationErrors } from "@/utils/validations/basic-info-register-building.validation"
 import { useEffect, useState } from "react"
 import { LocationInput } from "../ReusableComponents/LocationInput"

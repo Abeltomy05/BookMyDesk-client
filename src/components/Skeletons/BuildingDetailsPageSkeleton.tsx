@@ -1,8 +1,8 @@
-import ClientLayout from "@/pages/client/ClientLayout"
+
 
 export default function BuildingDetailsPageSkeleton() {
   return (
-    <ClientLayout>
+      <>
       <div className="min-h-screen bg-white">
         {/* Hero Section Skeleton */}
         <div className="relative h-[300px] w-full overflow-hidden">
@@ -238,6 +238,6 @@ export default function BuildingDetailsPageSkeleton() {
                 }
             `}</style>
 
-    </ClientLayout>
+    </>
   )
 }

@@ -4,7 +4,6 @@ import PicksSection from "@/components/HomeComponents/PicksSection"
 import WhyBookSection from "@/components/HomeComponents/WhyBookSection"
 import Loading from "@/components/Loadings/Loading"
 import { useState, useEffect } from "react"
-import ClientLayout from "../ClientLayout"
 
 const Home = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -22,7 +21,6 @@ const Home = () => {
 
 
   return (
-    <ClientLayout activeMenuItem="home">
      <div className={`font-sans overflow-x-hidden transition-all duration-1000 ease-out ${
        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
      }`}>
@@ -39,7 +37,6 @@ const Home = () => {
       <WhyBookSection />
       <FindNearestSection />
     </div>
-    </ClientLayout>
 
   )
 }

@@ -1,13 +1,9 @@
 import React from 'react'
-import VendorLayout from '../VendorLayout'
 import WalletComponent from '@/components/ReusableComponents/Wallet' 
 import { vendorService } from '@/services/vendorServices' 
 
 const VendorWalletPage: React.FC = () => {
   return (
-    <VendorLayout
-      backgroundClass="bg-black"
-    >
     <div className='mt-13'>
       <WalletComponent
         title="My Wallet"
@@ -21,7 +17,6 @@ const VendorWalletPage: React.FC = () => {
         enableWithdrawal={false}
       />
     </div>  
-    </VendorLayout>
   )
 }
 

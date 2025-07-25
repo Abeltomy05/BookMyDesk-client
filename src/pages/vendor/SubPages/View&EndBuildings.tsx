@@ -4,7 +4,6 @@ import { BasicInfoStep } from "@/components/View&EditBuildingComps/BasicInfoTab"
 import { SpaceDetailsStep } from "@/components/View&EditBuildingComps/SpaceDetailsTab"
 import { DescriptionAmenitiesStep } from "@/components/View&EditBuildingComps/DescriptionAmenitiesTab"
 import type { Building } from "@/types/view&editBuilding"
-import VendorLayout from "../VendorLayout"
 import { uploadImageCloudinary } from "@/utils/cloudinary/cloudinary"
 import { vendorService } from "@/services/vendorServices"
 import { useParams } from "react-router-dom"
@@ -132,18 +131,13 @@ export default function BuildingDetailsWizard() {
 
   if (!building) {
     return (
-      <VendorLayout backgroundClass="bg-black">
         <div className="min-h-screen flex items-center justify-center text-gray-600">
           <Loading/>
         </div>
-      </VendorLayout>
     );
   }
 
   return (
-     <VendorLayout
-      backgroundClass="bg-black"
-    >
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <div className="container mx-auto px-4 py-4 pt-16">
         <div className="max-w-10xl mx-auto">
@@ -314,6 +308,5 @@ export default function BuildingDetailsWizard() {
         </div>
       </div>
     </div>
-    </VendorLayout>
   )
 }

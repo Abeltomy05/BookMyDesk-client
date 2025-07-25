@@ -5,7 +5,6 @@ import { clientValidateProfileForm, validatePasswordForm, type ClientProfileErro
 import toast from "react-hot-toast"
 import { clientService } from "@/services/clientServices"
 import { uploadImageCloudinary } from "@/utils/cloudinary/cloudinary"
-import ClientLayout from "../ClientLayout"
 import type { LocationData } from "@/types/location.type"
 import { LocationInput } from "@/components/ReusableComponents/LocationInput"
 import { useDispatch } from "react-redux"
@@ -226,8 +225,6 @@ const handlePasswordValidation = () => {
   }
 
   return (
-   <ClientLayout>
-        
         <div className="max-w-6xl mx-auto p-4 md:p-6 bg-gray-50 min-h-screen">
       <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6 text-center">Profile Settings</h1>
 
@@ -470,7 +467,6 @@ const handlePasswordValidation = () => {
         </div>
       </div>
     </div>
-    </ClientLayout>
 
   );
 }

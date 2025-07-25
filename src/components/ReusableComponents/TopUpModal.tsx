@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { X, CreditCard, Lock, Loader2, Wallet } from "lucide-react"
 import { loadStripe, type StripeCardElementChangeEvent  } from "@stripe/stripe-js"
 import {
@@ -44,13 +44,11 @@ const cardElementOptions = {
 
 function TopUpPaymentForm({ 
   clientSecret,  
-  paymentIntentId,
   amount,
   onSuccess, 
   onError 
 }: {
   clientSecret: string
-  paymentIntentId: string
   amount: number
   onSuccess: () => void
   onError: (error: string) => void
@@ -429,7 +427,6 @@ export default function StripeTopUpModal({
               <Elements stripe={stripePromise} options={{ clientSecret: paymentData.clientSecret }}>
                 <TopUpPaymentForm
                   clientSecret={paymentData.clientSecret}
-                  paymentIntentId={paymentData.paymentIntentId}
                   amount={selectedAmount!}
                   onSuccess={handlePaymentSuccess}
                   onError={handlePaymentError}

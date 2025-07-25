@@ -3,7 +3,7 @@ import type { ApiResponse, FetchParams } from "@/types/api.type"
 import type { TableColumn } from "@/types/table.type"
 import { formatCurrency } from "@/utils/formatters/currency"
 import { formatDate } from "@/utils/formatters/date"
-import { ArrowUpRight, Calendar, FileText, Wallet } from "lucide-react"
+import { Calendar, FileText, Wallet } from "lucide-react"
 import { useState } from "react"
 import { motion } from 'framer-motion';
 import { adminService } from "@/services/adminService"
@@ -12,7 +12,6 @@ import type { WalletData, WalletTransaction } from "@/types/wallet.type"
 
 export default function AdminWalletPage() {
   const [currentBalance, setCurrentBalance] = useState<number>(0)
-  const [isWithdrawing, setIsWithdrawing] = useState(false)
 
   const fetchTransactions = async (params: FetchParams): Promise<ApiResponse<WalletTransaction>> => {
       try {
@@ -49,16 +48,6 @@ export default function AdminWalletPage() {
         totalItems: 0
       }
       }
-  }
-
-
-
-  const handleWithdraw = async () => {
-    setIsWithdrawing(true)
-    // Simulate withdrawal process
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    alert("Withdrawal request submitted successfully!")
-    setIsWithdrawing(false)
   }
 
   const columns: TableColumn<WalletTransaction>[] = [
@@ -141,30 +130,6 @@ export default function AdminWalletPage() {
                 </div>
               </div>
             </div>
-            
-            {/* <motion.button
-              onClick={handleWithdraw}
-              disabled={isWithdrawing}
-              className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
-                isWithdrawing
-                  ? "bg-gray-700 text-gray-400 cursor-not-allowed"
-                  : "bg-[#f69938] text-black hover:bg-[#f69938]/90 hover:scale-105"
-              }`}
-              whileHover={{ scale: isWithdrawing ? 1 : 1.05 }}
-              whileTap={{ scale: isWithdrawing ? 1 : 0.95 }}
-            >
-              {isWithdrawing ? (
-                <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-400 text-white"></div>
-                  <span>Processing...</span>
-                </>
-              ) : (
-                <>
-                  <ArrowUpRight size={20} />
-                  <span>Withdraw</span>
-                </>
-              )}
-            </motion.button> */}
           </div>
         </motion.div>
 

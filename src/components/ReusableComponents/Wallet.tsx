@@ -45,7 +45,6 @@ const WalletComponent: React.FC<WalletComponentProps> = ({
   const [balance, setBalance] = useState<number>(0)
   const [showTopUpModal, setShowTopUpModal] = useState<boolean>(false)
   const [showWithdrawModal, setShowWithdrawModal] = useState<boolean>(false)
-  const [topUpAmount, setTopUpAmount] = useState<string>("")
   const [withdrawAmount, setWithdrawAmount] = useState<string>("")
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
@@ -91,7 +90,7 @@ const WalletComponent: React.FC<WalletComponentProps> = ({
     }
   }
 
-  const handleTopUpSuccess = async (amount?: number) => {
+  const handleTopUpSuccess = async () => {
      setShowTopUpModal(false)
      if (tableRef.current) {
       (tableRef.current as any).refreshData()

@@ -3,7 +3,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Building2, Calendar, DollarSign, Users,  Download, ChevronDown,  } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/store/store';
-import VendorLayout from '../VendorLayout';
 import { vendorService } from '@/services/vendorServices';
 import { formatCurrency } from '@/utils/formatters/currency';
 import RevenueChart from '@/components/ReusableComponents/chart';
@@ -131,17 +130,14 @@ const VendorDashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <VendorLayout >
         <div className="min-h-screen flex items-center justify-center">
               <Loading/>
          </div>
-      </VendorLayout>
     );
   }
 
   if (error) {
     return (
-      <VendorLayout >
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <p className="text-red-600 mb-4">{error}</p>
@@ -153,12 +149,10 @@ const VendorDashboard: React.FC = () => {
             </button>
           </div>
         </div>
-      </VendorLayout>
     );
   }
 
   return (
-    <VendorLayout >
       <div className="min-h-screen">
         {/* Hero Section */}
         <motion.section 
@@ -445,7 +439,6 @@ const VendorDashboard: React.FC = () => {
           </div>
         </main>
       </div>
-    </VendorLayout>
   );
 };
 

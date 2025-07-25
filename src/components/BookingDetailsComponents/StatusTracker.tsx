@@ -17,17 +17,14 @@ export const StatusTracker: React.FC<StatusTrackerProps> = ({ status }) => {
     return () => clearTimeout(timer)
   }, [])
 
-  const getStatusColor = (currentStatus: BookingStatus) => {
-    switch (currentStatus) {
-      case "completed":
-        return "text-green-600"
-      case "cancelled":
-        return "text-red-600"
-      case "failed":
-        return "text-red-600"
-      default:
-        return "text-blue-600"
-    }
+  if (!animationComplete) {
+    return (
+      <div className="w-full max-w-4xl mx-auto mb-4">
+        <div className="flex items-center justify-center h-16">
+          <div className="animate-pulse bg-gray-300 w-full h-1 rounded-full" />
+        </div>
+      </div>
+    )
   }
 
   const isStepActive = (step: number) => {

@@ -1,6 +1,5 @@
 import type React from "react"
 import { useEffect, useState } from "react"
-import VendorLayout from "../VendorLayout"
 import toast from "react-hot-toast"
 import { uploadImageCloudinary } from "@/utils/cloudinary/cloudinary"
 import { vendorService } from "@/services/vendorServices"
@@ -235,9 +234,6 @@ const handleIdProofChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 }
 
   return (
-     <VendorLayout
-      backgroundClass="bg-black"
-    >
     <div className="min-h-screen bg-gray-50">
       {/* Banner Section */}
       <div className="pt-16 px-4 sm:px-6 lg:px-16">  
@@ -634,13 +630,13 @@ const handleIdProofChange = (event: React.ChangeEvent<HTMLInputElement>) => {
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Member Since</span>
                   <span className="text-sm font-medium">{profileData.createdAt
-                                                          ? new Date(profileData.createdAt).toLocaleDateString('en-US', {
-                                                              month: 'short',
-                                                              day: '2-digit',
-                                                              year: 'numeric'
-                                                            }).replace(',', '')
-                                                          : 'N/A'}
-                                                        </span>
+                    ? new Date(profileData.createdAt).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: '2-digit',
+                        year: 'numeric'
+                      }).replace(',', '')
+                    : 'N/A'}
+                  </span>
                 </div>
               </div>
             </div>
@@ -648,7 +644,6 @@ const handleIdProofChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         </div>
       </div>
     </div>
-    </VendorLayout>
   )
 }
 

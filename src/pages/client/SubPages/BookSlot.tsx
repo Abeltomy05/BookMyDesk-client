@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react"
 import { MapPin, Calendar, CheckCircle } from "lucide-react"
 import { Calendar as CalendarComponent } from "@/components/ui/calendar"
-import ClientLayout from "../ClientLayout"
 import { useNavigate, useParams } from "react-router-dom"
 import { clientService } from "@/services/clientServices"
 import toast from "react-hot-toast"
@@ -109,8 +108,7 @@ export default function SpaceBookingPage() {
 
   const handlePaymentSuccess = (bookingId: string) => {
     setShowStripeModal(false)
-    navigate(`/bookings`)
-    // toast.success("Booking confirmed successfully!")
+    navigate(`/booking-details/${bookingId}`)
   }
 
   const handleCloseModal = () => {
@@ -124,8 +122,7 @@ export default function SpaceBookingPage() {
 
   const handleWalletPaymentSuccess = (bookingId: string) => {
     setShowWalletModal(false)
-    navigate(`/bookings`)
-  // toast.success("Booking confirmed successfully!")
+    navigate(`/booking-details/${bookingId}`)
  }
 
   const handleWalletModalClose = () => {
@@ -163,21 +160,17 @@ export default function SpaceBookingPage() {
 
   if (loading) {
     return (
-      <ClientLayout>
         <SkeletonSpaceBooking />
-      </ClientLayout>
     )
   }
 
   if (!spaceData) {
     return (
-      <ClientLayout>
         <div className="min-h-screen bg-white flex items-center justify-center">
           <div className="text-center">
             <p className="text-gray-600 text-lg">Space not found</p>
           </div>
         </div>
-      </ClientLayout>
     )
   }
 
@@ -188,7 +181,6 @@ export default function SpaceBookingPage() {
   const totalPrice = originalPrice - discountAmount
 
   return (
-    <ClientLayout>
       <div className="min-h-screen bg-white">
         <div className="max-w-4xl mx-auto p-6">
           {/* Header */}
@@ -485,6 +477,5 @@ export default function SpaceBookingPage() {
           />
         )}
       </div>
-    </ClientLayout>
   )
 }

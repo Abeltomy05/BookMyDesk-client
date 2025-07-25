@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react"
 import { MapPin } from "lucide-react"
-import ClientLayout from "../ClientLayout"
 import { clientService } from "@/services/clientServices"
 import toast from "react-hot-toast"
 import { LocationInput } from "@/components/ReusableComponents/LocationInput" 
@@ -162,7 +161,6 @@ export default function BuildingsListing() {
   }
 
   return (
-    <ClientLayout activeMenuItem="buildings">
       <div className="min-h-screen bg-gray-50">
         {/* Hero Section */}
         <div 
@@ -329,6 +327,5 @@ export default function BuildingsListing() {
           showPagination={true}
         />
       </div>
-    </ClientLayout>
   )
 }

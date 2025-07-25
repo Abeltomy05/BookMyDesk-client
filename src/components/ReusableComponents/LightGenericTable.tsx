@@ -29,7 +29,6 @@ function LightGenericTableInner<T extends BaseItem>(
     enablePagination = true,
     enableActions = true,
     emptyMessage = "No data found",
-    loadingMessage = "Loading...",
     fetchData,
     onRefresh,
     className = "",

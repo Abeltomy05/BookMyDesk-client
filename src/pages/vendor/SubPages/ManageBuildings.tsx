@@ -3,7 +3,6 @@ import { LightGenericTable } from "@/components/ReusableComponents/LightGenericT
 import type { TableColumn, TableAction, TableFilter } from "@/types/table.type"
 import { Plus, Eye, Building2, Users, Calendar, MapPin, Archive, MessageCircle } from "lucide-react"
 import type { ApiResponse, FetchParams } from "@/types/api.type"
-import VendorLayout from "../VendorLayout"
 import type {  Building } from "@/types/building.type"
 import { vendorService, type BuildingStatus } from "@/services/vendorServices"
 import { useNavigate } from "react-router-dom"
@@ -194,7 +193,7 @@ export default function BuildingManagement() {
     },
     {
       label: (building) => building.status === "archived" ? "Unarchive Building" : "Archive Building",
-      icon: (building) => <Archive className="w-4 h-4" />,
+      icon: () => <Archive className="w-4 h-4" />,
       onClick: async (building) => {
          const isArchived = building.status === "archived";
          const newStatus: BuildingStatus = isArchived ? "approved" : "archived";
@@ -266,9 +265,7 @@ export default function BuildingManagement() {
   };
 
   return (
-    <VendorLayout
-      backgroundClass="bg-black"
-    >
+    <>
       <div className="min-h-screen bg-gray-50 p-4">
         <div className="max-w-7xl mx-auto pt-16">
           <div className="mb-6 flex justify-between items-center">
@@ -316,6 +313,6 @@ export default function BuildingManagement() {
         cancelText="Cancel"
         variant="warning"
       />
-    </VendorLayout>
+      </>
   )
 }

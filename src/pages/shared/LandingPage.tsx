@@ -5,7 +5,6 @@ import Loading from "@/components/Loadings/Loading"
 import { useState, useEffect } from "react"
 import LandingNavbar from "@/components/LandingPageComponents/LandingNavbar"
 import FindNearestSection from "@/components/HomeComponents/FindNearestSection"
-import PicksSection from "@/components/HomeComponents/PicksSection"
 import NavigateVendorSection from "@/components/HomeComponents/NavigateVendorSection"
 
 const LandingPage = () => {

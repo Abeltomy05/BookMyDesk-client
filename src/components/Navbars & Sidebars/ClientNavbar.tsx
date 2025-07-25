@@ -7,6 +7,7 @@ import NotificationsComponent from "../ReusableComponents/NotificationTab";
 import toast from "react-hot-toast";
 import { clientService } from "@/services/clientServices";
 import socketService from "@/services/socketService/socketService";
+import { fetchedRef } from "@/utils/helpers/socketState";
 
 interface ClientNavbarProps {
   onMenuClick: () => void;
@@ -52,7 +53,9 @@ const ClientNavbar: React.FC<ClientNavbarProps> = ({
   }, []);
 
 useEffect(() => {
-  if (!user?._id) return;
+  console.log("Navbar mounted");
+  if (!user?._id || fetchedRef.current) return;
+  fetchedRef.current = true;
 
   socketService.connect(user._id, "client");
   socketService.getSocket()?.emit("requestOnlineUsers");
@@ -63,6 +66,7 @@ useEffect(() => {
 
   const fetchInitialUnreadCount = async () => {
     try {
+      console.log("Fetching notifications...");
       const response = await clientService.getNotifications(1, limit, "unread");
       if (response.success && response.data?.unreadCount) {
         setUnreadCount(response.data.unreadCount);
@@ -77,6 +81,7 @@ useEffect(() => {
   return () => {
     socketService.removeAllListeners();
     socketService.disconnect();
+    fetchedRef.current = false;
   };
 }, [user?._id]);
 

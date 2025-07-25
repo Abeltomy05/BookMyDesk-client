@@ -5,7 +5,7 @@ import FloatingLabelInput from "@/components/ui/Floating-label"
 import toast from "react-hot-toast"
 import { useNavigate } from "react-router-dom"
 import { uploadFileToUploadThing } from "@/utils/uploadThing/FileUploader"
-import type { SignupConfig, BaseFormData, FormField } from "@/types/signup.type"
+import type { SignupConfig, FormField } from "@/types/signup.type"
 
 interface ReusableSignupProps {
   config: SignupConfig;

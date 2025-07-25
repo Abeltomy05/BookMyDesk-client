@@ -12,7 +12,6 @@ interface FloatingLabelInputProps {
   error?: string
   showPasswordToggle?: boolean
   isPasswordVisible?: boolean
-  onTogglePassword?: () => void
 }
 
 const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({ 
@@ -26,7 +25,6 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
   error,
   showPasswordToggle = false,
   isPasswordVisible,
-  onTogglePassword
 }) => {
   const [isFocused, setIsFocused] = useState(false)
 
