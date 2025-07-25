@@ -156,6 +156,8 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
                 src={selectedSession.avatar}
                 alt={selectedSession.name}
                 className="w-12 h-12 rounded-full object-cover"
+                referrerPolicy="no-referrer"
+                crossOrigin="anonymous"
               />
             ) : (
               <div className="w-12 h-12 rounded-full bg-gray-500 text-white flex items-center justify-center font-semibold">

@@ -100,9 +100,12 @@ const ResetPasswordForm: React.FC = () => {
 
         <button
           type="submit"
-          className="w-full py-3 px-4 bg-[#f69938] text-white rounded-lg hover:bg-[#e58828] transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-[#f69938] focus:ring-opacity-50"
+          disabled={isSubmitting}
+          className={`w-full py-3 px-4 text-white rounded-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-[#f69938] focus:ring-opacity-50 ${
+              isSubmitting ? "bg-[#d48b2b] cursor-not-allowed" : "bg-[#f69938] hover:bg-[#e58828]"
+            }`}        
         >
-          Reset Password
+          {isSubmitting ? "Resetting..." : "Reset Password"}
         </button>
       </form>
       </div>
