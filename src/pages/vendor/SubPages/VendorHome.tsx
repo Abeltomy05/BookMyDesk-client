@@ -70,7 +70,6 @@ const VendorDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [homeData, setHomeData] = useState<VendorHomeData | null>(null);
   const [showBuildingDropdown, setShowBuildingDropdown] = useState(false);
-  const [selectedBuilding, setSelectedBuilding] = useState<{ id: string; name: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const navigate = useNavigate()
@@ -123,7 +122,6 @@ const VendorDashboard: React.FC = () => {
     vendorService.downloadPdf(response.data, vendorData, selectedBuildingName);
 
     setShowBuildingDropdown(false);
-    setSelectedBuilding(null);
   };
 
   const completedBookings = homeData ? homeData.completedBookings  : [];

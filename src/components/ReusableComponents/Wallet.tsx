@@ -46,7 +46,6 @@ const WalletComponent: React.FC<WalletComponentProps> = ({
   const [showTopUpModal, setShowTopUpModal] = useState<boolean>(false)
   const [showWithdrawModal, setShowWithdrawModal] = useState<boolean>(false)
   const [withdrawAmount, setWithdrawAmount] = useState<string>("")
-  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const tableRef = useRef(null);
 
@@ -216,21 +215,12 @@ const getTypeColor = (type: string) => {
               {showTopUpButton && (
                 <button
                   onClick={() => setShowTopUpModal(true)}
-                  disabled={isLoading}
                   className="flex items-center justify-center gap-2 text-white px-6 py-3 rounded-xl font-semibold transition-colors duration-200 disabled:opacity-50"
                   style={{ 
                     backgroundColor: primaryColor,
                   }}
-                  onMouseEnter={(e) => {
-                    if (!isLoading) {
-                      e.currentTarget.style.backgroundColor = primaryColorHover;
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isLoading) {
-                      e.currentTarget.style.backgroundColor = primaryColor;
-                    }
-                  }}
+                  onMouseOver={(e) => (e.currentTarget.style.backgroundColor = primaryColorHover)}
+                  onMouseOut={(e) => (e.currentTarget.style.backgroundColor = primaryColor)}
                 >
                   <Plus className="w-5 h-5" />
                   Top Up
@@ -239,7 +229,6 @@ const getTypeColor = (type: string) => {
               {showWithdrawButton && enableWithdrawal && (
                 <button
                   onClick={() => setShowWithdrawModal(true)}
-                  disabled={isLoading}
                   className="flex items-center justify-center gap-2 bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-xl font-semibold transition-colors duration-200 disabled:opacity-50"
                 >
                   <Minus className="w-5 h-5" />
@@ -293,7 +282,6 @@ const getTypeColor = (type: string) => {
                     min="0"
                     max={balance}
                     step="0.01"
-                    disabled={isLoading}
                   />
                 </div>
                 <p className="text-xs text-gray-500 mt-1">Available balance: {formatCurrency(balance)}</p>
@@ -301,17 +289,16 @@ const getTypeColor = (type: string) => {
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowWithdrawModal(false)}
-                  disabled={isLoading}
                   className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleWithdraw}
-                  disabled={isLoading || !withdrawAmount || Number.parseFloat(withdrawAmount) <= 0 || Number.parseFloat(withdrawAmount) > balance}
+                  disabled={ !withdrawAmount || Number.parseFloat(withdrawAmount) <= 0 || Number.parseFloat(withdrawAmount) > balance}
                   className="flex-1 px-4 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-xl font-semibold transition-colors duration-200 disabled:opacity-50"
                 >
-                  {isLoading ? 'Processing...' : 'Withdraw'}
+                  Withdraw
                 </button>
               </div>
             </div>

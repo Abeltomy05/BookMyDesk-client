@@ -14,7 +14,6 @@ import { availableAmenities } from "@/utils/constants/AllAmenities"
 export default function BuildingsListing() {
   const [buildings, setBuildings] = useState<Building[]>([])  
   const [availableTypes, setAvailableTypes] = useState<string[]>([]);
-  const [availablePrices, setAvailablePrices] = useState<number[]>([]);
   const [selectedType, setSelectedType] = useState("");
   const [selectedPrice, setSelectedPrice] = useState("");
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([])
@@ -76,7 +75,6 @@ export default function BuildingsListing() {
     const response = await clientService.fetchFilters();
     console.log("Filter options:", response.data);
     setAvailableTypes(response.data.spaceNames || []);
-    setAvailablePrices((response.data.prices || []).sort((a:number, b:number) => a - b));
   } catch (error) {
     toast.error("Failed to load filter options");
     console.error("Error fetching filter data:", error);

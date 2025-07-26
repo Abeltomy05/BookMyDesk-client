@@ -5,7 +5,6 @@ import { vendorAxiosInstance } from "@/api/vendor.axios";
 import type { BuildingRegistrationData, GetAllBuildingsResponse, GetBuildingsParams } from "@/types/building.type";
 import type { Building } from "@/types/view&editBuilding";
 import type { GetBookingResponse } from "./clientServices";
-import type { VendorHomeData } from '@/types/vendor-home.types'; 
 import { formatCurrency } from '@/utils/formatters/currency';
 import { formatDate } from '@/utils/formatters/date';
 import type { NewOfferForm } from '@/pages/vendor/SubPages/OfferManagement';
