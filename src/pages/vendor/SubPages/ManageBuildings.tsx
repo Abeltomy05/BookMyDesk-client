@@ -290,7 +290,7 @@ export default function BuildingManagement() {
             actions={actions}
             filters={filters}
             searchPlaceholder="Search buildings..."
-            itemsPerPage={4}
+            itemsPerPage={3}
             enableSearch={true}
             enablePagination={true}
             enableActions={true}
