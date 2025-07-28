@@ -5,6 +5,7 @@ import { uploadImageCloudinary } from "@/utils/cloudinary/cloudinary"
 import { vendorService } from "@/services/vendorServices"
 import { validateVendorProfileForm, validatePasswordForm, type PasswordErrors, type VendorProfileErrors } from "@/utils/validations/profile-update.validation"
 import { getErrorMessage } from "@/utils/errors/errorHandler"
+import { uploadFileToUploadThing } from "@/utils/uploadThing/FileUploader"
 
 interface ProfileData {
   username: string
@@ -170,7 +171,7 @@ const handleIdProofChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 
        if (avatarFile) profileData.avatar = await uploadImageCloudinary(avatarFile);
        if (bannerFile) profileData.banner = await uploadImageCloudinary(bannerFile);
-       if (idProofFile) profileData.idProof = await uploadImageCloudinary(idProofFile);
+       if (idProofFile) profileData.idProof = await uploadFileToUploadThing(idProofFile);
 
         const response = await vendorService.updateProfile(profileData);
         console.log("Profile update response:", response.data)
@@ -239,7 +240,13 @@ const handleIdProofChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       <div className="pt-16 px-4 sm:px-6 lg:px-16">  
       <div className="relative h-58 bg-gradient-to-r from-blue-600 to-purple-600 w-full mt-1 rounded-lg shadow-lg overflow-hidden">
            <img
-            src={bannerUrl}
+            src={
+                bannerUrl?.startsWith("blob:")
+                  ? bannerUrl
+                  : bannerUrl
+                    ? `${import.meta.env.VITE_CLOUDINARY_SAVE_URL}${bannerUrl}`
+                    : ""
+              }            
             alt=""
             className="absolute inset-0 w-full h-full object-cover"
             onError={(e) => {
@@ -277,7 +284,13 @@ const handleIdProofChange = (event: React.ChangeEvent<HTMLInputElement>) => {
           <div className="relative">
             <div className="w-32 h-32 rounded-full border-4 border-white shadow-lg overflow-hidden bg-gray-200">
               <img
-                src={avatarUrl || "/placeholder.svg"}
+              src={
+                  avatarUrl?.startsWith("blob:")
+                    ? avatarUrl
+                    : avatarUrl
+                      ? `${import.meta.env.VITE_CLOUDINARY_SAVE_URL}${avatarUrl}`
+                      : "/placeholder.svg"
+                }                
                 alt="Vendor Avatar"
                 className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"
@@ -450,7 +463,7 @@ const handleIdProofChange = (event: React.ChangeEvent<HTMLInputElement>) => {
                     <span className="text-sm text-gray-600">{idProofFile.name}</span>
                   ) : profileData.idProof ? (
                     <a
-                      href={profileData.idProof}
+                      href={`${import.meta.env.VITE_UPLOADTHING_SAVE_URL}${profileData.idProof}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm text-blue-600 underline"

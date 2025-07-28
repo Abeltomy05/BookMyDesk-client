@@ -28,7 +28,7 @@ function ClientManagement() {
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center overflow-hidden">
             {user.avatar ? (
-              <img src={user.avatar} alt={user.username} className="w-full h-full object-cover" referrerPolicy="no-referrer" crossOrigin="anonymous" />
+              <img src={`${import.meta.env.VITE_CLOUDINARY_SAVE_URL}${user.avatar}`} alt={user.username} className="w-full h-full object-cover" referrerPolicy="no-referrer" crossOrigin="anonymous" />
             ) : (
               <User className="text-gray-400" size={20} />
             )}

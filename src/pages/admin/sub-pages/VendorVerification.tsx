@@ -157,15 +157,16 @@ export default function VendorVerification() {
   const isImage = ['jpg', 'jpeg', 'png', 'webp'].includes(lowerExt);
   const isPdf = lowerExt === 'pdf';
   const isDoc = ['doc', 'docx'].includes(lowerExt);
+  let fullUrl = `${import.meta.env.VITE_UPLOADTHING_SAVE_URL}${fileUrl}`;
 
   if (isImage) {
-    setSelectedImages([fileUrl]);
+    setSelectedImages([fullUrl]);
     setSelectedVendorName(vendorName);
     setShowImageModal(true);
   } else if (isPdf || isDoc) {
     const viewerUrl = isDoc
-      ? `https://docs.google.com/viewer?url=${encodeURIComponent(fileUrl)}&embedded=true`
-      : fileUrl;
+      ? `https://docs.google.com/viewer?url=${encodeURIComponent(fullUrl)}&embedded=true`
+      : fullUrl;
 
     window.open(viewerUrl, '_blank', 'noopener,noreferrer');
   } else {
@@ -208,9 +209,12 @@ export default function VendorVerification() {
       render: (vendor) => (
         <div className="flex items-start gap-2">
           <MapPin size={14} className="text-gray-400 mt-1 shrink-0" />
-          <span className="text-gray-300 text-sm whitespace-pre-wrap break-words max-w-md w-full leading-snug">
+          {vendor.companyAddress ?
+          (<span className="text-gray-300 text-sm whitespace-pre-wrap break-words max-w-md w-full leading-snug">
             {vendor.companyAddress}
-          </span>
+          </span>) :
+          'N/A'
+           }
         </div>
       )
     },

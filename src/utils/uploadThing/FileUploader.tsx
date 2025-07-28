@@ -52,9 +52,10 @@ export const uploadFileToUploadThing = async (file: File): Promise<string> => {
     if (uploadResponse.status !== 204) {
       throw new Error(`Upload failed with status ${uploadResponse.status}`);
     }
-
-    console.log(" Fileurl: ",uploadData.fileUrl);
-    return uploadData.fileUrl;
+    console.log("Uploaded file full path:", uploadData.fileUrl);
+    const relativePath = uploadData.fileUrl.split("/f/")[1];
+    console.log("Uploaded file path:", relativePath);
+    return relativePath;
   } catch (error) {
     console.error('UploadThing upload error:', error);
     

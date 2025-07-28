@@ -208,9 +208,11 @@ const handleMarkAsRead = async (id: string): Promise<{ success: boolean }> => {
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             >
               <img
-                src={user?.avatar || "https://res.cloudinary.com/dnivctodr/image/upload/v1748161444/default-user_rbydkc.png"}
+                src={`${import.meta.env.VITE_CLOUDINARY_SAVE_URL}${user?.avatar}` || "https://res.cloudinary.com/dnivctodr/image/upload/v1748161444/default-user_rbydkc.png"}
                 alt="User avatar"
                 className="w-10 h-10 object-cover rounded-full border-3 border-[#f69938]"
+                referrerPolicy="no-referrer"
+                crossOrigin="anonymous"
               />
             </div>
 

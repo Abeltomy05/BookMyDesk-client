@@ -186,7 +186,11 @@ useEffect(() => {
             {building.images.map((image, index) => (
               <div key={index} className="relative group">
                 <img
-                  src={image}
+                  src={
+                    image.startsWith("data:")
+                      ? image
+                      : `${import.meta.env.VITE_CLOUDINARY_SAVE_URL}${image}`
+                  }
                   alt={`Building ${index + 1}`}
                   className="w-full h-32 object-cover rounded-xl border border-gray-200 shadow-md hover:shadow-lg transition-all duration-200"
                 />

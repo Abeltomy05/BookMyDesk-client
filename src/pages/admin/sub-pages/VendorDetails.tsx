@@ -129,7 +129,7 @@ return (
       <div className={`h-48 w-full rounded-lg ${vendorData.banner ? "" : getBannerPlaceholder()}`}>
         {vendorData.banner ? (
           <img
-            src={vendorData.banner}
+            src={`${import.meta.env.VITE_CLOUDINARY_SAVE_URL}${vendorData.banner}`}
             alt="Vendor Banner"
             className="h-full w-full object-cover rounded-lg"
           />
@@ -145,7 +145,7 @@ return (
         >
           {vendorData.avatar ? (
             <img
-              src={vendorData.avatar}
+              src={`${import.meta.env.VITE_CLOUDINARY_SAVE_URL}${vendorData.avatar}`}
               alt="Vendor Avatar"
               className="w-full h-full object-cover rounded-full"
               referrerPolicy="no-referrer"

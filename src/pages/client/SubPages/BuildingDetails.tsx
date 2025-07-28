@@ -84,7 +84,7 @@ export default function BuildingDetailsPage() {
                     <div className="text-center">
                         <p className="text-gray-600 mb-4">Building not found</p>
                         <button 
-                            onClick={() => window.history.back()} 
+                            onClick={() => navigate('/bookings')} 
                             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                         >
                             Go Back
@@ -95,7 +95,7 @@ export default function BuildingDetailsPage() {
     }
 
     const mainImage = buildingData.images && buildingData.images.length > 0 
-        ? buildingData.images[0] 
+        ? `${import.meta.env.VITE_CLOUDINARY_SAVE_URL}${buildingData.images[0]}` 
         : "https://res.cloudinary.com/dnivctodr/image/upload/v1750089129/srptqnckz38fpjjxekdz.jpg";
 
     const displayImages = buildingData.images && buildingData.images.length > 0 
@@ -210,7 +210,7 @@ export default function BuildingDetailsPage() {
                                         <img
                                             src={
                                             buildingData.images && buildingData.images[i % buildingData.images.length]
-                                                ? buildingData.images[i % buildingData.images.length]
+                                                ? `${import.meta.env.VITE_CLOUDINARY_SAVE_URL}${buildingData.images[i % buildingData.images.length]}`
                                                 : mainImage
                                             }
                                             alt={space.name}
@@ -303,7 +303,7 @@ export default function BuildingDetailsPage() {
                             {displayImages.slice(1).map((image, index) => (
                                 <div key={index} className="relative h-30 w-36 overflow-hidden rounded-lg flex-shrink-0">
                                     <img
-                                        src={image}
+                                        src={`${import.meta.env.VITE_CLOUDINARY_SAVE_URL}${image}`}
                                         alt={`Thumbnail ${index + 1}`}
                                         className="w-full h-full object-cover cursor-pointer hover:opacity-80 transition-opacity"
                                         onClick={() => handleImageClick(index + 1)}
@@ -361,7 +361,9 @@ export default function BuildingDetailsPage() {
                  <Suspense fallback={<div className="h-72 md:h-96 bg-gray-100 rounded-lg animate-pulse" />}>
                 <ImageModal
                     isOpen={isImageModalOpen}
-                    images={buildingData.images || [mainImage]}
+                    images={(buildingData.images || [mainImage]).map(img =>
+                     img.startsWith("http") ? img : `${import.meta.env.VITE_CLOUDINARY_SAVE_URL}${img}`
+                    )}
                     onClose={() => setIsImageModalOpen(false)}
                     initialIndex={selectedImageIndex}
                     title={buildingData.buildingName}

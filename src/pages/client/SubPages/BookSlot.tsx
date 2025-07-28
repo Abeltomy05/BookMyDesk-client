@@ -216,7 +216,7 @@ export default function SpaceBookingPage() {
                         {spaceData.images.map((image, index) => (
                           <img
                             key={index}
-                            src={image || "/placeholder.svg"}
+                            src={`${import.meta.env.VITE_CLOUDINARY_SAVE_URL}${image}` || "https://res.cloudinary.com/dnivctodr/image/upload/v1750089129/srptqnckz38fpjjxekdz.jpg"}
                             alt={`Space image ${index + 1}`}
                             className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-2000 ease-in-out ${
                               index === currentIndex ? "opacity-100" : "opacity-0"
