@@ -285,12 +285,14 @@ const handleIdProofChange = (event: React.ChangeEvent<HTMLInputElement>) => {
             <div className="w-32 h-32 rounded-full border-4 border-white shadow-lg overflow-hidden bg-gray-200">
               <img
               src={
-                  avatarUrl?.startsWith("blob:")
-                    ? avatarUrl
-                    : avatarUrl
-                      ? `${import.meta.env.VITE_CLOUDINARY_SAVE_URL}${avatarUrl}`
-                      : "/placeholder.svg"
-                }                
+                  avatarUrl
+                    ? avatarUrl.startsWith("http") ||
+                      avatarUrl.startsWith("data:") ||
+                      avatarUrl.startsWith("blob:")
+                      ? avatarUrl
+                      : `${import.meta.env.VITE_CLOUDINARY_SAVE_URL}${avatarUrl}`
+                    : "https://res.cloudinary.com/dnivctodr/image/upload/v1748161444/default-user_rbydkc.png"
+                }               
                 alt="Vendor Avatar"
                 className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"
