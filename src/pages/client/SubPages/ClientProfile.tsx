@@ -240,7 +240,7 @@ const handlePasswordValidation = () => {
         >
           {profile.avatar ? (
             <img
-              src={profile.avatar?.startsWith("data:") ? profile.avatar : `${import.meta.env.VITE_CLOUDINARY_SAVE_URL}${profile.avatar}`}
+              src={profile.avatar?.startsWith("data:") || profile.avatar.startsWith("http") ? profile.avatar : `${import.meta.env.VITE_CLOUDINARY_SAVE_URL}${profile.avatar}`}
               alt="Profile Avatar"
               className="w-full h-full object-cover z-0"
               referrerPolicy="no-referrer"
