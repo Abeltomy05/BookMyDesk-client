@@ -96,9 +96,14 @@ export default function VendorManagement() {
       render: (vendor: VendorData) => (
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center overflow-hidden">
-            {vendor.avatar ? (
+           {vendor.avatar &&
+              (vendor.avatar.startsWith("http") || vendor.avatar.trim() !== "") ? (
               <img
-                src={`${import.meta.env.VITE_CLOUDINARY_SAVE_URL}${vendor.avatar}`}
+                src={
+                  vendor.avatar.startsWith("http") || vendor.avatar.startsWith("data:")
+                    ? vendor.avatar
+                    : `${import.meta.env.VITE_CLOUDINARY_SAVE_URL}${vendor.avatar}`
+                }
                 alt={vendor.username}
                 className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"
