@@ -24,6 +24,7 @@ const AuthCallback = () => {
         setTimeout(async()=>{
         if (user.role === "client"){
            dispatch(clientLogin(user));
+           console.log('Client logged in (dispatched):', user);
            navigate("/home");
 
            const fcmToken = await requestPermission();

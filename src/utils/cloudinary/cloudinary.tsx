@@ -14,8 +14,9 @@ export const uploadImageCloudinary = async (file: File) => {
 
   try {
     const response = await axios.post(uploadUrl, formData);
-    console.log(response.data.secure_url);
-    return response.data.secure_url;
+    const fullUrl = response.data.secure_url;
+    const relativePath = fullUrl.split("/upload/")[1];
+    return relativePath;
   } catch (error) {
     console.error("Error while uploading to Cloudinary:", error);
     throw error;

@@ -107,7 +107,7 @@ export default function BuildingManagement() {
           <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center overflow-hidden">
             {building.vendor.avatar ? (
               <img
-                src={building.vendor.avatar}
+                src={`${import.meta.env.VITE_CLOUDINARY_SAVE_URL}${building.vendor.avatar}`}
                 alt={building.vendor.username}
                 className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"

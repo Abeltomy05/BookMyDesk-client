@@ -98,7 +98,7 @@ export default function VendorManagement() {
           <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center overflow-hidden">
             {vendor.avatar ? (
               <img
-                src={vendor.avatar}
+                src={`${import.meta.env.VITE_CLOUDINARY_SAVE_URL}${vendor.avatar}`}
                 alt={vendor.username}
                 className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"

@@ -75,7 +75,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <div className="relative">
                   {session.avatar ? (
                     <img
-                      src={session.avatar}
+                      src={`${import.meta.env.VITE_CLOUDINARY_SAVE_URL}${session.avatar}`}
                       alt={session.name}
                       className="w-12 h-12 rounded-full object-cover"
                       referrerPolicy="no-referrer"

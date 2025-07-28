@@ -148,7 +148,11 @@ export default function BuildingVerification() {
   }
 
   const openImageModal = (images: string[], buildingName: string) => {
-    setSelectedImages(images)
+    const baseUrl = import.meta.env.VITE_CLOUDINARY_SAVE_URL;
+    const fullImageUrls = images.map(img =>
+      img.startsWith("http") ? img : `${baseUrl}${img}`
+    );
+    setSelectedImages(fullImageUrls)
     setSelectedBuildingName(buildingName)
     setShowImageModal(true)
   }

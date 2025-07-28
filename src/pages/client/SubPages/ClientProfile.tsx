@@ -126,7 +126,6 @@ const handleLocationChange = (location: LocationData | null) => {
     })
   }
 
-
   const handleAvatarUpload = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
@@ -241,7 +240,7 @@ const handlePasswordValidation = () => {
         >
           {profile.avatar ? (
             <img
-              src={profile.avatar}
+              src={profile.avatar?.startsWith("data:") ? profile.avatar : `${import.meta.env.VITE_CLOUDINARY_SAVE_URL}${profile.avatar}`}
               alt="Profile Avatar"
               className="w-full h-full object-cover z-0"
               referrerPolicy="no-referrer"

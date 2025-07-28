@@ -80,7 +80,7 @@ export default function BuildingsList({
               <div className="md:flex">
                 <div className="md:w-1/3">
                   <img
-                    src={(Array.isArray(building.images) && building.images[0]) || "/placeholder.svg"}
+                    src={(Array.isArray(building.images) && building.images[0]) ? `${import.meta.env.VITE_CLOUDINARY_SAVE_URL}${building.images[0]}` : "/placeholder.svg"}
                     alt={building.buildingName}
                     className="w-full h-64 md:h-full object-cover"
                   />
