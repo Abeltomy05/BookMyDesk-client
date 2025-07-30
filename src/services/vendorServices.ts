@@ -12,6 +12,7 @@ import type { LoginData } from './adminService';
 import type { NotificationResponse } from '@/types/notification.type';
 import { getErrorMessage } from '@/utils/errors/errorHandler';
 import type { ReportEntry } from '@/types/report.type';
+import type { DownloadReportFilterParams } from '@/components/VendorHomeComps/DownloadReport';
 
 interface ApiResponse {
   success: boolean;
@@ -442,7 +443,7 @@ downloadPdf: (
   doc.save('vendor-revenue-report.pdf');
 },
 
-getRevenueReport: async(buildingId?:string,filterParams?: any):Promise<ApiResponse>=>{
+getRevenueReport: async(buildingId?:string,filterParams?: DownloadReportFilterParams):Promise<ApiResponse>=>{
   try {
     const response = await vendorAxiosInstance.get('/revenue-report',{
       params:{
