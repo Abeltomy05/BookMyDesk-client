@@ -323,6 +323,18 @@ export const adminService = {
             totalItems: 0,
          };
     }
-  }
+  },
+
+  getRevenueChartData: async (filterParams: {
+    filterType: 'month' | 'year' | 'date';
+    date?: string;
+    month?: string;
+    year: string;
+  }):Promise<ApiResponse> => {
+    const response = await adminAxiosInstance.get('/revenue-chart', { 
+      params: filterParams 
+    });
+    return response.data;
+  },
 
 }

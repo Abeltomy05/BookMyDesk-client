@@ -413,7 +413,7 @@ const VendorDashboard: React.FC = () => {
                     </div>
                   )}
                 </motion.div>
-              </div>
+           </div>
             {/* Completed Bookings Table */}
             <CompletedBookingsTable 
             completedBookings={completedBookings}
