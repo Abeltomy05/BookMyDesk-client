@@ -10,12 +10,12 @@ import {
   ShoppingBag,
   Briefcase,
   Calendar,
-  DollarSign,
   LogOut,
   User,
   Menu,
   X,
 } from "react-feather"
+import { IndianRupee } from "lucide-react"
 import toast from "react-hot-toast"
 import { adminService } from "@/services/adminService"
 import { adminLogout } from "@/store/slices/admin.slice"
@@ -33,7 +33,7 @@ const sidebarItems = [
   { icon: Briefcase, label: "Buildings & Spaces", route: "/admin/buildings" },
   { icon: Briefcase, label: "Buildings Verification", route: "/admin/building-verification" },
   { icon: Calendar, label: "Bookings", route: "/admin/bookings" },
-  { icon: DollarSign, label: "Wallet", route: "/admin/wallet" },
+  { icon: IndianRupee, label: "Wallet", route: "/admin/wallet" },
 ]
 
 interface AdminLayoutProps {

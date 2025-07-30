@@ -1,7 +1,7 @@
 import type React from "react"
 import { useRef, useState } from "react"
 import clsx from "clsx";
-import { Plus, Minus, Download, Upload, Calendar, Hash, DollarSign, CreditCard } from "lucide-react"
+import { Plus, Minus, Download, Upload, Calendar, Hash, IndianRupee , CreditCard } from "lucide-react"
 import { formatCurrency } from "@/utils/formatters/currency"
 import { formatDate } from "@/utils/formatters/date"
 import { LightGenericTable } from "@/components/ReusableComponents/LightGenericTable"
@@ -107,7 +107,7 @@ const WalletComponent: React.FC<WalletComponentProps> = ({
       case "withdrawal":
         return <Download className="w-4 h-4 text-red-600" />
       case "refund":
-        return <DollarSign className="w-4 h-4 text-blue-600" />
+        return <IndianRupee  className="w-4 h-4 text-blue-600" />
       case "payment":
         return <CreditCard className="w-4 h-4 text-yellow-600" />
       default:

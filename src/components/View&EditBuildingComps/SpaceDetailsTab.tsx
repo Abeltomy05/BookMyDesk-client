@@ -1,6 +1,6 @@
 import type React from "react"
 import { useState } from "react"
-import { Plus, X, Users, DollarSign, AlertCircle } from "lucide-react"
+import { Plus, X, Users, IndianRupee, AlertCircle } from "lucide-react"
 import type { Building, Space } from "@/types/view&editBuilding"
 import { 
   validateSpaceField, 
@@ -370,7 +370,7 @@ export function SpaceDetailsStep({ building, setBuilding }: SpaceDetailsStepProp
                 </div>
                 <div>
                   <label className="text-xs font-semibold text-gray-600 mb-1 flex items-center gap-1">
-                    <DollarSign className="w-3 h-3" />
+                    <IndianRupee className="w-3 h-3" />
                     Price/Day
                   </label>
                   <input
