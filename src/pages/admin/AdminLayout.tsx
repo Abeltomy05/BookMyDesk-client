@@ -116,6 +116,22 @@ const handleMarkAsRead = async (id: string): Promise<{ success: boolean }> => {
   }
 };
 
+const handleClearNotifications = async (): Promise<{ success: boolean }> => {
+ try {
+    const response = await adminService.clearNotifications();
+    if (response?.success) {
+      return { success: true };
+    } else {
+      toast.error("Something went wrong!");
+      return { success: false };
+    }
+  } catch (error) {
+    console.error("Error clearing notifications:", error);
+    toast.error("Something went wrong!");
+    return { success: false };
+  }
+};
+
   const toggleUserDropdown = () => {
     setUserDropdownOpen(!userDropdownOpen)
   }
@@ -256,6 +272,7 @@ const handleMarkAsRead = async (id: string): Promise<{ success: boolean }> => {
                     <NotificationsComponent  
                     fetchNotifications={fetchNotificationsFromAdmin}
                     markAsRead={handleMarkAsRead}
+                    clearNotifications={handleClearNotifications}
                     />
                   </div>
                 )}

@@ -97,6 +97,22 @@ const handleMarkAsRead = async (id: string): Promise<{ success: boolean }> => {
   }
 };
 
+const handleClearNotifications = async (): Promise<{ success: boolean }> => {
+ try {
+    const response = await vendorService.clearNotifications();
+    if (response?.success) {
+      return { success: true };
+    } else {
+      toast.error("Something went wrong!");
+      return { success: false };
+    }
+  } catch (error) {
+    console.error("Error clearing notifications:", error);
+    toast.error("Something went wrong!");
+    return { success: false };
+  }
+};
+
   useEffect(() => {
   const handleClickOutside = (event: MouseEvent) => {
     if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
@@ -166,6 +182,7 @@ const handleMarkAsRead = async (id: string): Promise<{ success: boolean }> => {
                 <NotificationsComponent 
                 fetchNotifications={fetchNotificationsFromVendor} 
                 markAsRead={handleMarkAsRead} 
+                clearNotifications={handleClearNotifications}
                 />
               </div>
             )}

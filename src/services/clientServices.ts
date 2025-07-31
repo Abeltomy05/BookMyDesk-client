@@ -628,6 +628,18 @@ clearChat: async(sessionId: string):Promise<ApiResponse>=>{
   }
 },
 
+clearNotifications: async():Promise<ApiResponse>=>{
+  try {
+    const response = await clientAxiosInstance.delete('/clear-notifications');
+    return response.data;
+  } catch (error:unknown) {
+      return {
+      success: false,
+      message: getErrorMessage(error),
+    };
+  }
+},
+
 logout: async():Promise<ApiResponse>=>{
     try {
       const response = await clientAxiosInstance.post("/logout");

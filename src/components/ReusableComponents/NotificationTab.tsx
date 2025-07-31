@@ -7,9 +7,10 @@ import toast from "react-hot-toast";
 interface NotificationsComponentProps {
    fetchNotifications: (page: number, filter: "unread" | "all") => Promise<NotificationResponse>;
    markAsRead: (id: string) => Promise<{ success: boolean }>; 
+   clearNotifications: () => Promise<{ success: boolean }>; 
 }
 
-export default function NotificationsComponent({ fetchNotifications,markAsRead  }: NotificationsComponentProps) {
+export default function NotificationsComponent({ fetchNotifications,markAsRead,clearNotifications  }: NotificationsComponentProps) {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [activeTab, setActiveTab] = useState<"unread" | "all">("unread")
   const [currentPage, setCurrentPage] = useState(0)
@@ -74,15 +75,56 @@ const handleMarkAsRead  = async (id: string) => {
   }
 }
 
+const handleClearAllRead = async()=>{
+  try {
+    const response = await clearNotifications();
+    if(response.success){
+      await loadInitialNotifications();
+    }else{
+      toast.error("Failed to clear notifications. Please try again.")
+  }
+  } catch (error) {
+    console.error("Error clearing notification :", error);
+  toast.error("Failed to clear notifications. Please try again.");
+  }
+}
+
   return (
     <div className="w-full max-w-md mx-auto bg-white rounded-lg shadow-lg border border-gray-200">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-900">Notifications</h2>
-        <p className="text-sm text-gray-500 mt-1">
-        {unreadCount} unread message{unreadCount !== 1 ? "s" : ""}
-        </p>
+     <div className="p-4 border-b border-gray-200">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900">Notifications</h2>
+          <p className="text-sm text-gray-500 mt-1">
+            {unreadCount} unread message{unreadCount !== 1 ? "s" : ""}
+          </p>
+        </div>
+        
+        {/* Clear All Read Button */}
+          {activeTab === "all" && (
+          <button
+            onClick={handleClearAllRead}
+            disabled={loading}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 hover:text-red-700 border border-red-200 rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-red-50 disabled:hover:text-red-600"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="w-3 h-3 animate-spin" />
+                Clearing...
+              </>
+            ) : (
+              <>
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Clear Read
+              </>
+            )}
+          </button>
+        )}
       </div>
+    </div>
 
       {/* Tabs */}
       <div className="flex border-b border-gray-200">
