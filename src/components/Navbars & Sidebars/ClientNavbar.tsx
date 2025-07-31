@@ -124,6 +124,22 @@ const handleMarkAsRead = async (id: string): Promise<{ success: boolean }> => {
   }
 };
 
+const handleClearNotifications = async (): Promise<{ success: boolean }> => {
+  try {
+    const response = await clientService.clearNotifications();
+
+    if (response?.success) {
+      return { success: true };
+    } else {
+      toast.error("Something went wrong!");
+      return { success: false };
+    }
+  } catch (error) {
+    console.error("Error clearing notifications:", error);
+    toast.error("Something went wrong!");
+    return { success: false };
+  }
+}
 
   const locationName = user?.location?.displayName?.split(',')[0];
   return (
@@ -191,6 +207,7 @@ const handleMarkAsRead = async (id: string): Promise<{ success: boolean }> => {
                 <NotificationsComponent  
                 fetchNotifications={fetchNotificationsFromClient}
                 markAsRead={handleMarkAsRead}
+                clearNotifications={handleClearNotifications}
                 />
               </div>
             )}

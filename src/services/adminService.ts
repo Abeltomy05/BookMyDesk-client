@@ -417,4 +417,16 @@ export const adminService = {
       doc.save('admin-revenue-report.pdf');
   },
 
+  clearNotifications: async():Promise<ApiResponse>=>{
+    try {
+      const response = await adminAxiosInstance.delete('/clear-notifications');
+      return response.data;
+    } catch (error:unknown) {
+        return {
+        success: false,
+        message: getErrorMessage(error),
+      };
+    }
+  },
+
 }
