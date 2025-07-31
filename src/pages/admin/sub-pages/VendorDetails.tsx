@@ -1,5 +1,5 @@
 import type React from "react"
-import { Calendar, MapPin, Phone, Mail, Building, DollarSign, BookOpen, X } from "lucide-react"
+import { Calendar, MapPin, Phone, Mail, Building, IndianRupee, BookOpen, X } from "lucide-react"
 import { formatDate } from "@/utils/formatters/date"
 import { adminService } from "@/services/adminService"
 import toast from "react-hot-toast"
@@ -246,7 +246,7 @@ return (
               </p>
             </div>
             <div className="p-3 rounded-full" style={{ backgroundColor: "rgba(246, 153, 56, 0.1)" }}>
-              <DollarSign className="w-6 h-6" style={{ color: "#f69938" }} />
+              <IndianRupee className="w-6 h-6" style={{ color: "#f69938" }} />
             </div>
           </div>
         </div>

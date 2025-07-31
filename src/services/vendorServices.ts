@@ -12,6 +12,7 @@ import type { LoginData } from './adminService';
 import type { NotificationResponse } from '@/types/notification.type';
 import { getErrorMessage } from '@/utils/errors/errorHandler';
 import type { ReportEntry } from '@/types/report.type';
+import type { DownloadReportFilterParams } from '@/components/VendorHomeComps/DownloadReport';
 
 interface ApiResponse {
   success: boolean;
@@ -407,7 +408,7 @@ downloadPdf: (
 
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(14);
-    doc.text('Monthly Booking', 14, startY);
+    doc.text('Customer Bookings', 14, startY);
 
     const headColumns = selectedBuildingName
     ? [['Booking ID', 'Customer', 'Space', 'Desks', 'Amount', 'Date']]
@@ -442,11 +443,12 @@ downloadPdf: (
   doc.save('vendor-revenue-report.pdf');
 },
 
-getRevenueReport: async(buildingId?:string):Promise<ApiResponse>=>{
+getRevenueReport: async(buildingId?:string,filterParams?: DownloadReportFilterParams):Promise<ApiResponse>=>{
   try {
     const response = await vendorAxiosInstance.get('/revenue-report',{
       params:{
         buildingId,
+        ...filterParams,
       }
     })
     return response.data;
@@ -457,6 +459,18 @@ getRevenueReport: async(buildingId?:string):Promise<ApiResponse>=>{
         message: getErrorMessage(error),
       };
   }
+},
+
+getRevenueChartData: async (filterParams: {
+  filterType: 'month' | 'year' | 'date';
+  date?: string;
+  month?: string;
+  year: string;
+}):Promise<ApiResponse> => {
+  const response = await vendorAxiosInstance.get('/revenue-chart', { 
+    params: filterParams 
+  });
+  return response.data;
 },
 
 fetchBuildingsForVendor: async():Promise<ApiResponse>=>{

@@ -8,3 +8,12 @@ export const formatDate = (dateInput: Date | string | undefined) => {
     day: 'numeric'
   });
 };
+
+export const formatDateLabel = (dateStr: string) => {
+  const d = new Date(dateStr);
+  return d.toDateString(); 
+};
+
+export const getMonthName = (monthStr: string) => {
+  return new Date(`${monthStr}-01`).toLocaleString('default', { month: 'long' });
+};

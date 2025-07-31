@@ -3,11 +3,6 @@ export interface VendorHomeData {
   totalSpaces: number;
   completedBookingsCount: number;
   totalRevenue: number;
-  monthlyBookings: {
-    revenue:number;
-    bookings:number;
-    month:string;
-  };
   completedBookings: Array<{
     _id: string;
     bookingId: string;
@@ -42,7 +37,9 @@ export interface VendorHomeData {
 
 //revenur chart component
 export type RevenueDataPoint = {
-  month: string;
+  month?: string;
+  date?: string;
+  hour?: string;
   revenue: number;
   bookings: number;
 };
@@ -62,5 +59,6 @@ export type RevenueChartProps = {
     stroke: string;
     label: string;
   };
+  xAxisKey?: string;
   className?: string;
 };

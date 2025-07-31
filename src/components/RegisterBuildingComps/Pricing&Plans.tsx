@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronUp, Plus, Trash2, DollarSign, X } from "lucide-react"
+import { ChevronDown, ChevronUp, Plus, Trash2, IndianRupee, X } from "lucide-react"
 import type { PricingPlans, SpaceType } from "@/types/building-form.type"
 
 interface PricingPlansStepProps {
@@ -75,7 +75,7 @@ export function PricingPlansStep({ data, onChange }: PricingPlansStepProps) {
     <div className="space-y-4">
       <div className="text-center mb-4">
         <div className="w-8 h-8 bg-[#f69938] rounded-full flex items-center justify-center mx-auto mb-2">
-          <DollarSign className="w-4 h-4 text-white" />
+          <IndianRupee className="w-4 h-4 text-white" />
         </div>
         <h2 className="text-xl font-bold text-gray-900">Pricing and Plans</h2>
         <p className="text-gray-600 text-sm">Configure your workspace types and pricing</p>
