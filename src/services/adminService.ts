@@ -2,7 +2,12 @@ import { adminAxiosInstance } from "@/api/admin.axios";
 import authAxiosInstance from "@/api/auth.axios";
 import type { AllBuildingsData } from "@/pages/admin/sub-pages/BuildingListing";
 import type { NotificationResponse } from "@/types/notification.type";
+import type { AdminReportEntry } from "@/types/report.type";
 import { getErrorMessage } from "@/utils/errors/errorHandler";
+import { formatCurrency } from "@/utils/formatters/currency";
+import { formatDate } from "@/utils/formatters/date"
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 interface ApiResponse {
   success: boolean;
@@ -288,19 +293,6 @@ export const adminService = {
       }
     },
 
-  monthlyStats: async():Promise<ApiResponse>=>{
-   try {
-    const response = await adminAxiosInstance.get("/monthly-stats");
-    return response.data;
-   } catch (error:unknown) {
-     console.error('Error getting monthly stats:', error);
-        return {
-            success: false,
-            message: getErrorMessage(error),
-         };
-   }
-  },
-
   getAllBuildings: async(params:{ page?: number; limit?: number; search?: string; status?:string}):Promise<GetAllBuildingResponse>=>{
     try {
       const response = await adminAxiosInstance.get("/get-every-building",{
@@ -331,10 +323,98 @@ export const adminService = {
     month?: string;
     year: string;
   }):Promise<ApiResponse> => {
+     try {
     const response = await adminAxiosInstance.get('/revenue-chart', { 
       params: filterParams 
     });
     return response.data;
+    } catch (error:unknown) {
+        console.error('Error getting chart data:', error);
+        return {
+            success: false,
+            message: getErrorMessage(error),
+         };
+      }
+  },
+
+  getRevenueReport: async (filterParams: {
+    filterType: 'month' | 'year' | 'date';
+    date?: string;
+    month?: string;
+    year: string;
+  }):Promise<ApiResponse> =>{
+    try {
+    const response = await adminAxiosInstance.get('/revenue-report', { 
+      params: filterParams 
+    });
+     return response.data;
+    } catch (error:unknown) {
+        console.error('Error getting chart data:', error);
+        return {
+            success: false,
+            message: getErrorMessage(error),
+         };
+      }  
+  },
+
+  downloadPdf: (
+    reportData: AdminReportEntry[],
+    totalAdminRevenue: number,
+    filterLabel: string
+  )=>{
+     const doc = new jsPDF();
+  
+     //Heading
+     doc.setFont('helvetica', 'bold');
+     doc.setFontSize(22);
+     doc.text('Book My Desk', 70, 20);
+  
+     doc.setFontSize(13);
+     doc.text('Admin Revenue Report', 69, 30);
+  
+     // Filter info (Month/Year/Date)
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Report Period:', 14, 38);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`${filterLabel}`, 45, 38);
+
+     // Table Start Position
+     let startY = 50;  
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.text('Completed Bookings', 14, startY);
+
+     const headColumns = [['Booking ID', 'Customer', 'Space', 'Building', 'Desks', 'Amount', 'Admin Revenue', 'Date']];
+
+     const bodyRows = reportData.map((b) =>[
+          b.bookingId.slice(0, 16),
+          b.clientId?.username || '',
+          b.spaceId?.name || '',
+          b.buildingId?.buildingName || '',
+          b.numberOfDesks?.toString() || '',
+          formatCurrency(b.totalPrice!),
+          formatCurrency(b.adminRevenue),
+          formatDate(b.bookingDate),
+        ]
+      );
+
+      autoTable(doc, {
+        startY: startY + 5,
+        head: headColumns,
+        body: bodyRows,
+        styles: { fontSize: 9 },
+      });
+
+    const finalY = (doc as any).lastAutoTable.finalY || startY + 20;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      doc.text('Total Admin Revenue:', 14, finalY + 10);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`${formatCurrency(totalAdminRevenue)}`, 70, finalY + 10);
+
+      doc.save('admin-revenue-report.pdf');
   },
 
 }

@@ -8,3 +8,7 @@ export type ReportEntry = {
   bookingDate: Date;
   paymentMethod?: string;
 };
+
+export type AdminReportEntry = ReportEntry & {
+  adminRevenue: number;
+}
