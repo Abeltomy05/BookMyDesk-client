@@ -8,7 +8,6 @@ import { HandledAuthError } from "@/utils/errors/handleAuthError"
 import { useNavigate } from "react-router-dom"
 import BuildingsListingSkeleton from "@/components/Skeletons/BuildingListingSkeleton"
 import BuildingsList, { type Building } from "@/components/ReusableComponents/ListBuilding"
-import { availableAmenities } from "@/utils/constants/AllAmenities"
 
 
 export default function BuildingsListing() {
@@ -23,6 +22,7 @@ export default function BuildingsListing() {
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(false)
+  const [fetchedAmenities, setFetchedAmenities] = useState<string[]>([]);
   const limit = 4;
 
   const navigate = useNavigate()
@@ -50,7 +50,6 @@ export default function BuildingsListing() {
   fetchFilters();
   }, []);
   
-
   const fetchBuildings = async () => {
     setIsLoading(true)
     try {
@@ -151,6 +150,28 @@ export default function BuildingsListing() {
     document.removeEventListener('mousedown', handleClickOutside);
   };
 }, [showAmenities]);
+
+useEffect(() => {
+  const fetchAmenities = async () => {
+    try {
+      const response = await clientService.getAllAmenities(1, 100, undefined, true);
+      console.log("Amenities data: ",response.data);
+      if (response.success && Array.isArray(response.data)) {
+        const names = response.data.map((amenity: {_id:string,name:string}) => amenity.name); 
+        setFetchedAmenities(names);
+      } else {
+        toast.error("Failed to load amenities");
+      }
+    } catch (error) {
+      toast.error("Error fetching amenities");
+      console.error("Amenity fetch error:", error);
+    }
+  };
+
+  if (showAmenities && fetchedAmenities.length === 0) {
+    fetchAmenities();
+  }
+}, [showAmenities, fetchedAmenities.length]);
 
   if (isLoading) {
     return (
@@ -266,7 +287,7 @@ export default function BuildingsListing() {
 
                         {/* Amenities Checkboxes */}
                         <div className="grid grid-cols-2">
-                          {availableAmenities.map((amenity) => (
+                          {fetchedAmenities.map((amenity) => (
                             <label key={amenity} className="flex items-center px-3 py-2 hover:bg-gray-100 cursor-pointer border-r border-b border-gray-100 last:border-r-0">
                               <input
                                 type="checkbox"

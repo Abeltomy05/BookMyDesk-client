@@ -115,7 +115,7 @@ export default function BuildingDetailsWizard() {
          if(response.success){
            toast.success("Building updated successfully!")
          }else{
-           toast.error("Failed to update building. Please try again.")
+           toast.error(response.message || "Failed to update building. Please try again.")
          }
 
     } catch (error) {

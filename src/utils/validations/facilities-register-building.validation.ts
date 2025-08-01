@@ -20,12 +20,12 @@ const validatePhoneNumber = (phone: string): string | null => {
   
   // Check minimum length
   if (cleanPhone.length < 10) {
-    return "Phone number must be at least 10 digits"
+    return "Phone number must be  10 digits"
   }
   
   // Check maximum length
-  if (cleanPhone.length > 15) {
-    return "Phone number must be less than 15 digits"
+  if (cleanPhone.length > 10) {
+    return "Phone number must be 10 digits"
   }
   
   // Check if contains only digits, spaces, parentheses, hyphens, and plus
