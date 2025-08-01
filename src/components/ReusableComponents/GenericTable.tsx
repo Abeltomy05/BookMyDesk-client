@@ -1,6 +1,6 @@
 import { useState, useEffect, useImperativeHandle, forwardRef } from "react"
 import { motion } from "framer-motion"
-import { Search, MoreVertical, ChevronLeft, ChevronRight, AlertCircle } from "lucide-react"
+import { Search, MoreVertical, ChevronLeft, ChevronRight, AlertCircle, Plus  } from "lucide-react"
 import { type BaseItem, type TableConfiguration, type PaginationInfo, type TableAction} from "@/types/table.type"
 import type { ApiResponse, FetchParams } from "@/types/api.type"
 import { TableLoadingSkeleton } from "@/components/Skeletons/TableLoadingSkeleton"
@@ -11,6 +11,9 @@ interface GenericTableProps<T extends BaseItem> extends TableConfiguration<T> {
   onRefresh?: () => void
   className?: string
   onFilterChange?: (filterValue: string) => void
+  showAddButton?: boolean
+  addButtonLabel?: string
+  onAddClick?: () => void
 }
 
 function GenericTableInner<T extends BaseItem>({
@@ -27,7 +30,10 @@ function GenericTableInner<T extends BaseItem>({
   fetchData,
   onRefresh,
   className = "",
-  onFilterChange
+  onFilterChange,
+  showAddButton,
+  addButtonLabel,
+  onAddClick
 }: GenericTableProps<T>,
 ref: React.Ref<TableRef<T>>) {
   const [data, setData] = useState<T[]>([])
@@ -169,9 +175,23 @@ ref: React.Ref<TableRef<T>>) {
       animate="visible"
       variants={containerVariants}
     >
+      <div className="flex items-center justify-between mb-2">
       <motion.h1 className="text-2xl font-bold mb-2 text-[#f69938]" variants={itemVariants}>
         {title}
       </motion.h1>
+       {showAddButton && (
+        <motion.button
+          onClick={onAddClick}
+          className="px-4 py-2 bg-[#f69938] text-black rounded-lg hover:bg-[#e58a2f] transition-colors flex items-center gap-2 font-medium"
+          variants={itemVariants}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <Plus size={16} />
+          {addButtonLabel || "Add Item"}
+        </motion.button>
+      )}
+      </div>
 
       {/* Search and Filters */}
       <motion.div className="flex flex-col md:flex-row justify-between mb-6 gap-4" variants={itemVariants}>

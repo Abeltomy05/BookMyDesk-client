@@ -12,6 +12,7 @@ import BuildingVerification from '@/pages/admin/sub-pages/BuildingVerification'
 import AdminWalletPage from '@/pages/admin/sub-pages/AdminWallet'
 import AdminBookingsPage from '@/pages/admin/sub-pages/Bookings'
 import BuildingManagement from '@/pages/admin/sub-pages/BuildingListing'
+import AmenityManagement from '@/pages/admin/sub-pages/AmenityManagement'
 
 const AdminRoutes = () => {
   return (
@@ -28,6 +29,7 @@ const AdminRoutes = () => {
           <Route path="/buildings" element={<ProtectedRoute allowedRoles={["admin"]}  element={<AdminLayout><BuildingManagement /></AdminLayout>} />}/>
           <Route path="/wallet" element={<ProtectedRoute allowedRoles={["admin"]}  element={<AdminLayout><AdminWalletPage /></AdminLayout>} />}/>
           <Route path="/bookings" element={<ProtectedRoute allowedRoles={["admin"]}  element={<AdminLayout><AdminBookingsPage /></AdminLayout>} />}/>
+          <Route path="/amenities" element={<ProtectedRoute allowedRoles={["admin"]}  element={<AdminLayout><AmenityManagement /></AdminLayout>} />}/>
     </Routes>
   )
 }

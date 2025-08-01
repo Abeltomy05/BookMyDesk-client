@@ -22,8 +22,9 @@ export interface LoginData {
   fcmToken?:string;
 }
 
-type ClientStatus = "active" | "blocked"
-type VendorStatus = "pending" | "approved" | "rejected" | "blocked";
+export type ClientStatus = "active" | "blocked";
+export type VendorStatus = "pending" | "approved" | "rejected" | "blocked";
+export type AmenityStatus = "active" | "non-active"
 
 interface GetUsersParams {
   role?: "client" | "vendor";
@@ -42,6 +43,12 @@ interface GetAllUsersResponse {
   message?: string
 }
 
+export interface Amenities{
+  _id:string,
+  name:string,
+  isActive:boolean,
+}
+
 interface GetAllBuildingResponse{
   success: boolean;
   buildings: AllBuildingsData[];
@@ -49,6 +56,15 @@ interface GetAllBuildingResponse{
   currentPage: number;
   totalItems?: number;
   message?: string;
+}
+
+export interface GetAllAmenities{
+  success:boolean;
+  message:string;
+  data: Amenities[];
+  totalPages:number;
+  currentPage:number;
+  totalItems?:number;
 }
 
 interface VendorData {
@@ -155,9 +171,9 @@ export const adminService = {
     },
 
     updateEntityStatus: async (
-      entityType: "client" | "vendor" | "building",
+      entityType: "client" | "vendor" | "building" | "amenity",
       entityId: string,
-      status: ClientStatus | VendorStatus,
+      status: ClientStatus | VendorStatus | AmenityStatus,
       reason?: string
     ): Promise<ApiResponse> => {
       try {
@@ -420,6 +436,62 @@ export const adminService = {
   clearNotifications: async():Promise<ApiResponse>=>{
     try {
       const response = await adminAxiosInstance.delete('/clear-notifications');
+      return response.data;
+    } catch (error:unknown) {
+        return {
+        success: false,
+        message: getErrorMessage(error),
+      };
+    }
+  },
+
+  getAllAmenities: async(page?:number,limit?:number,search?:string,isActive?:boolean): Promise<GetAllAmenities>=>{
+    try {
+      const response = await adminAxiosInstance.get('/get-amenities',{
+        params: { page, limit, search, isActive }
+      })
+      return response.data;
+    }catch (error:unknown) {
+        return {
+        success: false,
+        message: getErrorMessage(error),
+        data: [],
+        totalPages:0,
+        currentPage:0,
+        totalItems:0,
+      };
+    }
+  },
+
+  createAmenity: async (name:string):Promise<ApiResponse>=>{
+    try {
+      const response = await adminAxiosInstance.post('/create-amenity',{name});
+      return response.data;
+    } catch (error:unknown) {
+        return {
+        success: false,
+        message: getErrorMessage(error),
+      };
+    }
+  },
+
+  editAmenity: async (name:string,id:string):Promise<ApiResponse>=>{
+    try {
+      const response = await adminAxiosInstance.patch('/edit-amenity',{name,id});
+      return response.data;
+    } catch (error:unknown) {
+        return {
+        success: false,
+        message: getErrorMessage(error),
+      };
+    }
+  },
+  
+  deleteAmenity: async (id:string):Promise<ApiResponse>=>{
+    try {
+      const response = await adminAxiosInstance.delete('/delete-amenity',{
+        params:{id}
+      });
       return response.data;
     } catch (error:unknown) {
         return {
