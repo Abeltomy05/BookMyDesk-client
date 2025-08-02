@@ -642,6 +642,21 @@ clearNotifications: async():Promise<ApiResponse>=>{
   }
 },
 
+getAllAmenities: async(page?:number,limit?:number,search?:string,isActive?:boolean): Promise<ApiResponse>=>{
+    try {
+      const response = await vendorAxiosInstance.get('/get-amenities',{
+        params:{page,limit,search,isActive}
+      })
+      return response.data;
+    }catch (error:unknown) {
+        return {
+        success: false,
+        message: getErrorMessage(error),
+        data: [],
+      };
+    }
+  },
+
  logout: async():Promise<ApiResponse>=>{
     try {
       const response = await vendorAxiosInstance.post("/logout");

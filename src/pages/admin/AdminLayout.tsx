@@ -21,7 +21,7 @@ import { adminService } from "@/services/adminService"
 import { adminLogout } from "@/store/slices/admin.slice"
 import { useDispatch } from "react-redux"
 import { useNavigate, useLocation } from "react-router-dom"
-import { ShieldCheck } from "lucide-react"
+import { ShieldCheck, Wrench } from "lucide-react"
 import NotificationsComponent from "@/components/ReusableComponents/NotificationTab"
 
 
@@ -32,6 +32,7 @@ const sidebarItems = [
   { icon: ShieldCheck, label: "Vendor Verification", route: "/admin/vendor-verification" },
   { icon: Briefcase, label: "Buildings & Spaces", route: "/admin/buildings" },
   { icon: Briefcase, label: "Buildings Verification", route: "/admin/building-verification" },
+  { icon: Wrench, label: "Amenities", route: "/admin/amenities" },
   { icon: Calendar, label: "Bookings", route: "/admin/bookings" },
   { icon: IndianRupee, label: "Wallet", route: "/admin/wallet" },
 ]

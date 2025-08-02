@@ -1,20 +1,30 @@
-"use client"
-
 import type React from "react"
 import { useState, useRef, useEffect } from "react"
-import { Plus, X, ImageIcon, FileText, Star, Upload } from "lucide-react"
+import { X, ImageIcon, FileText, Star, Upload, ChevronUp, ChevronDown } from "lucide-react"
 import type { Building } from "@/types/view&editBuilding"
+import { vendorService } from "@/services/vendorServices"
 
 interface DescriptionAmenitiesStepProps {
   building: Building
   setBuilding: React.Dispatch<React.SetStateAction<Building | null>>
 }
 
+interface Amenity {
+  _id: string
+  name: string
+}
+
 export function DescriptionAmenitiesStep({ building, setBuilding}: DescriptionAmenitiesStepProps) {
-  const [newAmenity, setNewAmenity] = useState("")
   const [uploadingImages, setUploadingImages] = useState<boolean[]>([])
   const [imageFiles, setImageFiles] = useState<File[]>([]) 
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const [availableAmenities, setAvailableAmenities] = useState<Amenity[]>([])
+  const [displayedAmenities, setDisplayedAmenities] = useState<Amenity[]>([])
+  const [showMore, setShowMore] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [hasMoreAmenities, setHasMoreAmenities] = useState(true)
 
 const updateBuilding = (field: keyof Building, value: string) => {
   setBuilding((prev) => {
@@ -23,28 +33,72 @@ const updateBuilding = (field: keyof Building, value: string) => {
   });
 };
 
-const addAmenity = () => {
-  if (newAmenity.trim()) {
-    setBuilding((prev) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        amenities: [...prev.amenities, newAmenity.trim()],
-      };
-    });
-    setNewAmenity("");
+const fetchAmenities = async (page: number = 1, append: boolean = false) => {
+  setLoading(true)
+  try {
+    const response = await vendorService.getAllAmenities(page, 8, '', true)
+    if (response.success && response.data) {
+      const newAmenities = response.data
+      
+      if (append) {
+        setAvailableAmenities(prev => [...prev, ...newAmenities])
+        setDisplayedAmenities(prev => [...prev, ...newAmenities])
+      } else {
+        setAvailableAmenities(newAmenities)
+        setDisplayedAmenities(newAmenities)
+      }
+      
+      setHasMoreAmenities(newAmenities.length === 8)
+    }
+  } catch (error) {
+    console.error('Error fetching amenities:', error)
+  } finally {
+    setLoading(false)
   }
-};
+}
 
-const removeAmenity = (index: number) => {
+useEffect(() => {
+  fetchAmenities(1, false)
+}, [])
+
+const handleShowMore = () => {
+  if (!showMore) {
+    setShowMore(true)
+    if (hasMoreAmenities && availableAmenities.length <= 8) {
+      const nextPage = currentPage + 1
+      setCurrentPage(nextPage)
+      fetchAmenities(nextPage, true)
+    }
+  } else {
+    setShowMore(false)
+    setDisplayedAmenities(availableAmenities.slice(0, 8))
+  }
+}
+
+const isAmenitySelected = (amenityName: string) => {
+  return building.amenities.includes(amenityName)
+}
+
+const toggleAmenity = (amenity: Amenity) => {
   setBuilding((prev) => {
     if (!prev) return prev;
-    return {
-      ...prev,
-      amenities: prev.amenities.filter((_, i) => i !== index),
-    };
+    
+    const isSelected = prev.amenities.includes(amenity.name)
+    
+    if (isSelected) {
+      return {
+        ...prev,
+        amenities: prev.amenities.filter(name => name !== amenity.name),
+      };
+    } else {
+      return {
+        ...prev,
+        amenities: [...prev.amenities, amenity.name],
+      };
+    }
   });
 };
+
 
 const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
   const files = event.target.files;
@@ -98,7 +152,7 @@ useEffect(() => {
   });
 }, [imageFiles, setBuilding]);
 
-  return (
+ return (
     <div className="space-y-8">
       <div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Description & Amenities</h2>
@@ -130,37 +184,67 @@ useEffect(() => {
               <Star className="w-5 h-5 text-[#f69938]" />
               Building Amenities
             </h3>
-            <div className="flex flex-wrap gap-3 mb-4">
-              {building.amenities.map((amenity, index) => (
-                <span
-                  key={index}
-                  className="bg-gradient-to-r from-[#f69938] to-[#e5862f] text-white px-4 py-2 rounded-full text-sm flex items-center gap-2 shadow-md hover:shadow-lg transition-all duration-200"
-                >
-                  {amenity}
-                  <button
-                    onClick={() => removeAmenity(index)}
-                    className="hover:bg-white/20 rounded-full p-1 transition-colors"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              ))}
-            </div>
-            <div className="flex gap-3">
-              <input
-                type="text"
-                value={newAmenity}
-                onChange={(e) => setNewAmenity(e.target.value)}
-                placeholder="Add new amenity (e.g., Parking, WiFi, Security)"
-                className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#f69938] transition-all duration-200"
-                onKeyPress={(e) => e.key === "Enter" && addAmenity()}
-              />
-              <button
-                onClick={addAmenity}
-                className="bg-[#f69938] text-white px-6 py-3 rounded-xl hover:bg-[#e5862f] transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
-              >
-                <Plus className="w-4 h-4" />
-              </button>
+            
+            {/* Available Amenities Grid */}
+            <div className="mb-6">
+              <h4 className="text-md font-semibold text-gray-700 mb-3">Select from available amenities:</h4>
+              
+              {loading && displayedAmenities.length === 0 ? (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {[...Array(8)].map((_, index) => (
+                    <div key={index} className="h-16 bg-gray-200 rounded-xl animate-pulse"></div>
+                  ))}
+                </div>
+              ) : (
+                <>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {(showMore ? availableAmenities : displayedAmenities.slice(0, 8)).map((amenity) => (
+                      <button
+                        key={amenity._id}
+                        onClick={() => toggleAmenity(amenity)}
+                        className={`p-4 rounded-xl border-2 transition-all duration-200 text-center ${
+                          isAmenitySelected(amenity.name)
+                            ? 'border-[#f69938] bg-[#f69938] text-white shadow-lg'
+                            : 'border-gray-200 bg-white text-gray-700 hover:border-[#f69938] hover:bg-gray-50'
+                        }`}
+                      >
+                        <div className="flex flex-col items-center gap-2">
+                            <Star className={`w-5 h-5 ${isAmenitySelected(amenity.name) ? 'text-white' : 'text-gray-400'}`} />
+                          <span className="text-sm font-medium">{amenity.name}</span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                  
+                  {/* Show More/Less Button */}
+                  {(availableAmenities.length > 8 || hasMoreAmenities) && (
+                    <div className="mt-4 text-center">
+                      <button
+                        onClick={handleShowMore}
+                        disabled={loading}
+                        className="inline-flex items-center gap-2 px-4 py-2 text-[#f69938] hover:text-[#e5862f] font-medium transition-colors disabled:opacity-50"
+                      >
+                        {loading ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-[#f69938] border-t-transparent rounded-full animate-spin"></div>
+                            Loading...
+                          </>
+                        ) : showMore ? (
+                          <>
+                            <ChevronUp className="w-4 h-4" />
+                            Show Less
+                          </>
+                        ) : (
+                          <>
+                            <ChevronDown className="w-4 h-4" />
+                            Show More
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           </div>
         </div>
