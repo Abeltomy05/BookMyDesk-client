@@ -6,7 +6,7 @@ import type { BuildingRegistrationData, GetAllBuildingsResponse, GetBuildingsPar
 import type { Building } from "@/types/view&editBuilding";
 import type { GetBookingResponse } from "./clientServices";
 import { formatCurrency } from '@/utils/formatters/currency';
-import { formatDate } from '@/utils/formatters/date';
+import { formatBookingDates } from '@/utils/formatters/date';
 import type { NewOfferForm } from '@/pages/vendor/SubPages/OfferManagement';
 import type { LoginData } from './adminService';
 import type { NotificationResponse } from '@/types/notification.type';
@@ -417,12 +417,12 @@ downloadPdf: (
     const bodyRows = reportData.map((b) =>
     selectedBuildingName
       ? [
-          b.bookingId.slice(0, 16),
+          b.bookingId.slice(0, 13),
           b.clientId?.username || '',
           b.spaceId?.name || '',
           b.numberOfDesks?.toString() || '',
           formatCurrency(b.totalPrice!),
-          formatDate(b.bookingDate),
+          formatBookingDates(b.bookingDates),
         ]
       : [
           b.bookingId.slice(0, 16),
@@ -431,7 +431,7 @@ downloadPdf: (
           b.buildingId?.buildingName || '',
           b.numberOfDesks?.toString() || '',
           formatCurrency(b.totalPrice!),
-          formatDate(b.bookingDate),
+          formatBookingDates(b.bookingDates),
         ]
   );
 
@@ -439,6 +439,29 @@ downloadPdf: (
     startY: startY + 5,
     head: headColumns,
     body: bodyRows,
+    styles: {
+      fontSize: 10,
+      cellPadding: 1.5,
+    },
+    margin: { left: 14 },
+    columnStyles: selectedBuildingName
+    ? {
+        0: { cellWidth: 25 }, // Booking ID (shorter)
+        1: { cellWidth: 28 }, // Customer
+        2: { cellWidth: 30 }, // Space
+        3: { cellWidth: 15 }, // Desks
+        4: { cellWidth: 25 }, // Amount
+        5: { cellWidth: 50 }, // Date (longest)
+      }
+    : {
+        0: { cellWidth: 25 },
+        1: { cellWidth: 25 },
+        2: { cellWidth: 28 },
+        3: { cellWidth: 30 }, // Building
+        4: { cellWidth: 15 }, // Desks
+        5: { cellWidth: 25 }, // Amount
+        6: { cellWidth: 50 }, // Date
+      }
   });
   doc.save('vendor-revenue-report.pdf');
 },

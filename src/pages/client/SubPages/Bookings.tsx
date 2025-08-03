@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import type { TableColumn } from '@/types/table.type';
 import type { BookingData } from '@/types/booking.type';
 import type { FetchParams } from '@/types/api.type';
-import { formatDate } from '@/utils/formatters/date';
+import { formatBookingDates } from '@/utils/formatters/date';
 
 const ClientBookings = () => {
   const tableRef = useRef(null);
@@ -21,7 +21,7 @@ const ClientBookings = () => {
         search: params.search || '',
         status: currentFilter  !== 'all' ? currentFilter  : undefined
       });
-
+      console.log(response.data)
       if (response.success) {
         return {
           success: true,
@@ -69,21 +69,24 @@ const ClientBookings = () => {
     }
   };
 
-
   const handleFilterChange = (filterValue: string) => {
   setCurrentFilter(filterValue);
 };
+
 
 
   const tableColumns:TableColumn<BookingData>[] = [
     {
       key: 'bookingDate',
       label: 'Booking Date',
-      width: 'col-span-2',
+      width: 'col-span-3',
       render: (item) => (
-        <div className="flex items-center gap-2">
-          <Calendar size={16} className="text-gray-400" />
-          <span className="font-medium">{formatDate(item.bookingDate)}</span>
+        <div className="flex items-start gap-2">
+          <Calendar size={16} className="text-gray-400 mt-1" />
+          <span
+            className="font-medium whitespace-pre-line"
+            dangerouslySetInnerHTML={{ __html: formatBookingDates(item.bookingDates) }}
+          />
         </div>
       )
     },

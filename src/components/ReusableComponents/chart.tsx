@@ -1,6 +1,7 @@
 import React from 'react';
 import { ComposedChart, Line, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import type { RevenueChartProps } from '@/types/vendor-home.types';
+import { formatDate } from '@/utils/formatters/date';
 
 const RevenueChart: React.FC<RevenueChartProps> = ({ 
   data = [], 
@@ -97,17 +98,11 @@ const RevenueChart: React.FC<RevenueChartProps> = ({
               axisLine={false}
               tick={{ fill: '#64748b' }}
               tickFormatter={(value) => {
-                  if (xAxisKey === 'date') {
-                    return new Date(value).toLocaleDateString('en-IN', {
-                      day: 'numeric',
-                      month: 'short'
-                    });
-                  }
-                  if (xAxisKey === 'hour') {
-                    return value;
-                  }
-                  return value; 
-                }}
+                if (xAxisKey === 'date') {
+                  return formatDate(value);
+                }
+                return value;
+              }}
             />
             
             <YAxis 

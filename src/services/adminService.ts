@@ -5,7 +5,7 @@ import type { NotificationResponse } from "@/types/notification.type";
 import type { AdminReportEntry } from "@/types/report.type";
 import { getErrorMessage } from "@/utils/errors/errorHandler";
 import { formatCurrency } from "@/utils/formatters/currency";
-import { formatDate } from "@/utils/formatters/date"
+import { formatBookingDates } from "@/utils/formatters/date"
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
@@ -412,7 +412,7 @@ export const adminService = {
           b.numberOfDesks?.toString() || '',
           formatCurrency(b.totalPrice!),
           formatCurrency(b.adminRevenue),
-          formatDate(b.bookingDate),
+          formatBookingDates(b.bookingDates || []),
         ]
       );
 
@@ -420,7 +420,14 @@ export const adminService = {
         startY: startY + 5,
         head: headColumns,
         body: bodyRows,
-        styles: { fontSize: 9 },
+        styles: {
+          fontSize: 9,
+          cellPadding: 2,
+          valign: 'top',
+        },
+        columnStyles: {
+          7: { cellWidth: 40 }, 
+        },
       });
 
     const finalY = (doc as any).lastAutoTable.finalY || startY + 20;

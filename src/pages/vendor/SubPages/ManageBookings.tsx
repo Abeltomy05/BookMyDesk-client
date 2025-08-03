@@ -7,7 +7,7 @@ import type { BookingData } from '@/types/booking.type';
 import type { FetchParams } from '@/types/api.type';
 import { formatCurrency } from '@/utils/formatters/currency';
 import toast from 'react-hot-toast';
-import { formatDate } from '@/utils/formatters/date';
+import { formatBookingDates } from '@/utils/formatters/date';
 import ConfirmModal from '@/components/ReusableComponents/ConfirmModal';
 import CancelBookingModal from '@/components/BookingDetailsComponents/CancelConfirmModal';
 
@@ -111,10 +111,20 @@ const VendorManageBookings = () => {
 
    const handleCompleteBooking = async () => {
     if (!selectedBooking) return;
-    const now = new Date();
-    const bookingDate = new Date(selectedBooking.bookingDate);
-    if(bookingDate > now){
-      toast.error("Booking cannot be marked as completed before the booking date.");
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const bookingDates = selectedBooking.bookingDates.map(date => new Date(date));
+    const latestBookingDate = bookingDates.reduce((latest, curr) =>
+      curr > latest ? curr : latest
+    );
+
+    latestBookingDate.setHours(0, 0, 0, 0);
+
+    if(latestBookingDate > today){
+      toast.error("You can only mark this booking as completed after the last booked date has passed.",{
+        icon:'🟡'
+      });
       return;
     }
     try {
@@ -155,12 +165,15 @@ const VendorManageBookings = () => {
     {
       key: 'bookingDate',
       label: 'Booking Date',
-      width: 'col-span-2',
+      width: 'col-span-3',
       render: (item) => (
-        <div className="flex items-center gap-2">
-          <Calendar size={16} className="text-gray-400" />
-          <span className="font-medium">{formatDate(item.bookingDate)}</span>
-        </div>
+       <div className="flex items-start gap-2">
+        <Calendar size={16} className="text-gray-400 mt-1" />
+        <span
+            className="font-medium whitespace-pre-line"
+            dangerouslySetInnerHTML={{ __html: formatBookingDates(item.bookingDates) }}
+          />
+      </div>
       )
     },
     {
