@@ -22,7 +22,7 @@ interface PaymentModalProps {
     spaceId: string
     spaceName: string
     location: string
-    bookingDate: Date
+    bookingDates: Date[]
     numberOfDesks: number
     totalAmount: number
     discountAmount?: number
@@ -153,11 +153,22 @@ function PaymentForm({
     }
   }
 
-
    const formatLocation = (location: string): string => {
     const parts = location.split(",").map((p) => p.trim())
     if (parts.length <= 4) return location
     return `${parts[0]}, ${parts[1]}, ${parts[parts.length - 2]}, ${parts[parts.length - 1]}`
+  }
+
+  const formatDateRange = (dates: Date[]): string => {
+    if (dates.length === 0) return 'No dates selected'
+    if (dates.length === 1) return formatDate(dates[0])
+    
+    const sortedDates = [...dates].sort((a, b) => a.getTime() - b.getTime())
+    if (dates.length === 2) {
+      return `${formatDate(sortedDates[0])} - ${formatDate(sortedDates[1])}`
+    }
+    
+    return `${formatDate(sortedDates[0])} - ${formatDate(sortedDates[sortedDates.length - 1])} (${dates.length} days)`
   }
 
   return (
@@ -175,9 +186,17 @@ function PaymentForm({
             <span className="font-medium">{formatLocation(bookingData.location)}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-600">Date:</span>
-            <span className="font-medium">{formatDate(bookingData.bookingDate)}</span>
+            <span className="text-gray-600">
+              {bookingData.bookingDates.length === 1 ? 'Date:' : 'Dates:'}
+            </span>
+            <span className="font-medium">{formatDateRange(bookingData.bookingDates)}</span>
           </div>
+          {bookingData.bookingDates.length > 1 && (
+            <div className="flex justify-between">
+              <span className="text-gray-600">Duration:</span>
+              <span className="font-medium">{bookingData.bookingDates.length} days</span>
+            </div>
+          )}
           <div className="flex justify-between">
             <span className="text-gray-600">Desks:</span>
             <span className="font-medium">{bookingData.numberOfDesks}</span>
@@ -269,12 +288,11 @@ export default function StripePaymentModal({
     setError(null)
 
     try {
-      // const totalAmountInPaise = Math.round(bookingData.totalAmount * 100);
       const response = await clientService.createPaymentIntent({
         amount: bookingData.totalAmount, 
         currency: "inr",
         spaceId: bookingData.spaceId,
-        bookingDate: bookingData.bookingDate.toISOString(),
+        bookingDates: bookingData.bookingDates.map(date => date.toISOString()),
         numberOfDesks: bookingData.numberOfDesks,
         discountAmount: bookingData.discountAmount,
         bookingId: bookingData.bookingId || undefined,

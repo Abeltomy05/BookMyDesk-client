@@ -262,7 +262,7 @@ export const clientService = {
     amount: number
     currency: string
     spaceId: string
-    bookingDate: string
+    bookingDates: string[]
     numberOfDesks: number
     discountAmount?: number
     bookingId?: string
@@ -351,11 +351,11 @@ export const clientService = {
     }
   },
 
-  payWithWallet:async ({spaceId,bookingDate,numberOfDesks,totalPrice,discountAmount}:{spaceId: string,bookingDate:Date,numberOfDesks:number,totalPrice:number,discountAmount?:number})=>{
+  payWithWallet:async ({spaceId,bookingDates,numberOfDesks,totalPrice,discountAmount}:{spaceId: string,bookingDates:Date[],numberOfDesks:number,totalPrice:number,discountAmount?:number})=>{
     try {
       const response = await clientAxiosInstance.post("/pay-with-wallet",{
         spaceId,
-        bookingDate,
+        bookingDates,
         numberOfDesks,
         totalPrice,
         discountAmount
