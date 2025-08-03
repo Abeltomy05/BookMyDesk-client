@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { MapPin, Calendar, CheckCircle } from "lucide-react"
+import { MapPin, Calendar, CheckCircle, X } from "lucide-react"
 import { Calendar as CalendarComponent } from "@/components/ui/calendar"
 import { useNavigate, useParams } from "react-router-dom"
 import { clientService } from "@/services/clientServices"
@@ -33,7 +33,7 @@ export default function SpaceBookingPage() {
     amenities: [],
     capacity: 0,
   })
-  const [selectedDate, setSelectedDate] = useState<Date>()
+  const [selectedDates, setSelectedDates] = useState<Date[]>([]) 
   const [numberOfDesks, setNumberOfDesks] = useState(1)
   const [showCalendar, setShowCalendar] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -129,7 +129,15 @@ export default function SpaceBookingPage() {
   setShowWalletModal(false)
 }
 
-  const formatDate = (date: Date) => {
+ const formatDate = (date: Date) => {
+    return date.toLocaleDateString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+    })
+  }
+
+  const formatDateLong = (date: Date) => {
     return date.toLocaleDateString("en-US", {
       weekday: "long",
       year: "numeric",
@@ -138,9 +146,13 @@ export default function SpaceBookingPage() {
     })
   }
 
-  const handleDateSelect = (date: Date | undefined) => {
-    setSelectedDate(date)
-    setShowCalendar(false)
+
+  const removeDate = (dateToRemove: Date) => {
+    setSelectedDates(prev => prev.filter(date => date.toDateString() !== dateToRemove.toDateString())) // Remove individual date
+  }
+
+  const clearAllDates = () => {
+    setSelectedDates([]) // Clear all selected dates
   }
 
   const formatLocation = (location: string): string => {
@@ -174,13 +186,14 @@ export default function SpaceBookingPage() {
     )
   }
 
-  const originalPrice = numberOfDesks * Number(spaceData.pricePerDay)
+  const numberOfDays = selectedDates.length
+  const originalPrice = numberOfDesks * Number(spaceData.pricePerDay) * numberOfDays
   const discountAmount = spaceData.offer?.discountPercentage 
   ? (originalPrice * spaceData.offer.discountPercentage) / 100 
   : 0
   const totalPrice = originalPrice - discountAmount
 
-  return (
+return (
       <div className="min-h-screen bg-white">
         <div className="max-w-4xl mx-auto p-6">
           {/* Header */}
@@ -261,33 +274,75 @@ export default function SpaceBookingPage() {
             <div className="space-y-6">
               <div className="rounded-lg border border-gray-200 bg-white shadow-sm p-6">
                 <h3 className="text-xl font-semibold text-black mb-6">Book Your Space</h3>
+                
                 {/* Date Selection */}
                 <div className="space-y-4 mb-6">
-                  <label className="block text-sm font-medium text-black">Select Date</label>
+                  <div className="flex items-center justify-between">
+                    <label className="block text-sm font-medium text-black">Select Dates</label>
+                    {selectedDates.length > 0 && (
+                      <button
+                        onClick={clearAllDates}
+                        className="text-xs text-red-600 hover:text-red-800 underline"
+                      >
+                        Clear All
+                      </button>
+                    )}
+                  </div>
+                  
                   <div className="relative">
                     <button
                       onClick={() => setShowCalendar(!showCalendar)}
                       className="w-full flex items-center justify-start px-3 py-2 text-left font-normal border-2 rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#f69938] focus:ring-offset-2"
                       style={{
-                        borderColor: selectedDate ? "#f69938" : "#d1d5db",
+                        borderColor: selectedDates.length > 0 ? "#f69938" : "#d1d5db",
                       }}
                     >
                       <Calendar className="mr-2 h-4 w-4" style={{ color: "#f69938" }} />
-                      {selectedDate ? formatDate(selectedDate) : "Select a date"}
+                      {selectedDates.length > 0 
+                        ? `${selectedDates.length} date${selectedDates.length > 1 ? 's' : ''} selected`
+                        : "Select dates"
+                      }
                     </button>
 
                     {showCalendar && (
                       <div className="absolute top-full left-0 mt-2 z-50 bg-white border border-gray-200 rounded-md shadow-lg p-4">
                         <CalendarComponent
-                          mode="single"
-                          selected={selectedDate}
-                          onSelect={handleDateSelect}
+                          mode="multiple"
+                          selected={selectedDates}
+                          onSelect={(dates) => {
+                            if (Array.isArray(dates)) {
+                              setSelectedDates(dates.sort((a, b) => a.getTime() - b.getTime()))
+                            }
+                          }}
                           disabled={(date) => date < new Date()}
                           initialFocus
                         />
                       </div>
                     )}
                   </div>
+
+                  {/* Selected Dates Display */}
+                  {selectedDates.length > 0 && (
+                    <div className="mt-3">
+                      <p className="text-xs text-gray-600 mb-2">Selected dates:</p>
+                      <div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto">
+                        {selectedDates.map((date, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center bg-orange-50 text-orange-800 px-2 py-1 rounded-md text-xs border border-orange-200"
+                          >
+                            <span>{formatDate(date)}</span>
+                            <button
+                              onClick={() => removeDate(date)}
+                              className="ml-1 text-orange-600 hover:text-orange-800"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Number of Desks */}
@@ -332,10 +387,15 @@ export default function SpaceBookingPage() {
                       <span className="text-gray-600">Location:</span>
                       <span className="text-black">{formatLocation(spaceData.location)}</span>
                     </div>
-                    {selectedDate && (
+                    {selectedDates.length > 0 && (
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Date:</span>
-                        <span className="text-black">{formatDate(selectedDate)}</span>
+                        <span className="text-gray-600">Dates:</span>
+                        <span className="text-black">
+                          {selectedDates.length === 1 
+                            ? formatDateLong(selectedDates[0])
+                            : `${selectedDates.length} days selected`
+                          }
+                        </span>
                       </div>
                     )}
                     <div className="flex justify-between">
@@ -343,9 +403,15 @@ export default function SpaceBookingPage() {
                       <span className="text-black">{numberOfDesks}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Price per desk:</span>
+                      <span className="text-gray-600">Price per desk/day:</span>
                       <span className="text-black">₹{spaceData.pricePerDay}</span>
                     </div>
+                    {numberOfDays > 0 && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Duration:</span>
+                        <span className="text-black">{numberOfDays} day{numberOfDays > 1 ? 's' : ''}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between">
                       <span className="text-gray-600">Subtotal:</span>
                       <span className={`text-black ${spaceData.offer ? 'line-through text-gray-500' : ''}`}>
@@ -379,13 +445,13 @@ export default function SpaceBookingPage() {
                     onClick={handleBookNow}
                     className="w-full text-white font-semibold py-3 text-lg rounded-md transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{ backgroundColor: "#f69938" }}
-                    disabled={!selectedDate}
+                    disabled={selectedDates.length === 0}
                   >
                     Book Now
                   </button>
 
                   {/* Payment Options Dropdown  */}
-                  {showPaymentOptions && selectedDate && (
+                  {showPaymentOptions && selectedDates.length > 0 && (
                       <div className="absolute -top-16 right-full mr-8 z-50 bg-white border border-gray-200 rounded-md shadow-lg overflow-hidden w-80">
                         <button
                           onClick={handleStripePayment}
@@ -419,8 +485,8 @@ export default function SpaceBookingPage() {
                     )}
                 </div>
 
-                {!selectedDate && (
-                  <p className="text-sm text-gray-500 text-center mt-2">Please select a date to continue</p>
+                {selectedDates.length === 0 && (
+                  <p className="text-sm text-gray-500 text-center mt-2">Please select at least one date to continue</p>
                 )}
               </div>
             </div>
@@ -437,7 +503,7 @@ export default function SpaceBookingPage() {
               spaceId: spaceId || "",
               spaceName: spaceData.name,
               location: spaceData.location,
-              bookingDate: selectedDate || new Date(),
+              bookingDates: selectedDates,
               numberOfDesks: numberOfDesks,
               totalAmount: totalPrice,
               discountAmount,
@@ -457,7 +523,7 @@ export default function SpaceBookingPage() {
                 spaceId: spaceId || "",
                 spaceName: spaceData.name,
                 location: spaceData.location,
-                bookingDate: selectedDate || new Date(),
+                bookingDates: selectedDates,
                 numberOfDesks: numberOfDesks,
                 totalAmount: totalPrice,
                 discountAmount,

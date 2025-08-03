@@ -273,7 +273,7 @@ return (
             spaceId: booking.spaceId,
             spaceName: booking.space?.name ?? "Unknown Space",
             location: booking.building?.location?.displayName ?? "Unknown Location",
-            bookingDate: new Date(booking.bookingDate),
+            bookingDates: booking.bookingDates.map(date => new Date(date)),
             numberOfDesks: booking.numberOfDesks ?? 1,
             totalAmount: booking.totalPrice ?? 0,
             discountAmount: booking.discountAmount ?? 0,

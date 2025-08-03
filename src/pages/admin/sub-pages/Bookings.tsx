@@ -62,9 +62,9 @@ const getStatusIcon = (status: string) => {
 
 const getStatusColor = (status: string) => {
   switch (status) {
-    case "confirmed":
-      return "bg-green-500/20 text-green-400 border-green-500/30"
     case "completed":
+      return "bg-green-500/20 text-green-400 border-green-500/30"
+    case "confirmed":
       return "bg-blue-500/20 text-blue-400 border-blue-500/30"
     case "cancelled":
       return "bg-red-500/20 text-red-400 border-red-500/30"
@@ -75,8 +75,8 @@ const getStatusColor = (status: string) => {
 
 const statuses = [
   { value: 'all', label: 'All Statuses' },
-  { value: 'confirmed', label: 'Confirmed' },
   { value: 'completed', label: 'Completed' },
+  { value: 'confirmed', label: 'Confirmed' },
   { value: 'cancelled', label: 'Cancelled' },
 ]
 

@@ -1,7 +1,7 @@
 import type React from "react"
 import type { BookingData } from "@/types/booking.type" 
 import { formatCurrency } from "../../utils/formatters/currency"
-import { formatDate } from "@/utils/formatters/date"
+import { formatBookingDates, formatDate } from "@/utils/formatters/date"
 
 interface BookingDetailsProps {
   booking: BookingData
@@ -10,7 +10,11 @@ interface BookingDetailsProps {
 export const BookingDetails: React.FC<BookingDetailsProps> = ({ booking }) => {
 
   const calculatePricePerDay = () => {
-    return ((booking.totalPrice ?? 0) + (booking.discountAmount ?? 0)) / (booking.numberOfDesks || 1);
+    const deskCount = booking.numberOfDesks || 1;
+    const dayCount = booking.bookingDates?.length || 1;
+    const totalBeforeDiscount = (booking.totalPrice ?? 0) + (booking.discountAmount ?? 0);
+
+    return totalBeforeDiscount / (deskCount * dayCount);
   }
 
 
@@ -30,8 +34,11 @@ return (
         <h3 className="text-lg font-semibold text-gray-800 mb-4">Booking Information</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-gray-50 p-4 rounded-lg">
-            <p className="text-sm font-medium text-gray-600 mb-1">Booking Date</p>
-            <p className="text-gray-800 font-semibold">{formatDate(booking.bookingDate)}</p>
+            <p className="text-sm font-medium text-gray-600 mb-1">Booking Dates</p>
+            <p
+              className="text-gray-800 font-semibold whitespace-pre-line leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: formatBookingDates(booking.bookingDates) }}
+            />
           </div>
           <div className="bg-gray-50 p-4 rounded-lg">
             <p className="text-sm font-medium text-gray-600 mb-1">Number of Desks</p>
@@ -70,6 +77,10 @@ return (
           <div className="flex justify-between">
             <span className="text-gray-600">Number of Desks:</span>
             <span className="text-gray-800">x {booking.numberOfDesks || 0}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-600">Number of Days:</span>
+            <span className="text-gray-800">x {booking.bookingDates?.length || 0}</span>
           </div>
           {booking.discountAmount && booking.discountAmount > 0 &&(
             <div className="flex justify-between">

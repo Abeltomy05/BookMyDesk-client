@@ -6,7 +6,7 @@ import type { LoginData } from "./adminService";
 import type { NotificationResponse } from "@/types/notification.type";
 import { getErrorMessage } from "@/utils/errors/errorHandler";
 import jsPDF from 'jspdf'
-import { formatDate } from "@/utils/formatters/date"; 
+import { formatBookingDates, formatDate } from "@/utils/formatters/date"; 
 import { formatCurrency } from "@/utils/formatters/currency"
 
 interface ApiResponse {
@@ -262,7 +262,7 @@ export const clientService = {
     amount: number
     currency: string
     spaceId: string
-    bookingDate: string
+    bookingDates: string[]
     numberOfDesks: number
     discountAmount?: number
     bookingId?: string
@@ -351,11 +351,11 @@ export const clientService = {
     }
   },
 
-  payWithWallet:async ({spaceId,bookingDate,numberOfDesks,totalPrice,discountAmount}:{spaceId: string,bookingDate:Date,numberOfDesks:number,totalPrice:number,discountAmount?:number})=>{
+  payWithWallet:async ({spaceId,bookingDates,numberOfDesks,totalPrice,discountAmount}:{spaceId: string,bookingDates:Date[],numberOfDesks:number,totalPrice:number,discountAmount?:number})=>{
     try {
       const response = await clientAxiosInstance.post("/pay-with-wallet",{
         spaceId,
-        bookingDate,
+        bookingDates,
         numberOfDesks,
         totalPrice,
         discountAmount
@@ -470,7 +470,7 @@ handleDownloadInvoice : async(booking:BookingData, user?:{username?:string,email
   // Invoice details
   doc.setFontSize(10);
   doc.text(`Invoice Date: ${formatDate(new Date())}`, margin, yPosition);
-  doc.text(`Booking ID: ${booking._id}`, pageWidth - margin - 60, yPosition);
+  doc.text(`Booking ID: ${booking.bookingId.slice(0,28)}`, pageWidth - margin - 60, yPosition);
   
   yPosition += 15;
   
@@ -504,8 +504,14 @@ handleDownloadInvoice : async(booking:BookingData, user?:{username?:string,email
   yPosition += 6;
   doc.text(`Location: ${booking.building?.location?.name || 'N/A'}`, margin, yPosition);
   yPosition += 6;
-  doc.text(`Booking Date: ${formatDate(booking.bookingDate)}`, margin, yPosition);
+  const formattedDates = formatBookingDates(booking.bookingDates);
+  const dateLines = formattedDates.split('\n');
+  doc.text(`Booking Dates:`, margin, yPosition);
   yPosition += 6;
+  for (const line of dateLines) {
+    doc.text(line, margin + 10, yPosition); 
+    yPosition += 6;
+  }
   doc.text(`Number of Desks: ${booking.numberOfDesks || 0}`, margin, yPosition);
   yPosition += 6;
   doc.text(`Status: ${booking.status}`, margin, yPosition);
@@ -527,25 +533,31 @@ handleDownloadInvoice : async(booking:BookingData, user?:{username?:string,email
   
   // Table separator line
  doc.line(margin, yPosition - 4, pageWidth - margin, yPosition - 4);
-  
   // Table content
   doc.setFont('helvetica', 'normal');
-  const pricePerDay = ((booking.totalPrice ?? 0) + (booking.discountAmount ?? 0)) / (booking.numberOfDesks || 1);
+    const deskCount = booking.numberOfDesks || 1;
+    const dayCount = booking.bookingDates?.length || 1;
+    const totalBeforeDiscount = (booking.totalPrice ?? 0) + (booking.discountAmount ?? 0);
+    const pricePerDay = totalBeforeDiscount / (deskCount * dayCount)
   
   doc.text(`Price Per Day`, margin, yPosition);
   doc.text(`${formatCurrency(pricePerDay)}`, pageWidth - margin - 40, yPosition);
   yPosition += 6;
   
-  doc.text(`Number of Desks (x${booking.numberOfDesks || 0})`, margin, yPosition);
-  doc.text(`${formatCurrency(pricePerDay * (booking.numberOfDesks || 0))}`, pageWidth - margin - 40, yPosition);
+  doc.text(`Number of Desks`, margin, yPosition);
+  doc.text(` ${deskCount}`, pageWidth - margin - 40, yPosition);
+  yPosition += 6;
+
+  doc.text(`Number of Days`, margin, yPosition);
+  doc.text(` ${dayCount}`, pageWidth - margin - 40, yPosition);
   yPosition += 6;
   
   // Offer/Discount section
   if (booking.discountAmount && booking.discountAmount > 0) {
-    doc.setTextColor(0, 128, 0); // Green color for discount
+    doc.setTextColor(0, 128, 0);
     doc.text('Offer Applied (Discount)', margin, yPosition);
     doc.text(`-${formatCurrency(booking.discountAmount)}`, pageWidth - margin - 40, yPosition);
-    doc.setTextColor(0, 0, 0); // Reset to black
+    doc.setTextColor(0, 0, 0);
     yPosition += 6;
   }
   

@@ -92,6 +92,7 @@ const VendorDashboard: React.FC = () => {
       companyName: user?.companyName,
       email: user?.email,
     }
+    console.log('revenue report : ',response.data)
     const selectedBuildingName = buildingId
     ? homeData.buildingIdsAndName.find(b => b._id === buildingId)?.name
     : undefined;
@@ -105,6 +106,7 @@ const VendorDashboard: React.FC = () => {
   }
   fetchChartData();
 };
+
   const completedBookings = homeData ? homeData.completedBookings  : [];
   if (loading) {
     return (

@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Eye, CheckCircle, Calendar } from 'lucide-react';
 import { formatCurrency } from '@/utils/formatters/currency';
-import { formatDate } from '@/utils/formatters/date';
+import { formatBookingDates } from '@/utils/formatters/date';
 
 export type CompletedBooking = {
   _id: string;
@@ -10,7 +10,7 @@ export type CompletedBooking = {
   client: { username: string; email: string };
   space: { name: string; pricePerDay: number };
   building: { buildingName: string; location: { name: string; displayName: string } };
-  bookingDate: Date;
+  bookingDates: Date[];
   status: string;
   totalPrice: number;
   numberOfDesks: number;
@@ -156,9 +156,11 @@ const CompletedBookingsTable: React.FC<{
                       <div className="text-gray-500 text-xs">{booking.building.location.displayName.split(',').slice(0,2).join(', ')}</div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {formatDate(booking.bookingDate)}
-                  </td>
+<td className="px-6 py-4 text-sm text-gray-900 whitespace-pre-line max-w-[160px] overflow-hidden text-ellipsis">
+  <div className="line-clamp-2" title={formatBookingDates(booking.bookingDates)}>
+    {formatBookingDates(booking.bookingDates)}
+  </div>
+</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {booking.numberOfDesks}
                   </td>

@@ -9,7 +9,7 @@ export interface VendorHomeData {
     clientId: string;
     spaceId: string;
     buildingId: string;
-    bookingDate: Date;
+    bookingDates: Date[];
     status: string;
     totalPrice: number;
     numberOfDesks:number;

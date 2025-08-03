@@ -6,7 +6,8 @@ export interface BookingData{
     _id: string;
     spaceId: string;
     buildingId: string;
-    bookingDate: Date;
+    bookingId: string;
+    bookingDates: string[] | Date[];
     numberOfDesks?: number;
     totalPrice?: number;
     discountAmount?: number;

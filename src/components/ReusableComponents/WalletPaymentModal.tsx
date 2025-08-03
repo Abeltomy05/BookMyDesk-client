@@ -7,7 +7,7 @@ interface BookingData {
   spaceId: string
   spaceName: string
   location: string
-  bookingDate: Date
+  bookingDates: Date[]
   numberOfDesks: number
   totalAmount: number
   discountAmount?:number
@@ -34,13 +34,21 @@ const WalletPaymentModal: React.FC<WalletPaymentModalProps> = ({
 
   if (!isOpen) return null
 
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    })
+  const formatDates = (dates: Date[]) => {
+    if (dates.length === 1) {
+      return dates[0].toLocaleDateString("en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    }
+    
+    if (dates.length === 2) {
+      return `${dates[0].toLocaleDateString("en-US", { month: "short", day: "numeric" })} - ${dates[1].toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`
+    }
+    
+    return `${dates.length} days selected (${dates[0].toLocaleDateString("en-US", { month: "short", day: "numeric" })} - ${dates[dates.length - 1].toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })})`
   }
 
   const formatLocation = (location: string): string => {
@@ -61,7 +69,7 @@ const WalletPaymentModal: React.FC<WalletPaymentModalProps> = ({
      
       const response = await clientService.payWithWallet({
         spaceId: bookingData.spaceId,
-        bookingDate: bookingData.bookingDate,
+        bookingDates: bookingData.bookingDates,
         numberOfDesks: bookingData.numberOfDesks,
         totalPrice: bookingData.totalAmount,
         discountAmount: bookingData.discountAmount
@@ -140,8 +148,8 @@ const WalletPaymentModal: React.FC<WalletPaymentModalProps> = ({
                 <span className="text-black">{formatLocation(bookingData.location)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Date:</span>
-                <span className="text-black">{formatDate(bookingData.bookingDate)}</span>
+                <span className="text-gray-600">Date{bookingData.bookingDates.length > 1 ? 's' : ''}:</span>
+                <span className="text-black">{formatDates(bookingData.bookingDates)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">No. of Desks:</span>

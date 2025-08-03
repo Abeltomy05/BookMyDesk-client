@@ -5,7 +5,7 @@ export type ReportEntry = {
   buildingId: { _id: string; buildingName: string };
   totalPrice?: number;
   numberOfDesks?: number;
-  bookingDate: Date;
+  bookingDates: Date[];
   paymentMethod?: string;
 };
 
