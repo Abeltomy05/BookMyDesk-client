@@ -80,11 +80,15 @@ const VendorNavbar: React.FC<VendorNavbarProps> = ({
   };
   };
 
-const handleMarkAsRead = async (id: string): Promise<{ success: boolean }> => {
+const handleMarkAsRead = async (id: string | undefined): Promise<{ success: boolean }> => {
  try {
     const response = await vendorService.markAsRead(id);
     if (response?.success) {
+      if (id) {
       setUnreadCount((prev) => prev - 1);
+      }else{
+        setUnreadCount(0);
+      }
       return { success: true };
     } else {
       toast.error("Something went wrong!");

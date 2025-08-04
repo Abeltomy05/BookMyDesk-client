@@ -596,9 +596,10 @@ getNotifications: async(page:number,limit:number,filter: "unread" | "all"):Promi
     }
   },
 
-markAsRead: async(id:string):Promise<ApiResponse>=>{
+markAsRead: async(id:string | undefined):Promise<ApiResponse>=>{
   try {
-     const response = await vendorAxiosInstance.patch(`/mark-as-read/${id}`);
+     const endpoint = id ? `/mark-as-read/${id}` : `/mark-as-read`;
+     const response = await vendorAxiosInstance.patch(endpoint);
      return response.data;
   } catch (error:unknown) {
      console.error('Error getting notifiactions:', error);

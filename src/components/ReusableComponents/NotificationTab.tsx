@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
   
 interface NotificationsComponentProps {
    fetchNotifications: (page: number, filter: "unread" | "all") => Promise<NotificationResponse>;
-   markAsRead: (id: string) => Promise<{ success: boolean }>; 
+   markAsRead: (id: string | undefined) => Promise<{ success: boolean }>; 
    clearNotifications: () => Promise<{ success: boolean }>; 
 }
 
@@ -19,6 +19,7 @@ export default function NotificationsComponent({ fetchNotifications,markAsRead,c
   const [initialLoading, setInitialLoading] = useState(true)
   const [unreadCount, setUnreadCount] = useState(0);
   const [totalCount, setTotalCount] = useState(0); 
+  const [markingAllAsRead, setMarkingAllAsRead] = useState(false);
 
   useEffect(() => {
   loadInitialNotifications()
@@ -61,7 +62,11 @@ const loadMoreNotifications = async () => {
   }
 }
 
-const handleMarkAsRead  = async (id: string) => {
+const handleMarkAsRead  = async (id: string | undefined) => {
+  if (id === undefined) {
+    setMarkingAllAsRead(true);
+  }
+
     try {
   const response = await markAsRead(id);
   if(response.success){
@@ -89,7 +94,7 @@ const handleClearAllRead = async()=>{
   }
 }
 
-  return (
+return (
     <div className="w-full max-w-md mx-auto bg-white rounded-lg shadow-lg border border-gray-200">
       {/* Header */}
      <div className="p-4 border-b border-gray-200">
@@ -101,8 +106,29 @@ const handleClearAllRead = async()=>{
           </p>
         </div>
         
-        {/* Clear All Read Button */}
-          {activeTab === "all" && (
+        {/* Mark All as Read Button for Unread Tab */}
+        {activeTab === "unread" && unreadCount > 0 && (
+          <button
+            onClick={() => handleMarkAsRead(undefined)}
+            disabled={markingAllAsRead || loading}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#f69938] bg-[#f69938]/10 hover:bg-[#f69938]/20 hover:text-[#f69938] border border-[#f69938]/20 rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {markingAllAsRead ? (
+              <>
+                <Loader2 className="w-3 h-3 animate-spin" />
+                Marking...
+              </>
+            ) : (
+              <>
+                <CheckCheck className="w-3 h-3" />
+                Mark All Read
+              </>
+            )}
+          </button>
+        )}
+
+        {/* Clear All Read Button for All Tab */}
+        {activeTab === "all" && (
           <button
             onClick={handleClearAllRead}
             disabled={loading}
@@ -189,7 +215,7 @@ const handleClearAllRead = async()=>{
 
                     {/* Mark as read button - use _id */}
                     <button
-                        onClick={() => handleMarkAsRead (notification._id)}
+                        onClick={() => handleMarkAsRead(notification._id)}
                         disabled={notification.isRead}
                         className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all ${
                         notification.isRead

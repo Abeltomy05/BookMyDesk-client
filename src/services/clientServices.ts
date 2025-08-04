@@ -422,9 +422,10 @@ export const clientService = {
     }
   },
 
-markAsRead: async(id:string):Promise<ApiResponse>=>{
+markAsRead: async(id:string | undefined):Promise<ApiResponse>=>{
   try {
-     const response = await clientAxiosInstance.patch(`/mark-as-read/${id}`);
+    const endpoint = id ? `/mark-as-read/${id}` : `/mark-as-read`;
+     const response = await clientAxiosInstance.patch(endpoint);
      return response.data;
   } catch (error:unknown) {
       return {

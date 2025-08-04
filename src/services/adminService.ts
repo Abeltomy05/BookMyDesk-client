@@ -296,9 +296,10 @@ export const adminService = {
       }
     }, 
 
-    markAsRead: async(id:string):Promise<ApiResponse>=>{
+    markAsRead: async(id:string | undefined):Promise<ApiResponse>=>{
       try {
-        const response = await adminAxiosInstance.patch(`/mark-as-read/${id}`);
+        const endpoint = id ? `/mark-as-read/${id}` : `/mark-as-read`;
+        const response = await adminAxiosInstance.patch(endpoint);
         return response.data;
       } catch (error:unknown) {
         console.error('Error getting notifiactions:', error);
