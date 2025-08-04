@@ -12,14 +12,16 @@ const ClientBookings = () => {
   const tableRef = useRef(null);
   const navigate = useNavigate();
   const [currentFilter, setCurrentFilter] = useState<string>("all");
+  const [dateRange, setDateRange] = useState<{ from: string; to: string }>({ from: '', to: '' });
 
   const fetchBookings = async (params:FetchParams) => {
     try {
       const response = await clientService.getBookings({
         page: params.page || 1,
         limit: params.limit || 4,
-        search: params.search || '',
-        status: currentFilter  !== 'all' ? currentFilter  : undefined
+        status: currentFilter  !== 'all' ? currentFilter  : undefined,
+        fromDate: dateRange.from || undefined,
+        toDate: dateRange.to || undefined
       });
       console.log(response.data)
       if (response.success) {
@@ -73,7 +75,9 @@ const ClientBookings = () => {
   setCurrentFilter(filterValue);
 };
 
-
+const handleDateFilterChange = (fromDate: string, toDate: string) => {
+ setDateRange({ from: fromDate, to: toDate });
+};
 
   const tableColumns:TableColumn<BookingData>[] = [
     {
@@ -168,6 +172,8 @@ const ClientBookings = () => {
         emptyMessage="No bookings found"
         loadingMessage="Loading bookings..."
         onFilterChange={handleFilterChange}
+        enableDateFilter={true}
+        onDateFilterChange={handleDateFilterChange}
       />
 
     </div>

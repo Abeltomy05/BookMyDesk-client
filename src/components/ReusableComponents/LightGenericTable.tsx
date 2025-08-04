@@ -1,6 +1,6 @@
 import { useState, useEffect, forwardRef, useImperativeHandle } from "react"
 import { motion } from "framer-motion"
-import { Search, MoreVertical, ChevronLeft, ChevronRight, AlertCircle } from "lucide-react"
+import { Search, MoreVertical, ChevronLeft, ChevronRight, AlertCircle, X } from "lucide-react"
 import { type BaseItem, type TableConfiguration, type PaginationInfo, type TableAction} from "@/types/table.type"
 import type { ApiResponse, FetchParams } from "@/types/api.type"
 import { TableLoadingSkeleton } from "@/components/Skeletons/TableLoadingSkeleton"
@@ -10,6 +10,14 @@ interface GenericTableProps<T extends BaseItem> extends TableConfiguration<T> {
   onRefresh?: () => void
   className?: string
   onFilterChange?: (filterValue: string) => void
+
+  enableDateFilter?: boolean
+  enableBuildingFilter?: boolean
+  buildings?: { id: string; name: string }[]
+  onDateFilterChange?: (fromDate: string, toDate: string) => void
+  onBuildingFilterChange?: (buildingId: string) => void
+  dateFilterLabel?: string
+  buildingFilterLabel?: string
 }
 
 export interface TableRef<T extends BaseItem> {
@@ -32,7 +40,15 @@ function LightGenericTableInner<T extends BaseItem>(
     fetchData,
     onRefresh,
     className = "",
-    onFilterChange
+    onFilterChange,
+
+    enableDateFilter = false,
+    enableBuildingFilter = false,
+    buildings = [],
+    onDateFilterChange,
+    onBuildingFilterChange,
+    dateFilterLabel = "Date Range",
+    buildingFilterLabel = "Building"
   }: GenericTableProps<T>,
   ref: React.Ref<TableRef<T>>
 ) {
@@ -42,6 +58,12 @@ function LightGenericTableInner<T extends BaseItem>(
   const [activeFilter, setActiveFilter] = useState<string>(filters[0]?.value.toString() || "all")
   const [searchQuery, setSearchQuery] = useState("")
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
+  
+  // New filter states
+  const [fromDate, setFromDate] = useState("")
+  const [toDate, setToDate] = useState("")
+  const [selectedBuilding, setSelectedBuilding] = useState("")
+  
   const [pagination, setPagination] = useState<PaginationInfo>({
     currentPage: 1,
     totalPages: 0,
@@ -70,7 +92,10 @@ function LightGenericTableInner<T extends BaseItem>(
       const params: FetchParams = {
         page,
         limit: itemsPerPage,
-        ...(enableSearch && search && { search })
+        ...(enableSearch && search && { search }),
+        ...(enableDateFilter && fromDate && { fromDate }),
+        ...(enableDateFilter && toDate && { toDate }),
+        ...(enableBuildingFilter && selectedBuilding && { buildingId: selectedBuilding })
       }
       
       const response = await fetchData(params)
@@ -106,7 +131,7 @@ function LightGenericTableInner<T extends BaseItem>(
       loadData(1, searchQuery)
     }, 500)
     return () => clearTimeout(debounceTimer)
-  }, [activeFilter, searchQuery])
+  }, [activeFilter, searchQuery, fromDate, toDate, selectedBuilding])
 
   const toggleDropdown = (e: React.MouseEvent, id: string) => {
     console.log(id)
@@ -118,6 +143,31 @@ function LightGenericTableInner<T extends BaseItem>(
   const handleFilterChange = (value: string) => {
     setActiveFilter(value)
     onFilterChange?.(value)
+  }
+
+  const handleDateChange = (type: 'from' | 'to', value: string) => {
+    if (type === 'from') {
+      setFromDate(value)
+    } else {
+      setToDate(value)
+    }
+    onDateFilterChange?.(type === 'from' ? value : fromDate, type === 'to' ? value : toDate)
+  }
+
+  const handleBuildingChange = (value: string) => {
+    setSelectedBuilding(value)
+    onBuildingFilterChange?.(value)
+  }
+
+  const clearDateFilter = () => {
+    setFromDate("")
+    setToDate("")
+    onDateFilterChange?.("", "")
+  }
+
+  const clearBuildingFilter = () => {
+    setSelectedBuilding("")
+    onBuildingFilterChange?.("")
   }
 
   const handlePageChange = (page: number) => {
@@ -192,40 +242,132 @@ function LightGenericTableInner<T extends BaseItem>(
         {title}
       </motion.h1>
 
-      {/* Search and Filters */}
-      <motion.div className="flex flex-col md:flex-row justify-between mb-6 gap-4" variants={itemVariants}>
-        {/* Search Bar */}
-        {enableSearch && (
-          <div className="relative w-full md:w-1/3">
-            <input
-              type="text"
-              placeholder={searchPlaceholder}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-gray-50 border border-gray-300 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#f69938] focus:border-transparent text-gray-900 placeholder-gray-500"
-            />
-            <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
+      {/* Enhanced Search and Filters Section */}
+      <motion.div className="space-y-4 mb-6" variants={itemVariants}>
+        
+        {/* First Row: Search and Status Filters */}
+        <div className="flex flex-col lg:flex-row justify-between gap-4">
+          {/* Search Bar */}
+          {enableSearch && (
+            <div className="relative w-full lg:w-1/3">
+              <input
+                type="text"
+                placeholder={searchPlaceholder}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-gray-50 border border-gray-300 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#f69938] focus:border-transparent text-gray-900 placeholder-gray-500"
+              />
+              <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
+            </div>
+          )}
+
+          {/* Status Filter Tabs */}
+          {filters.length > 0 && (
+            <div className="flex flex-wrap space-x-1 bg-gray-100 p-1 rounded-lg">
+              {filters.map((filter) => (
+                <button
+                  key={filter.key}
+                  onClick={() => handleFilterChange(filter.value.toString())}
+                  className={`px-3 py-2 rounded-md capitalize transition-all duration-200 text-sm ${
+                    activeFilter === filter.value.toString()
+                      ? "bg-[#f69938] text-white font-medium shadow-sm"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-200"
+                  }`}
+                >
+                  {filter.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Second Row: Additional Filters (Date and Building) */}
+        {(enableDateFilter || enableBuildingFilter) && (
+          <div className="flex flex-col md:flex-row gap-4 pt-2 border-t border-gray-100">
+            
+            {/* Date Filter */}
+            {enableDateFilter && (
+              <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+                <label className="text-sm font-medium text-gray-700 whitespace-nowrap">
+                  {dateFilterLabel}:
+                </label>
+                <div className="flex gap-2 items-center">
+                  <input
+                    type="date"
+                    value={fromDate}
+                    onChange={(e) => handleDateChange('from', e.target.value)}
+                    className="bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#f69938] focus:border-transparent"
+                  />
+                  <span className="text-gray-500 text-sm">to</span>
+                  <input
+                    type="date"
+                    value={toDate}
+                    onChange={(e) => handleDateChange('to', e.target.value)}
+                    className="bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#f69938] focus:border-transparent"
+                  />
+                  {(fromDate || toDate) && (
+                    <button
+                      onClick={clearDateFilter}
+                      className="text-gray-400 hover:text-gray-600 p-1"
+                      title="Clear date filter"
+                    >
+                      <X size={16} />
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Building Filter */}
+            {enableBuildingFilter && (
+              <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+                <label className="text-sm font-medium text-gray-700 whitespace-nowrap">
+                  {buildingFilterLabel}:
+                </label>
+                <div className="flex gap-2 items-center">
+                  <select
+                    value={selectedBuilding}
+                    onChange={(e) => handleBuildingChange(e.target.value)}
+                    className="bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#f69938] focus:border-transparent min-w-[150px]"
+                  >
+                    <option value="">All Buildings</option>
+                    {buildings.map((building) => (
+                      <option key={building.id} value={building.id}>
+                        {building.name}
+                      </option>
+                    ))}
+                  </select>
+                  {selectedBuilding && (
+                    <button
+                      onClick={clearBuildingFilter}
+                      className="text-gray-400 hover:text-gray-600 p-1"
+                      title="Clear building filter"
+                    >
+                      <X size={16} />
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Clear All Filters Button */}
+            {(enableDateFilter || enableBuildingFilter) && (fromDate || toDate || selectedBuilding) && (
+              <div className="flex items-center">
+                <button
+                  onClick={() => {
+                    clearDateFilter()
+                    clearBuildingFilter()
+                  }}
+                  className="text-sm text-[#f69938] hover:text-[#e58a2b] font-medium flex items-center gap-1"
+                >
+                  <X size={14} />
+                  Clear All
+                </button>
+              </div>
+            )}
           </div>
         )}
 
-        {/* Filter Tabs */}
-        {filters.length > 0 && (
-          <div className="flex flex-wrap space-x-1 bg-gray-100 p-1 rounded-lg">
-            {filters.map((filter) => (
-              <button
-                key={filter.key}
-                onClick={() => handleFilterChange(filter.value.toString())}
-                className={`px-3 py-2 rounded-md capitalize transition-all duration-200 text-sm ${
-                  activeFilter === filter.value.toString()
-                    ? "bg-[#f69938] text-white font-medium shadow-sm"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-200"
-                }`}
-              >
-                {filter.label}
-              </button>
-            ))}
-          </div>
-        )}
       </motion.div>
 
       {/* Error Message */}
