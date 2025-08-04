@@ -294,10 +294,10 @@ export const clientService = {
 
   //bookings
 
-  getBookings: async ({page = 1, limit = 5, search='', status}:{page:number,limit:number,search:string,status?:string}): Promise<GetBookingResponse> => {
+  getBookings: async ({page = 1, limit = 5, status,fromDate,toDate}:{page:number,limit:number,status?:string,fromDate?:string,toDate?:string}): Promise<GetBookingResponse> => {
      try {
       const response = await clientAxiosInstance.get('/get-bookings', {
-        params: { page, limit, search, ...(status && { status }) }
+        params: { page, limit, ...(status && { status }),fromDate,toDate }
       })
       return response.data;
      } catch (error:unknown) {
@@ -422,9 +422,10 @@ export const clientService = {
     }
   },
 
-markAsRead: async(id:string):Promise<ApiResponse>=>{
+markAsRead: async(id:string | undefined):Promise<ApiResponse>=>{
   try {
-     const response = await clientAxiosInstance.patch(`/mark-as-read/${id}`);
+    const endpoint = id ? `/mark-as-read/${id}` : `/mark-as-read`;
+     const response = await clientAxiosInstance.patch(endpoint);
      return response.data;
   } catch (error:unknown) {
       return {

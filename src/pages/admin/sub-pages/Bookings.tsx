@@ -15,12 +15,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { adminService } from "@/services/adminService"
+import { formatBookingDates } from "@/utils/formatters/date"
 
 
 interface BookingData {
   _id: string
   bookingId: string
-  bookingDate: string
+  bookingDates: string[] | Date[]
   totalPrice: number
   status: string
   clientName: string
@@ -328,7 +329,10 @@ useEffect(() => {
                         <td className="p-4 text-white">
                           <div className="flex items-center gap-2">
                             <Calendar size={14} className="text-gray-400" />
-                            <span>{new Date(booking.bookingDate).toLocaleDateString()}</span>
+                            <span
+                              className="font-medium whitespace-pre-line"
+                              dangerouslySetInnerHTML={{ __html: formatBookingDates(booking.bookingDates) }}
+                            />
                           </div>
                         </td>
                         <td className="p-4">

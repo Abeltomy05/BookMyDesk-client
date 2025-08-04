@@ -1,4 +1,4 @@
-import  { useState, useRef } from 'react';
+import  { useState, useRef, useEffect } from 'react';
 import {  MapPin, Calendar, Users, CheckCircle, XCircle, Phone, Mail, User } from 'lucide-react';
 import { LightGenericTable, type TableRef } from '@/components/ReusableComponents/LightGenericTable';
 import { vendorService } from '@/services/vendorServices';
@@ -20,14 +20,21 @@ const VendorManageBookings = () => {
   const [showCompleteModal, setShowCompleteModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<BookingData | null>(null);
 
+  const [buildings, setBuildings] = useState<{ id: string; name: string }[]>([]);
+  const [selectedBuildingId, setSelectedBuildingId] = useState<string>('');
+  const [dateRange, setDateRange] = useState<{ from: string; to: string }>({ from: '', to: '' });
+
+
   const fetchBookings = async (params: FetchParams) => {
     try {
   
       const response = await vendorService.getBookings({
         page: params.page || 1,
         limit: params.limit || 4,
-        search: params.search || '',
-        status: currentFilter !== 'all' ? currentFilter : undefined
+        status: currentFilter !== 'all' ? currentFilter : undefined,
+        buildingId: selectedBuildingId || undefined,
+        fromDate: dateRange.from || undefined,
+        toDate: dateRange.to || undefined
       });
 
       if (response.success) {
@@ -61,6 +68,21 @@ const VendorManageBookings = () => {
     }
   };
 
+  const fetchBuildings = async () => {
+  try {
+    const response = await vendorService.fetchBuildingsForVendor();
+    if (response.success) {
+      const buildingOptions = response.data.map((building: {buildingName: string, _id:string}) => ({
+        id: building._id,
+        name: building.buildingName
+      }));
+      setBuildings(buildingOptions);
+    }
+  } catch (error) {
+    console.error('Error fetching buildings:', error);
+  }
+};
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'confirmed':
@@ -81,6 +103,18 @@ const VendorManageBookings = () => {
   const handleFilterChange = (filterValue: string) => {
     setCurrentFilter(filterValue);
   };
+
+  const handleBuildingFilterChange = (buildingId: string) => {
+  setSelectedBuildingId(buildingId);
+  };
+
+  const handleDateFilterChange = (fromDate: string, toDate: string) => {
+  setDateRange({ from: fromDate, to: toDate });
+  };
+
+  useEffect(() => {
+    fetchBuildings();
+  }, []);
 
   const handleCancelBooking = async (reason: string) => {
        if (!selectedBooking) return;
@@ -281,7 +315,7 @@ const VendorManageBookings = () => {
           actions={tableActions}
           filters={tableFilters}
           fetchData={fetchBookings}
-          enableSearch={true}
+          enableSearch={false}
           enablePagination={true}
           enableActions={true}
           itemsPerPage={3}
@@ -289,6 +323,11 @@ const VendorManageBookings = () => {
           emptyMessage="No bookings found"
           loadingMessage="Loading bookings..."
           onFilterChange={handleFilterChange}
+          enableBuildingFilter={true} 
+          enableDateFilter={true}       
+          buildings={buildings}    
+          onBuildingFilterChange={handleBuildingFilterChange}
+          onDateFilterChange={handleDateFilterChange}
         />
       </div>
 
