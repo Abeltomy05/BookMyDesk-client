@@ -4,11 +4,12 @@ import type { TableColumn, TableAction, TableFilter } from "@/types/table.type"
 import { Plus, Eye, Building2, Users, Calendar, MapPin, Archive, MessageCircle } from "lucide-react"
 import type { ApiResponse, FetchParams } from "@/types/api.type"
 import type {  Building } from "@/types/building.type"
-import { vendorService, type BuildingStatus } from "@/services/vendorServices"
+import { vendorService } from "@/services/vendorServices"
 import { useNavigate } from "react-router-dom"
 import toast from "react-hot-toast"
 import ConfirmModal from "@/components/ReusableComponents/ConfirmModal"
 import type{ TableRef } from "@/components/ReusableComponents/LightGenericTable"
+import type { BuildingStatus } from "@/types/service.type"
 
 
 export default function BuildingManagement() {
