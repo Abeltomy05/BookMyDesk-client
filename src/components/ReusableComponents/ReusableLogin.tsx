@@ -12,12 +12,13 @@ import { requestPermission } from "@/utils/firebase/firebaseNotification"
 // Services
 import { vendorService } from "@/services/vendorServices"
 import { clientService } from "@/services/clientServices"
-import { adminService, type LoginData } from "@/services/adminService"
+import { adminService} from "@/services/adminService"
 
 // Actions
 import { vendorLogin } from "@/store/slices/vendor.slice"
 import { clientLogin } from "@/store/slices/client.slice"
 import { adminLogin } from "@/store/slices/admin.slice"
+import type { LoginData } from "@/types/service.type"
 
 // Types
 export type UserType = 'vendor' | 'client' | 'admin'
