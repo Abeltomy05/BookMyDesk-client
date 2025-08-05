@@ -4,34 +4,16 @@ import authAxiosInstance from "@/api/auth.axios";
 import { vendorAxiosInstance } from "@/api/vendor.axios";
 import type { BuildingRegistrationData, GetAllBuildingsResponse, GetBuildingsParams } from "@/types/building.type";
 import type { Building } from "@/types/view&editBuilding";
-import type { GetBookingResponse } from "./clientServices";
+import type { ApiResponse, BookingStatus, BuildingStatus, GetBookingResponse, VendorFormData } from "@/types/service.type";
 import { formatCurrency } from '@/utils/formatters/currency';
 import { formatBookingDates } from '@/utils/formatters/date';
 import type { NewOfferForm } from '@/pages/vendor/SubPages/OfferManagement';
-import type { LoginData } from './adminService';
+import type { LoginData } from '@/types/service.type';
 import type { NotificationResponse } from '@/types/notification.type';
 import { getErrorMessage } from '@/utils/errors/errorHandler';
 import type { ReportEntry } from '@/types/report.type';
 import type { DownloadReportFilterParams } from '@/components/VendorHomeComps/DownloadReport';
 
-interface ApiResponse {
-  success: boolean;
-  message: string;
-  data?: any;
-}
-
-export interface VendorFormData {
-  username: string
-  email: string
-  password: string
-  phone: string
-  companyName: string
-  companyAddress: string
-  idProof: string
-  role: string
-}
-export type BuildingStatus = "approved" | "archived";
-export type BookingStatus = "pending" | "confirmed" | "cancelled" | "completed" | "failed";
 
 export const vendorService = {
 
@@ -122,7 +104,7 @@ getSingleUser: async (): Promise<ApiResponse> => {
 
 updateProfile: async (data: any): Promise<ApiResponse> => {
     try {
-      const response = await vendorAxiosInstance.put("/update-profile", data);
+      const response = await vendorAxiosInstance.patch("/update-profile", data);
       return response.data;
     } catch (error:unknown) {
       console.error('Error updating profile:', error);
@@ -135,7 +117,7 @@ updateProfile: async (data: any): Promise<ApiResponse> => {
 
 updatePassword: async (currentPassword: string, newPassword: string): Promise<ApiResponse> => {
     try {
-      const response = await vendorAxiosInstance.put("/update-password", {
+      const response = await vendorAxiosInstance.patch("/update-password", {
         currentPassword,
         newPassword
       });
@@ -320,7 +302,7 @@ updateBookingStatus: async (
 
 cancelBooking: async (bookingId: string, reason: string): Promise<ApiResponse> => {
      try {
-      const response = await vendorAxiosInstance.post(`/cancel-booking`, { 
+      const response = await vendorAxiosInstance.patch(`/cancel-booking`, { 
         reason,
         bookingId
        });
@@ -644,7 +626,7 @@ getChatMessages: async(sessionId:string):Promise<ApiResponse>=>{
 
 clearChat: async(sessionId: string):Promise<ApiResponse>=>{
   try {
-    const response = await vendorAxiosInstance.post('/clear-chat',{sessionId});
+    const response = await vendorAxiosInstance.patch('/clear-chat',{sessionId});
     return response.data;
   } catch (error:unknown) {
     return {

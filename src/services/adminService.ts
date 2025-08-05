@@ -1,98 +1,13 @@
 import { adminAxiosInstance } from "@/api/admin.axios";
 import authAxiosInstance from "@/api/auth.axios";
-import type { AllBuildingsData } from "@/pages/admin/sub-pages/BuildingListing";
 import type { NotificationResponse } from "@/types/notification.type";
 import type { AdminReportEntry } from "@/types/report.type";
+import type { AmenityStatus, ApiResponse, ClientStatus, GetAllAmenities, GetAllBuildingResponse, GetAllUsersResponse, GetUsersParams, LoginData, VendorStatus } from "@/types/service.type";
 import { getErrorMessage } from "@/utils/errors/errorHandler";
 import { formatCurrency } from "@/utils/formatters/currency";
 import { formatBookingDates } from "@/utils/formatters/date"
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-
-interface ApiResponse {
-  success: boolean;
-  message: string;
-  data?: any;
-}
-
-export interface LoginData {
-  email: string;
-  password: string;
-  role:string;
-  fcmToken?:string;
-}
-
-export type ClientStatus = "active" | "blocked";
-export type VendorStatus = "pending" | "approved" | "rejected" | "blocked";
-export type AmenityStatus = "active" | "non-active"
-
-interface GetUsersParams {
-  role?: "client" | "vendor";
-  page?: number;
-  limit?: number;
-  search?: string;
-  status?: string;
-  excludeStatus?: string | string[];
-}
-
-interface GetAllUsersResponse {
-  success: boolean;
-  users: ClientData[] | VendorData[];
-  totalPages: number;
-  currentPage: number;
-  message?: string
-}
-
-export interface Amenities{
-  _id:string,
-  name:string,
-  isActive:boolean,
-}
-
-interface GetAllBuildingResponse{
-  success: boolean;
-  buildings: AllBuildingsData[];
-  totalPages: number;
-  currentPage: number;
-  totalItems?: number;
-  message?: string;
-}
-
-export interface GetAllAmenities{
-  success:boolean;
-  message:string;
-  data: Amenities[];
-  totalPages:number;
-  currentPage:number;
-  totalItems?:number;
-}
-
-interface VendorData {
-  _id: string;
-  username: string;
-  email: string;
-  phone: string;
-  status: VendorStatus
-  avatar?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  companyName?: string;
-  companyAddress?: string;
-  banner?: string;
-  description?: string;
-  idProof?: string;
-}
-
-interface ClientData {
-  _id: string
-  username: string
-  email: string
-  phone: string
-  status: ClientStatus
-  avatar?: string
-  createdAt?: string;
-  updatedAt?: string;
-}
 
 export const adminService = {
     login: async (data: LoginData): Promise<ApiResponse> => {

@@ -1,6 +1,6 @@
 import { GenericTable } from "@/components/ReusableComponents/GenericTable"
 import { type TableColumn, type TableAction, type TableFilter, type ExtendableItem } from "@/types/table.type"
-import { adminService, type AmenityStatus } from "@/services/adminService"
+import { adminService } from "@/services/adminService"
 import { Edit, Shield, Trash, Wrench } from "lucide-react"
 import toast from "react-hot-toast"
 import type { FetchParams, ApiResponse } from "@/types/api.type"
@@ -8,6 +8,7 @@ import { useRef, useState } from "react"
 import type { TableRef } from "@/components/ReusableComponents/LightGenericTable"
 import { AddAmenityForm } from "./AddAmenity"
 import ConfirmModal from "@/components/ReusableComponents/ConfirmModal"
+import type { AmenityStatus } from "@/types/service.type"
 
 interface Amenity extends ExtendableItem {
   name: string;

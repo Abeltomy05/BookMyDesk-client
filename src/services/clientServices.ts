@@ -2,45 +2,15 @@ import authAxiosInstance from "@/api/auth.axios";
 import { clientAxiosInstance } from "@/api/client.axios";
 import type { UserProfile } from "@/pages/client/SubPages/ClientProfile";
 import type { BookingData } from "@/types/booking.type";
-import type { LoginData } from "./adminService";
+import type { LoginData } from "@/types/service.type";
 import type { NotificationResponse } from "@/types/notification.type";
 import { getErrorMessage } from "@/utils/errors/errorHandler";
 import jsPDF from 'jspdf'
 import { formatBookingDates, formatDate } from "@/utils/formatters/date"; 
 import { formatCurrency } from "@/utils/formatters/currency"
+import type { ApiResponse, ApiResponseWithPagination, GetBookingResponse, SignupData } from "@/types/service.type";
 
-interface ApiResponse {
-  success: boolean;
-  message: string;
-  data?: any;
-}
 
-interface ApiResponseWithPagination{
-  success: boolean;
-  message?:string;
-  data?: any;
-  total?:number;
-  page?:number;
-  limit?:number;
-  totalPages?:number;
-}
-
-export interface SignupData {
-  username: string;
-  email: string;
-  phone: string;
-  password: string;
-  role: string;
-}
-
-export interface GetBookingResponse {
-  success: boolean;
-  data?: BookingData[];
-  totalItems?: number;
-  totalPages?: number;
-  currentPage?: number;
-  message?: string
-}
 
 export const clientService = {
 
@@ -157,7 +127,7 @@ export const clientService = {
 
   updateProfile: async (data: UserProfile): Promise<ApiResponse> => {
     try {
-      const response = await clientAxiosInstance.put("/update-profile", data);
+      const response = await clientAxiosInstance.patch("/update-profile", data);
       return response.data;
     } catch (error:unknown) {
        return {
@@ -169,7 +139,7 @@ export const clientService = {
 
   updatePassword: async (currentPassword: string, newPassword: string): Promise<ApiResponse> => {
     try {
-      const response = await clientAxiosInstance.put("/update-password", {
+      const response = await clientAxiosInstance.patch("/update-password", {
         currentPassword,
         newPassword
       });
@@ -322,7 +292,7 @@ export const clientService = {
 
   cancelBooking: async (bookingId: string, reason: string): Promise<ApiResponse> => {
      try {
-      const response = await clientAxiosInstance.post(`/cancel-booking`, { 
+      const response = await clientAxiosInstance.patch(`/cancel-booking`, { 
         reason,
         bookingId
        });
@@ -631,7 +601,7 @@ getChatMessages: async(sessionId:string):Promise<ApiResponse>=>{
 
 clearChat: async(sessionId: string):Promise<ApiResponse>=>{
   try {
-    const response = await clientAxiosInstance.post('/clear-chat',{sessionId});
+    const response = await clientAxiosInstance.patch('/clear-chat',{sessionId});
     return response.data;
   } catch (error:unknown) {
       return {
