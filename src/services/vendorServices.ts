@@ -1,7 +1,7 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import authAxiosInstance from "@/api/auth.axios";
-import { vendorAxiosInstance } from "@/api/vendor.axios";
+import { vendorAxiosInstance } from "@/api/private.axios";
 import type { BuildingRegistrationData, GetAllBuildingsResponse, GetBuildingsParams } from "@/types/building.type";
 import type { Building } from "@/types/view&editBuilding";
 import type { ApiResponse, BookingStatus, BuildingStatus, GetBookingResponse, VendorFormData } from "@/types/service.type";

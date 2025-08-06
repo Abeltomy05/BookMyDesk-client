@@ -1,4 +1,4 @@
-import { adminAxiosInstance } from "@/api/admin.axios";
+import { adminAxiosInstance } from "@/api/private.axios";
 import authAxiosInstance from "@/api/auth.axios";
 import type { NotificationResponse } from "@/types/notification.type";
 import type { AdminReportEntry } from "@/types/report.type";
