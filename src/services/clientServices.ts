@@ -1,5 +1,5 @@
 import authAxiosInstance from "@/api/auth.axios";
-import { clientAxiosInstance } from "@/api/client.axios";
+import { clientAxiosInstance } from "@/api/private.axios";
 import type { UserProfile } from "@/pages/client/SubPages/ClientProfile";
 import type { BookingData } from "@/types/booking.type";
 import type { LoginData } from "@/types/service.type";
