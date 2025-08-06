@@ -56,17 +56,24 @@ const ReusableChat: React.FC<ReusableChatProps> = ({
         setMessages((prev) => [...prev, newMessage]);
       }
 
-      setSessions((prev) =>
-        prev.map((session) =>
-          session._id === data.sessionId
-            ? {
-                ...session,
-                lastMessage: data.text || "Image",
-                createdAt: "now",
-              }
-            : session
-        )
-      );
+
+  setSessions((prev) => {
+    const updatedSessions = prev.map((session) =>
+      session._id === data.sessionId
+        ? {
+            ...session,
+            lastMessage: data.text || "Image",
+            createdAt: "now",
+          }
+        : session
+    );
+
+    return updatedSessions.sort((a, b) => {
+      if (a._id === data.sessionId) return -1; // Move updated session to top
+      if (b._id === data.sessionId) return 1;
+      return 0; 
+    });
+  });
     };
 
     socketService.onReceiveMessage(handleReceiveMessage);

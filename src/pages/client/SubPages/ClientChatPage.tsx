@@ -46,7 +46,13 @@ const ClientChatPage: React.FC = () => {
   const user = useSelector((state: RootState) => state.client.client);
 
   const transformChatSessionsToUsers = (sessions: ChatSessionDto[]): ChatSidebarItem[] => {
-    return sessions.map((session) => ({
+    return sessions
+    .sort((a, b) => {
+      const dateA = a.lastMessageAt ? new Date(a.lastMessageAt).getTime() : 0;
+      const dateB = b.lastMessageAt ? new Date(b.lastMessageAt).getTime() : 0;
+      return dateB - dateA;
+    })
+    .map((session) => ({
       _id: session._id,
       userId: session.buildingId?._id!,
       name: session.buildingId?.buildingName || 'Unknown Building',

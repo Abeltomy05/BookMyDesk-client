@@ -149,7 +149,7 @@ export const adminService = {
     }
    },
 
-   getBookingsForAdmin:async(params:{ page: number; limit: number; vendorId?: string; buildingId?: string; status?: string }):Promise<ApiResponse>=>{
+   getBookingsForAdmin:async(params:{ page: number; limit: number; vendorId?: string; buildingId?: string; status?: string,fromDate?:string,toDate?:string }):Promise<ApiResponse>=>{
     try {
        const response = await adminAxiosInstance.get("/get-bookings",{
         params: {
@@ -158,6 +158,8 @@ export const adminService = {
         vendorId: params.vendorId,
         buildingId: params.buildingId,
         status: params.status,
+        fromDate: params.fromDate,
+        toDate:params.toDate
       },
        })
        return response.data;
