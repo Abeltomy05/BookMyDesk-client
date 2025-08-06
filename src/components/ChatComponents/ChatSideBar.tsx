@@ -23,8 +23,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const isUserOnline = (userId: string) => onlineUserIds.includes(userId);
 
-  const filteredSessions = sessions.filter((session) => 
-    session.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredSessions = sessions
+    .filter((session) => session.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (

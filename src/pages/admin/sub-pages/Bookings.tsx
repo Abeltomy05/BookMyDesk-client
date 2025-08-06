@@ -96,6 +96,9 @@ const [currentPage, setCurrentPage] = useState(1)
 const [totalPages, setTotalPages] = useState(1)
 const [totalItems, setTotalItems] = useState(0)
 
+const [fromDate, setFromDate] = useState("")
+const [toDate, setToDate] = useState("")
+
   const itemsPerPage = 4
 
   const fetchVendorsAndBuilding = async () => {
@@ -123,6 +126,8 @@ const [totalItems, setTotalItems] = useState(0)
     vendorId?: string,
     buildingId?: string,
     status?: string;
+    fromDate?: string,
+    toDate?: string
   } = {
       page: currentPage,
       limit: itemsPerPage,
@@ -139,6 +144,14 @@ const [totalItems, setTotalItems] = useState(0)
     if (selectedStatus && selectedStatus !== "all") {
       params.status = selectedStatus
     }  
+
+    if (fromDate) {
+      params.fromDate = fromDate
+    }
+
+    if (toDate) {
+      params.toDate = toDate
+    }
     
     const response = await adminService.getBookingsForAdmin(params)
     console.log("Bookings response", response.data)
@@ -162,11 +175,11 @@ useEffect(() => {
 
 useEffect(() => {
   setCurrentPage(1) 
-}, [selectedVendor, selectedBuilding, selectedStatus])
+}, [selectedVendor, selectedBuilding, selectedStatus, fromDate, toDate])
 
 useEffect(() => {
   fetchBookings()
-}, [currentPage, selectedVendor, selectedBuilding, selectedStatus])
+}, [currentPage, selectedVendor, selectedBuilding, selectedStatus, fromDate, toDate])
 
 
   const handlePageChange = (page: number) => {
@@ -196,63 +209,85 @@ useEffect(() => {
                 Filters
               </CardTitle>
             </CardHeader>
-            <CardContent>
-            <div className="flex flex-wrap items-center justify-start gap-3">
+          <CardContent>
+            <div className="flex flex-wrap justify-between items-center gap-3 w-full">
+              {/* Left Filters */}
+              <div className="flex flex-wrap items-center gap-3">
                 {/* Vendor Filter */}
                 <Select value={selectedVendor} onValueChange={setSelectedVendor}>
-                <SelectTrigger className="bg-gray-700 border-gray-600 text-white h-10 text-sm w-[160px]">
+                  <SelectTrigger className="bg-gray-700 border-gray-600 text-white h-10 text-sm w-[160px]">
                     <div className="flex items-center gap-2">
-                    <User size={16} />
-                    <SelectValue placeholder="Vendor" />
+                      <User size={16} />
+                      <SelectValue placeholder="Vendor" />
                     </div>
-                </SelectTrigger>
-                <SelectContent className="bg-gray-700 border-gray-600">
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-700 border-gray-600">
                     <SelectItem value="all">All Vendors</SelectItem>
                     {validVendors.map((vendor) => (
-                    <SelectItem key={vendor._id} value={vendor._id} className="text-white hover:bg-gray-600">
+                      <SelectItem key={vendor._id} value={vendor._id} className="text-white hover:bg-gray-600">
                         {vendor.companyName}
-                    </SelectItem>
+                      </SelectItem>
                     ))}
-                </SelectContent>
+                  </SelectContent>
                 </Select>
 
                 {/* Building Filter */}
                 <Select value={selectedBuilding} onValueChange={setSelectedBuilding}>
-                <SelectTrigger className="bg-gray-700 border-gray-600 text-white h-10 text-sm w-[160px]">
+                  <SelectTrigger className="bg-gray-700 border-gray-600 text-white h-10 text-sm w-[160px]">
                     <div className="flex items-center gap-2">
-                    <Building size={16} />
-                    <SelectValue placeholder="Building" />
+                      <Building size={16} />
+                      <SelectValue placeholder="Building" />
                     </div>
-                </SelectTrigger>
-                <SelectContent className="bg-gray-700 border-gray-600">
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-700 border-gray-600">
                     <SelectItem value="all">All Buildings</SelectItem>
                     {validBuildings.map((building) => (
-                    <SelectItem key={building._id} value={building._id} className="text-white hover:bg-gray-600">
+                      <SelectItem key={building._id} value={building._id} className="text-white hover:bg-gray-600">
                         {building.buildingName}
-                    </SelectItem>
+                      </SelectItem>
                     ))}
-                </SelectContent>
+                  </SelectContent>
                 </Select>
 
                 {/* Status Filter */}
                 <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                <SelectTrigger className="bg-gray-700 border-gray-600 text-white h-10 text-sm w-[150px]">
+                  <SelectTrigger className="bg-gray-700 border-gray-600 text-white h-10 text-sm w-[150px]">
                     <div className="flex items-center gap-2">
-                    <CheckCircle size={16} />
-                    <SelectValue placeholder="Status" />
+                      <CheckCircle size={16} />
+                      <SelectValue placeholder="Status" />
                     </div>
-                </SelectTrigger>
-                <SelectContent className="bg-gray-700 border-gray-600">
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-700 border-gray-600">
                     {statuses.map((status) => (
-                    <SelectItem key={status.value} value={status.value} className="text-white hover:bg-gray-600">
+                      <SelectItem key={status.value} value={status.value} className="text-white hover:bg-gray-600">
                         {status.label}
-                    </SelectItem>
+                      </SelectItem>
                     ))}
-                </SelectContent>
+                  </SelectContent>
                 </Select>
-            </div>
-            </CardContent>
+              </div>
 
+              {/* Right Filters */}
+              <div className="flex items-center gap-2">
+                <Calendar size={16} className="text-gray-400" />
+                <input
+                  type="date"
+                  value={fromDate}
+                  onChange={(e) => setFromDate(e.target.value)}
+                  className="bg-gray-700 border border-gray-600 text-white rounded-md px-3 py-2 h-10 text-sm w-[140px] focus:ring-2 focus:ring-[#f69938] focus:border-transparent"
+                  placeholder="From Date"
+                />
+                <span className="text-gray-400 text-sm">to</span>
+                <input
+                  type="date"
+                  value={toDate}
+                  onChange={(e) => setToDate(e.target.value)}
+                  className="bg-gray-700 border border-gray-600 text-white rounded-md px-3 py-2 h-10 text-sm w-[140px] focus:ring-2 focus:ring-[#f69938] focus:border-transparent"
+                  placeholder="To Date"
+                />
+              </div>
+            </div>
+          </CardContent>
           </Card>
         </motion.div>
 

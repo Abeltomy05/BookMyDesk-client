@@ -22,7 +22,13 @@ const BuildingChatPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   const transformChatSessionsToBuildings = (sessions: ChatSessionDto[]): ChatSidebarItem[] => {
-    return sessions.map((session) => ({
+    return sessions
+    .sort((a, b) => {
+      const dateA = a.lastMessageAt ? new Date(a.lastMessageAt).getTime() : 0;
+      const dateB = b.lastMessageAt ? new Date(b.lastMessageAt).getTime() : 0;
+      return dateB - dateA;
+    })
+    .map((session) => ({
       _id: session._id,
       userId: session.clientId?._id!,
       name: session.clientId?.name || 'Unknown Client',
