@@ -13,17 +13,17 @@ type Role = "admin" | "client" | "vendor";
 
 const roleConfigs = {
   admin: {
-    baseURL: `${BACKEND_URL}/api/_a/admin`,
+    baseURL: `${BACKEND_URL}/api/admin`,
     logout: adminLogout,
     loginRedirect: "/admin/login",
   },
   client: {
-    baseURL: `${BACKEND_URL}/api/_c/client`,
+    baseURL: `${BACKEND_URL}/api/client`,
     logout: clientLogout,
     loginRedirect: "/login",
   },
   vendor: {
-    baseURL: `${BACKEND_URL}/api/_v/vendor`,
+     baseURL: `${BACKEND_URL}/api/vendor`,
     logout: vendorLogout,
     loginRedirect: "/vendor/login",
   },
