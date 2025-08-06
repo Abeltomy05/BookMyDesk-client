@@ -18,6 +18,7 @@ const OfferPage = lazy(() => import("@/pages/vendor/SubPages/OfferManagement"));
 const BuildingChatPage = lazy(() => import("@/pages/vendor/SubPages/BuildingChatPage"));
 import VendorLayout from "@/pages/vendor/VendorLayout"
 import Loading from "@/components/Loadings/Loading";
+import BuildingReregister from "@/pages/vendor/SubPages/RetryBuilding";
 
 
 const VendorRoutes = () => {
@@ -46,6 +47,7 @@ const VendorRoutes = () => {
                   <Route path="/wallet" element={<VendorWalletPage />} />
                   <Route path="/offer" element={<OfferPage />} />
                   <Route path="/chat/:buildingId" element={<BuildingChatPage />} />
+                  <Route path="/retry-building/:token" element={<BuildingReregister />} />
             </Route>
 
             <Route path="/*" element={<NotFoundPage/>}/>

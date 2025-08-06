@@ -14,7 +14,6 @@ import { getErrorMessage } from '@/utils/errors/errorHandler';
 import type { ReportEntry } from '@/types/report.type';
 import type { DownloadReportFilterParams } from '@/components/VendorHomeComps/DownloadReport';
 
-
 export const vendorService = {
 
 sendOtp: async (email: string): Promise<ApiResponse> => {
@@ -662,6 +661,34 @@ getAllAmenities: async(page?:number,limit?:number,search?:string,isActive?:boole
       };
     }
   },
+
+  getBuildingByToken: async(token: string):Promise<ApiResponse>=>{
+    try {
+      const response = await vendorAxiosInstance.get("/retry-building",{
+        params:{token}
+      });
+      return response.data
+     } catch (error:unknown) {
+      console.error('Error in logout:', error);
+      return {
+        success: false,
+        message: getErrorMessage(error),
+      };
+     }
+    },
+
+  retryBuilding: async(buildingData:Building):Promise<ApiResponse>=>{
+    try {
+      const response = await vendorAxiosInstance.post("/retry-building",buildingData);
+      return response.data;
+    } catch (error:unknown) {
+      console.error('Error in logout:', error);
+      return {
+        success: false,
+        message: getErrorMessage(error),
+      };
+    }
+  },  
 
  logout: async():Promise<ApiResponse>=>{
     try {
