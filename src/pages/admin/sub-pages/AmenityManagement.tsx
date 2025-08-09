@@ -12,7 +12,7 @@ import type { AmenityStatus } from "@/types/service.type"
 
 interface Amenity extends ExtendableItem {
   name: string;
-  isActive: boolean;
+  status: string;
 }
 
 function AmenityManagement() {
@@ -42,11 +42,15 @@ function AmenityManagement() {
       key: "status",
       label: "Status",
       width: "col-span-6 md:col-span-2",
-      render: (item) => (
-        <span className={`font-medium ${item.isActive ? "text-green-500" : "text-red-500"}`}>
-          {item.isActive ? "Active" : "Non-active"}
-        </span>
-      )
+      render: (item) => {
+          let color = "text-gray-400"
+          if (item.status === "active") color = "text-green-500"
+          else if (item.status === "non-active") color = "text-red-500"
+          else if (item.status === "pending") color = "text-yellow-500"
+          else if (item.status === "rejected") color = "text-red-700"
+
+          return <span className={`font-medium ${color}`}>{item.status}</span>
+        }
     }
   ]
 
@@ -63,15 +67,15 @@ function AmenityManagement() {
       condition: () => true
     },
     {
-      label: (item) => item.isActive ? "Make Non-active" : "Make Active",
+      label: (item) => item.status === 'active' ? "Make Non-active" : "Make Active",
       icon: <Shield size={16} />,
       onClick: async (amenity) => {
         try {
-          const newStatus: AmenityStatus = amenity.isActive ? "non-active" : "active"
+          const newStatus: AmenityStatus = amenity.status === 'active' ? "non-active" : "active"
           const response = await adminService.updateEntityStatus("amenity",amenity._id, newStatus) 
 
           if (response.success) {
-            tableRef.current?.updateItemOptimistically(amenity._id, { isActive: newStatus === "active" })
+            tableRef.current?.updateItemOptimistically(amenity._id, { status: newStatus })
             toast.success(`Amenity ${newStatus ? "activated" : "deactivated"} successfully`)
           } else {
             toast.error(response.message || "Failed to update amenity status")
@@ -106,12 +110,7 @@ function AmenityManagement() {
 
   const fetchAmenities = async (params: FetchParams): Promise<ApiResponse<Amenity>> => {
     try {
-      const status =
-        activeFilter === "active"
-          ? true
-          : activeFilter === "non-active"
-          ? false
-          : undefined
+      const status = activeFilter != 'all' ? activeFilter : undefined
 
       const response = await adminService.getAllAmenities(
         params.page,

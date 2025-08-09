@@ -36,7 +36,7 @@ const updateBuilding = (field: keyof Building, value: string) => {
 const fetchAmenities = async (page: number = 1, append: boolean = false) => {
   setLoading(true)
   try {
-    const response = await vendorService.getAllAmenities(page, 8, '', true)
+    const response = await vendorService.getAllAmenities(page, 8, '', "active")
     if (response.success && response.data) {
       const newAmenities = response.data
       

@@ -647,10 +647,10 @@ clearNotifications: async():Promise<ApiResponse>=>{
   }
 },
 
-getAllAmenities: async(page?:number,limit?:number,search?:string,isActive?:boolean): Promise<ApiResponse>=>{
+getAllAmenities: async(page?:number,limit?:number,search?:string,status?: string): Promise<ApiResponse>=>{
     try {
       const response = await vendorAxiosInstance.get('/get-amenities',{
-        params:{page,limit,search,isActive}
+        params:{page,limit,search,status}
       })
       return response.data;
     }catch (error:unknown) {
@@ -682,13 +682,26 @@ getAllAmenities: async(page?:number,limit?:number,search?:string,isActive?:boole
       const response = await vendorAxiosInstance.post("/retry-building",buildingData);
       return response.data;
     } catch (error:unknown) {
-      console.error('Error in logout:', error);
+      console.error('Error in retry building application:', error);
       return {
         success: false,
         message: getErrorMessage(error),
       };
     }
   },  
+
+  requestAmenity: async(amenityData: { name: string; description: string }): Promise<ApiResponse>=>{
+    try {
+      const response = await vendorAxiosInstance.post("/request-amenity",amenityData);
+      return response.data;
+    } catch (error) {
+      console.error('Error in lrequesting amenity:', error);
+      return {
+        success: false,
+        message: getErrorMessage(error),
+      };
+    }
+  },
 
  logout: async():Promise<ApiResponse>=>{
     try {

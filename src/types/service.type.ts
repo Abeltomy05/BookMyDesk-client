@@ -49,7 +49,7 @@ export type BuildingStatus = "approved" | "archived";
 export type BookingStatus = "pending" | "confirmed" | "cancelled" | "completed" | "failed";
 export type ClientStatus = "active" | "blocked";
 export type VendorStatus = "pending" | "approved" | "rejected" | "blocked";
-export type AmenityStatus = "active" | "non-active"
+export type AmenityStatus = "active" | "non-active" 
 
 export interface GetUsersParams {
   role?: "client" | "vendor";
@@ -99,7 +99,7 @@ interface VendorData{
 export interface Amenities{
   _id:string,
   name:string,
-  isActive:boolean,
+  status:AmenityStatus,
 }
 
 export interface GetAllAmenities{

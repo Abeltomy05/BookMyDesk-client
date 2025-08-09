@@ -623,10 +623,10 @@ clearNotifications: async():Promise<ApiResponse>=>{
   }
 },
 
-getAllAmenities: async(page?:number,limit?:number,search?:string,isActive?:boolean): Promise<ApiResponse>=>{
+getAllAmenities: async(page?:number,limit?:number,search?:string,status?:string): Promise<ApiResponse>=>{
     try {
       const response = await clientAxiosInstance.get('/get-amenities',{
-        params:{page,limit,search,isActive}
+        params:{page,limit,search,status}
       })
       return response.data;
     }catch (error:unknown) {

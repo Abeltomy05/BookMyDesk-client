@@ -370,10 +370,10 @@ export const adminService = {
     }
   },
 
-  getAllAmenities: async(page?:number,limit?:number,search?:string,isActive?:boolean): Promise<GetAllAmenities>=>{
+  getAllAmenities: async(page?:number,limit?:number,search?:string,status?:string): Promise<GetAllAmenities>=>{
     try {
       const response = await adminAxiosInstance.get('/get-amenities',{
-        params: { page, limit, search, isActive }
+        params: { page, limit, search, status }
       })
       return response.data;
     }catch (error:unknown) {
