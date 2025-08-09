@@ -80,8 +80,19 @@ export const validateVendorField = (
 ): string | undefined => {
   switch (name as keyof VendorFormData) {
     case "username":
-      return !value || typeof value !== 'string' || !value.trim() ? "Username is required" : undefined
-      
+        if (!value || typeof value !== "string" || !value.trim()) {
+          return "Username is required";
+        }   
+        
+        if (value.trim().length < 2) {
+          return "Username must be at least 2 characters long";
+        }
+
+         if (!/^[a-zA-Z\s]+$/.test(value.trim())) {
+            return "Username must contain only alphabetic characters and spaces";
+          }
+
+        return undefined; 
     case "email":
       return !value || typeof value !== 'string' || !value.trim() 
         ? "Email is required" 
