@@ -1,7 +1,7 @@
 import { GenericTable } from "@/components/ReusableComponents/GenericTable"
 import { type TableColumn, type TableAction, type TableFilter, type ExtendableItem } from "@/types/table.type"
 import { adminService } from "@/services/adminService"
-import { Edit, Shield, Trash, Wrench } from "lucide-react"
+import { Bell, Edit, Shield, Trash, Wrench } from "lucide-react"
 import toast from "react-hot-toast"
 import type { FetchParams, ApiResponse } from "@/types/api.type"
 import { useRef, useState } from "react"
@@ -9,6 +9,7 @@ import type { TableRef } from "@/components/ReusableComponents/LightGenericTable
 import { AddAmenityForm } from "./AddAmenity"
 import ConfirmModal from "@/components/ReusableComponents/ConfirmModal"
 import type { AmenityStatus } from "@/types/service.type"
+import { NewAmenityRequests, type AmenityRequest } from "@/components/Amenity Modals/PendingAmenity"
 
 interface Amenity extends ExtendableItem {
   name: string;
@@ -22,6 +23,7 @@ function AmenityManagement() {
   const [editingAmenity, setEditingAmenity] = useState<Amenity | null>(null)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [amenityToDelete, setAmenityToDelete] = useState<Amenity | null>(null)
+  const [showRequestsModal, setShowRequestsModal] = useState(false)
 
   const columns: TableColumn<Amenity>[] = [
    {
@@ -76,7 +78,7 @@ function AmenityManagement() {
 
           if (response.success) {
             tableRef.current?.updateItemOptimistically(amenity._id, { status: newStatus })
-            toast.success(`Amenity ${newStatus ? "activated" : "deactivated"} successfully`)
+            toast.success(`Amenity status changed successfully`)
           } else {
             toast.error(response.message || "Failed to update amenity status")
           }
@@ -137,6 +139,44 @@ function AmenityManagement() {
       }
     }
   }
+
+   const fetchAmenityRequests = async (params: FetchParams): Promise<ApiResponse<AmenityRequest>> => {
+    try {
+      const response = await adminService.getAmenityRequests(
+        params.page,
+        params.limit,
+      )
+      console.log(response)
+      return {
+        success: response.success,
+        users: response.data, 
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        totalItems: response.totalItems || response.data.length,
+      }
+    } catch (error) {
+      console.error("Error fetching amenity requests:", error)
+      return {
+        success: false,
+        users: [],
+        totalPages: 0,
+        currentPage: 1,
+        totalItems: 0,
+      }
+    }
+  }
+
+  const handleChangeStatus = async (_id:string,status:'active' | 'rejected',reason?:string,email?:string) => {
+    try {
+      const response = await adminService.updateEntityStatus('amenity',_id,status,reason,email)
+      if (!response.success) {
+        throw new Error(response.message || "Failed to approve request")
+      }
+    } catch (error) {
+      throw error
+    }
+  }
+
 
   const handleAddAmenity = async (name: string) => {
     try {
@@ -210,6 +250,10 @@ function AmenityManagement() {
       showAddButton={true}
       addButtonLabel="Add Amenity"
       onAddClick={() => setShowAddForm(true)}
+      showSecondButton={true}
+      secondButtonLabel="View Requests"
+      onSecondClick={() => setShowRequestsModal(true)}
+      secondButtonIcon={<Bell size={16} />}
     />
 
     <AddAmenityForm
@@ -232,6 +276,16 @@ function AmenityManagement() {
         confirmText="Delete"
         cancelText="Cancel"
         variant="danger"
+      />
+
+      <NewAmenityRequests
+        isOpen={showRequestsModal}
+        onClose={() =>{
+          setShowRequestsModal(false)
+          tableRef.current?.refreshData() 
+        }}
+        fetchRequests={fetchAmenityRequests}
+        onStatusChange={handleChangeStatus}
       />
   
    </>   

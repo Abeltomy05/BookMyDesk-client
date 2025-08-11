@@ -10,7 +10,7 @@ import toast from "react-hot-toast"
 import ConfirmModal from "@/components/ReusableComponents/ConfirmModal"
 import type{ TableRef } from "@/components/ReusableComponents/LightGenericTable"
 import type { BuildingStatus } from "@/types/service.type"
-import RequestAmenityModal from "@/components/Modals/RequestAmenity"
+import RequestAmenityModal from "@/components/Amenity Modals/RequestAmenity"
 
 
 export default function BuildingManagement() {

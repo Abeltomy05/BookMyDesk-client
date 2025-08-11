@@ -21,7 +21,8 @@ interface GenericTableProps<T extends BaseItem> extends TableConfiguration<T> {
 }
 
 export interface TableRef<T extends BaseItem> {
-  updateItemOptimistically: (id: string, updates: Partial<T>) => void
+  updateItemOptimistically: (id: string, updates: Partial<T>) => void;
+  removeItemOptimistically?: (id: string) => void;
   refreshData: () => void
 }
 

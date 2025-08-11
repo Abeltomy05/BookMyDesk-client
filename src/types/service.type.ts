@@ -49,7 +49,7 @@ export type BuildingStatus = "approved" | "archived";
 export type BookingStatus = "pending" | "confirmed" | "cancelled" | "completed" | "failed";
 export type ClientStatus = "active" | "blocked";
 export type VendorStatus = "pending" | "approved" | "rejected" | "blocked";
-export type AmenityStatus = "active" | "non-active" 
+export type AmenityStatus = "active" | "non-active" | "rejected" | "pending"
 
 export interface GetUsersParams {
   role?: "client" | "vendor";
@@ -102,13 +102,13 @@ export interface Amenities{
   status:AmenityStatus,
 }
 
-export interface GetAllAmenities{
-  success:boolean;
-  message:string;
-  data: Amenities[];
-  totalPages:number;
-  currentPage:number;
-  totalItems?:number;
+export interface PaginatedResponse<T> {
+  success: boolean;
+  message: string;
+  data: T[];
+  totalPages: number;
+  currentPage: number;
+  totalItems?: number;
 }
 
 export interface GetAllBuildingResponse{
