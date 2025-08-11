@@ -1,7 +1,7 @@
 import { GenericTable } from "@/components/ReusableComponents/GenericTable"
 import { type TableColumn, type TableAction, type TableFilter, type ExtendableItem } from "@/types/table.type"
 import { adminService } from "@/services/adminService"
-import { Edit, Shield, Trash, Wrench } from "lucide-react"
+import { Bell, Edit, Shield, Trash, Wrench } from "lucide-react"
 import toast from "react-hot-toast"
 import type { FetchParams, ApiResponse } from "@/types/api.type"
 import { useRef, useState } from "react"
@@ -9,10 +9,11 @@ import type { TableRef } from "@/components/ReusableComponents/LightGenericTable
 import { AddAmenityForm } from "./AddAmenity"
 import ConfirmModal from "@/components/ReusableComponents/ConfirmModal"
 import type { AmenityStatus } from "@/types/service.type"
+import { NewAmenityRequests, type AmenityRequest } from "@/components/Amenity Modals/PendingAmenity"
 
 interface Amenity extends ExtendableItem {
   name: string;
-  isActive: boolean;
+  status: string;
 }
 
 function AmenityManagement() {
@@ -22,6 +23,7 @@ function AmenityManagement() {
   const [editingAmenity, setEditingAmenity] = useState<Amenity | null>(null)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [amenityToDelete, setAmenityToDelete] = useState<Amenity | null>(null)
+  const [showRequestsModal, setShowRequestsModal] = useState(false)
 
   const columns: TableColumn<Amenity>[] = [
    {
@@ -42,11 +44,15 @@ function AmenityManagement() {
       key: "status",
       label: "Status",
       width: "col-span-6 md:col-span-2",
-      render: (item) => (
-        <span className={`font-medium ${item.isActive ? "text-green-500" : "text-red-500"}`}>
-          {item.isActive ? "Active" : "Non-active"}
-        </span>
-      )
+      render: (item) => {
+          let color = "text-gray-400"
+          if (item.status === "active") color = "text-green-500"
+          else if (item.status === "non-active") color = "text-red-500"
+          else if (item.status === "pending") color = "text-yellow-500"
+          else if (item.status === "rejected") color = "text-red-700"
+
+          return <span className={`font-medium ${color}`}>{item.status}</span>
+        }
     }
   ]
 
@@ -63,16 +69,16 @@ function AmenityManagement() {
       condition: () => true
     },
     {
-      label: (item) => item.isActive ? "Make Non-active" : "Make Active",
+      label: (item) => item.status === 'active' ? "Make Non-active" : "Make Active",
       icon: <Shield size={16} />,
       onClick: async (amenity) => {
         try {
-          const newStatus: AmenityStatus = amenity.isActive ? "non-active" : "active"
+          const newStatus: AmenityStatus = amenity.status === 'active' ? "non-active" : "active"
           const response = await adminService.updateEntityStatus("amenity",amenity._id, newStatus) 
 
           if (response.success) {
-            tableRef.current?.updateItemOptimistically(amenity._id, { isActive: newStatus === "active" })
-            toast.success(`Amenity ${newStatus ? "activated" : "deactivated"} successfully`)
+            tableRef.current?.updateItemOptimistically(amenity._id, { status: newStatus })
+            toast.success(`Amenity status changed successfully`)
           } else {
             toast.error(response.message || "Failed to update amenity status")
           }
@@ -106,12 +112,7 @@ function AmenityManagement() {
 
   const fetchAmenities = async (params: FetchParams): Promise<ApiResponse<Amenity>> => {
     try {
-      const status =
-        activeFilter === "active"
-          ? true
-          : activeFilter === "non-active"
-          ? false
-          : undefined
+      const status = activeFilter != 'all' ? activeFilter : undefined
 
       const response = await adminService.getAllAmenities(
         params.page,
@@ -138,6 +139,44 @@ function AmenityManagement() {
       }
     }
   }
+
+   const fetchAmenityRequests = async (params: FetchParams): Promise<ApiResponse<AmenityRequest>> => {
+    try {
+      const response = await adminService.getAmenityRequests(
+        params.page,
+        params.limit,
+      )
+      console.log(response)
+      return {
+        success: response.success,
+        users: response.data, 
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        totalItems: response.totalItems || response.data.length,
+      }
+    } catch (error) {
+      console.error("Error fetching amenity requests:", error)
+      return {
+        success: false,
+        users: [],
+        totalPages: 0,
+        currentPage: 1,
+        totalItems: 0,
+      }
+    }
+  }
+
+  const handleChangeStatus = async (_id:string,status:'active' | 'rejected',reason?:string,email?:string) => {
+    try {
+      const response = await adminService.updateEntityStatus('amenity',_id,status,reason,email)
+      if (!response.success) {
+        throw new Error(response.message || "Failed to approve request")
+      }
+    } catch (error) {
+      throw error
+    }
+  }
+
 
   const handleAddAmenity = async (name: string) => {
     try {
@@ -211,6 +250,10 @@ function AmenityManagement() {
       showAddButton={true}
       addButtonLabel="Add Amenity"
       onAddClick={() => setShowAddForm(true)}
+      showSecondButton={true}
+      secondButtonLabel="View Requests"
+      onSecondClick={() => setShowRequestsModal(true)}
+      secondButtonIcon={<Bell size={16} />}
     />
 
     <AddAmenityForm
@@ -233,6 +276,16 @@ function AmenityManagement() {
         confirmText="Delete"
         cancelText="Cancel"
         variant="danger"
+      />
+
+      <NewAmenityRequests
+        isOpen={showRequestsModal}
+        onClose={() =>{
+          setShowRequestsModal(false)
+          tableRef.current?.refreshData() 
+        }}
+        fetchRequests={fetchAmenityRequests}
+        onStatusChange={handleChangeStatus}
       />
   
    </>   

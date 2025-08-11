@@ -10,6 +10,7 @@ import toast from "react-hot-toast"
 import ConfirmModal from "@/components/ReusableComponents/ConfirmModal"
 import type{ TableRef } from "@/components/ReusableComponents/LightGenericTable"
 import type { BuildingStatus } from "@/types/service.type"
+import RequestAmenityModal from "@/components/Amenity Modals/RequestAmenity"
 
 
 export default function BuildingManagement() {
@@ -25,6 +26,7 @@ export default function BuildingManagement() {
     action: "",
     newStatus: null
   });
+  const [isAmenityModalOpen, setIsAmenityModalOpen] = useState(false);
   
   const tableRef = useRef<TableRef<Building> | null>(null);
   
@@ -252,6 +254,20 @@ export default function BuildingManagement() {
     navigate("/vendor/register-building")
   }
 
+    const handleAddAmenity = async(amenityData: { name: string; description: string }) => {
+     try {
+      const response = await vendorService.requestAmenity(amenityData);
+      if(response.success){
+        toast.success("Amenity requested successfully, Please wait for admin approval.")
+      }else{
+        toast.error(response.message || "Amenity approval failed. Please try again.")
+      }
+     } catch (error) {
+      console.error("Error in adding new amenity:", error)
+      toast.error("An error occurred while requesting amenity.");
+     }
+  }
+
   const handleFilterChange = (filterValue: string) => {
     setCurrentFilter(filterValue)
   }
@@ -274,6 +290,14 @@ export default function BuildingManagement() {
               <h1 className="text-3xl font-bold text-gray-900">Building Management</h1>
               <p className="text-gray-600 mt-1">Manage your buildings and workspace availability</p>
             </div>
+            <div className="flex gap-2">
+            <button
+              onClick={() => setIsAmenityModalOpen(true)}
+              className="flex items-center gap-2 bg-[#f69938] hover:bg-[#e5873a] text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm"
+            >
+              <Plus className="w-5 h-5" />
+              Reqest New Amenity
+            </button>
             <button
               onClick={handleAddBuilding}
               className="flex items-center gap-2 bg-[#f69938] hover:bg-[#e5873a] text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm"
@@ -281,6 +305,7 @@ export default function BuildingManagement() {
               <Plus className="w-5 h-5" />
               Add Building
             </button>
+            </div>
           </div>
 
           {/* Buildings Table */}
@@ -313,6 +338,12 @@ export default function BuildingManagement() {
         confirmText={confirmModal.action ? confirmModal.action.charAt(0).toUpperCase() + confirmModal.action.slice(1) : 'Confirm'}
         cancelText="Cancel"
         variant="warning"
+      />
+
+      <RequestAmenityModal
+        isOpen={isAmenityModalOpen}
+        onClose={() => setIsAmenityModalOpen(false)}
+        onSubmit={handleAddAmenity}
       />
       </>
   )

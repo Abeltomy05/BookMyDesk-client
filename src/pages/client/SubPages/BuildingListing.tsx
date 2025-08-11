@@ -154,7 +154,7 @@ export default function BuildingsListing() {
 useEffect(() => {
   const fetchAmenities = async () => {
     try {
-      const response = await clientService.getAllAmenities(1, 100, undefined, true);
+      const response = await clientService.getAllAmenities(1, 100, undefined, 'active');
       console.log("Amenities data: ",response.data);
       if (response.success && Array.isArray(response.data)) {
         const names = response.data.map((amenity: {_id:string,name:string}) => amenity.name); 

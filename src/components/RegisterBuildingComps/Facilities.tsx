@@ -27,7 +27,8 @@ export function FacilitiesContactStep({
 
   useEffect(() => {
   const fetchAmenities = async () => {
-    const res = await vendorService.getAllAmenities(1, 1000, '', true) 
+    const res = await vendorService.getAllAmenities(1, 1000, '', "active") 
+    console.log(res.data)
     if (res.success) {
       setAllAmenities(res.data)
     }

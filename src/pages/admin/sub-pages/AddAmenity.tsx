@@ -6,7 +6,7 @@ import toast from "react-hot-toast"
 interface Amenity {
   _id: string;
   name: string;
-  isActive: boolean;
+  status: string;
 }
 
 interface AddAmenityFormProps {

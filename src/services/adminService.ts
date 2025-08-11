@@ -2,12 +2,13 @@ import { adminAxiosInstance } from "@/api/private.axios";
 import authAxiosInstance from "@/api/auth.axios";
 import type { NotificationResponse } from "@/types/notification.type";
 import type { AdminReportEntry } from "@/types/report.type";
-import type { AmenityStatus, ApiResponse, ClientStatus, GetAllAmenities, GetAllBuildingResponse, GetAllUsersResponse, GetUsersParams, LoginData, VendorStatus } from "@/types/service.type";
+import type { AmenityStatus, ApiResponse, ClientStatus, PaginatedResponse, GetAllBuildingResponse, GetAllUsersResponse, GetUsersParams, LoginData, VendorStatus, Amenities } from "@/types/service.type";
 import { getErrorMessage } from "@/utils/errors/errorHandler";
 import { formatCurrency } from "@/utils/formatters/currency";
 import { formatBookingDates } from "@/utils/formatters/date"
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import type { AmenityRequest } from "@/components/Amenity Modals/PendingAmenity";
 
 export const adminService = {
     login: async (data: LoginData): Promise<ApiResponse> => {
@@ -89,7 +90,8 @@ export const adminService = {
       entityType: "client" | "vendor" | "building" | "amenity",
       entityId: string,
       status: ClientStatus | VendorStatus | AmenityStatus,
-      reason?: string
+      reason?: string,
+      email?: string,
     ): Promise<ApiResponse> => {
       try {
         const response = await adminAxiosInstance.patch("/update-status", {
@@ -97,6 +99,7 @@ export const adminService = {
           entityId,
           status,
           reason,
+          email,
         });
         return response.data;
       } catch (error:unknown) {
@@ -370,10 +373,10 @@ export const adminService = {
     }
   },
 
-  getAllAmenities: async(page?:number,limit?:number,search?:string,isActive?:boolean): Promise<GetAllAmenities>=>{
+  getAllAmenities: async(page?:number,limit?:number,search?:string,status?:string): Promise<PaginatedResponse<Amenities>>=>{
     try {
       const response = await adminAxiosInstance.get('/get-amenities',{
-        params: { page, limit, search, isActive }
+        params: { page, limit, search, status }
       })
       return response.data;
     }catch (error:unknown) {
@@ -422,6 +425,24 @@ export const adminService = {
         return {
         success: false,
         message: getErrorMessage(error),
+      };
+    }
+  },
+
+  getAmenityRequests: async (page?:number,limit?:number):Promise<PaginatedResponse<AmenityRequest>>=>{
+    try {
+      const response = await adminAxiosInstance.get('/pending-amenity', {
+        params: { page, limit }
+      });
+      return response.data;
+    } catch (error:unknown) {
+        return {
+          success: false,
+          message: getErrorMessage(error),
+          data: [],
+          totalPages:0,
+          currentPage:0,
+          totalItems:0,
       };
     }
   },

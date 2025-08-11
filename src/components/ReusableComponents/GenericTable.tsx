@@ -14,6 +14,10 @@ interface GenericTableProps<T extends BaseItem> extends TableConfiguration<T> {
   showAddButton?: boolean
   addButtonLabel?: string
   onAddClick?: () => void
+  showSecondButton?: boolean
+  secondButtonLabel?: string
+  onSecondClick?: () => void
+  secondButtonIcon?: React.ReactNode
 }
 
 function GenericTableInner<T extends BaseItem>({
@@ -33,7 +37,11 @@ function GenericTableInner<T extends BaseItem>({
   onFilterChange,
   showAddButton,
   addButtonLabel,
-  onAddClick
+  onAddClick,
+  showSecondButton,
+  secondButtonLabel,
+  onSecondClick,
+  secondButtonIcon
 }: GenericTableProps<T>,
 ref: React.Ref<TableRef<T>>) {
   const [data, setData] = useState<T[]>([])
@@ -56,6 +64,11 @@ ref: React.Ref<TableRef<T>>) {
           item._id === id ? { ...item, ...updates } : item
         )
       )
+    },
+     removeItemOptimistically: (id: string) => {
+      setData(prevData =>
+        prevData.filter(item => item._id !== id)
+      );
     },
     refreshData: () => {
       loadData(pagination.currentPage, searchQuery)
@@ -175,23 +188,37 @@ ref: React.Ref<TableRef<T>>) {
       animate="visible"
       variants={containerVariants}
     >
-      <div className="flex items-center justify-between mb-2">
+    <div className="flex items-center justify-between mb-2">
       <motion.h1 className="text-2xl font-bold mb-2 text-[#f69938]" variants={itemVariants}>
         {title}
       </motion.h1>
-       {showAddButton && (
-        <motion.button
-          onClick={onAddClick}
-          className="px-4 py-2 bg-[#f69938] text-black rounded-lg hover:bg-[#e58a2f] transition-colors flex items-center gap-2 font-medium"
-          variants={itemVariants}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <Plus size={16} />
-          {addButtonLabel || "Add Item"}
-        </motion.button>
-      )}
+      <div className="flex items-center gap-3">
+        {showSecondButton && (
+          <motion.button
+            onClick={onSecondClick}
+            className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors flex items-center gap-2 font-medium"
+            variants={itemVariants}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            {secondButtonIcon}
+            {secondButtonLabel || "Second Action"}
+          </motion.button>
+        )}
+        {showAddButton && (
+          <motion.button
+            onClick={onAddClick}
+            className="px-4 py-2 bg-[#f69938] text-black rounded-lg hover:bg-[#e58a2f] transition-colors flex items-center gap-2 font-medium"
+            variants={itemVariants}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Plus size={16} />
+            {addButtonLabel || "Add Item"}
+          </motion.button>
+        )}
       </div>
+    </div>
 
       {/* Search and Filters */}
       <motion.div className="flex flex-col md:flex-row justify-between mb-6 gap-4" variants={itemVariants}>
