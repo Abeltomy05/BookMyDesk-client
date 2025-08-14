@@ -246,7 +246,7 @@ return (
                         </button>
                     )}
                     
-                    {booking.status === 'completed' && (
+                    {(booking.status === 'completed' || booking.status === 'confirmed') && (
                         <button
                             onClick={handleDownloadInvoice}
                             className="px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors duration-200 flex items-center gap-1"
