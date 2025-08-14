@@ -20,7 +20,7 @@ export const clientService = {
 
   sendOtp: async (email: string): Promise<ApiResponse> => {
     try {
-       const response = await authAxiosInstance.post('/send-otp', { email });
+       const response = await authAxiosInstance.post('/otp/send', { email });
        return response.data;
     } catch (error:unknown) {
        return {
@@ -32,7 +32,7 @@ export const clientService = {
 
   verifyOtp: async (email: string, otp: string): Promise<ApiResponse> => {
     try {
-       const response = await authAxiosInstance.post('/verify-otp', { email, otp });
+       const response = await authAxiosInstance.post('/otp/verify', { email, otp });
        return response.data;
     } catch (error:unknown) {
       return {
@@ -69,7 +69,7 @@ export const clientService = {
 
   forgotPassword: async (email: string): Promise<ApiResponse> => {
     try {
-      const response = await authAxiosInstance.post('/forgot-password', { 
+      const response = await authAxiosInstance.post('/password/forgot', { 
         email
       });
       return response.data;
@@ -83,7 +83,7 @@ export const clientService = {
 
   resetPassword: async (token: string, password: string): Promise<ApiResponse> => {
     try {
-      const response = await authAxiosInstance.post('/reset-password', {
+      const response = await authAxiosInstance.post('/password/reset', {
         token,
         password
       });

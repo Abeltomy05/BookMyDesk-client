@@ -29,7 +29,7 @@ const AuthCallback = () => {
 
            const fcmToken = await requestPermission();
             if (fcmToken) {
-              await authAxiosInstance.post('/save-fcm-token', {
+              await authAxiosInstance.post('/fcm-token', {
                 fcmToken,
                 userId: user._id,
                 role: user.role,
@@ -55,7 +55,7 @@ const AuthCallback = () => {
 
               const fcmToken = await requestPermission();
               if (fcmToken) {
-                await authAxiosInstance.post('/save-fcm-token', {
+                await authAxiosInstance.post('/fcm-token', {
                   fcmToken,
                   userId: user._id,
                   role: user.role,

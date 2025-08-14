@@ -18,7 +18,7 @@ export const vendorService = {
 
 sendOtp: async (email: string): Promise<ApiResponse> => {
     try {
-    const response = await authAxiosInstance.post('/send-otp', { email });
+    const response = await authAxiosInstance.post('/otp/send', { email });
     return response.data;
     } catch (error:unknown) {
         console.error('Error sending OTP:', error);
@@ -31,7 +31,7 @@ sendOtp: async (email: string): Promise<ApiResponse> => {
 
 verifyOtp: async (email: string, otp: string): Promise<ApiResponse> => {
     try {
-    const response = await authAxiosInstance.post('/verify-otp', { email, otp });
+    const response = await authAxiosInstance.post('/otp/verify', { email, otp });
     return response.data;
     } catch (error:unknown) {
     console.error('Error verifying OTP:', error);
