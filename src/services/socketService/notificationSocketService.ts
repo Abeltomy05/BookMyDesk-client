@@ -32,7 +32,7 @@ class NotificationSocketService {
     });
   }
 
-  onNotification(callback: () => void) {
+  onNotification(callback: (payload: {type?:'chat' | 'general'}) => void) {
     this.socket?.on("newNotification", callback);
   }
 
