@@ -18,7 +18,7 @@ export const vendorService = {
 
 sendOtp: async (email: string): Promise<ApiResponse> => {
     try {
-    const response = await authAxiosInstance.post('/send-otp', { email });
+    const response = await authAxiosInstance.post('/otp/send', { email });
     return response.data;
     } catch (error:unknown) {
         console.error('Error sending OTP:', error);
@@ -31,7 +31,7 @@ sendOtp: async (email: string): Promise<ApiResponse> => {
 
 verifyOtp: async (email: string, otp: string): Promise<ApiResponse> => {
     try {
-    const response = await authAxiosInstance.post('/verify-otp', { email, otp });
+    const response = await authAxiosInstance.post('/otp/verify', { email, otp });
     return response.data;
     } catch (error:unknown) {
     console.error('Error verifying OTP:', error);
@@ -75,7 +75,7 @@ handleGoogleLogin:  () => {
 
 uploadIdProof: async (idProof: string): Promise<ApiResponse> => {
     try {
-      const response = await vendorAxiosInstance.post('/upload-id-proof', { idProof });
+      const response = await vendorAxiosInstance.post('/users/id-proof', { idProof });
       return response.data;
     } catch (error:unknown) {
       console.error('Error uploading ID proof:', error);
@@ -90,7 +90,7 @@ uploadIdProof: async (idProof: string): Promise<ApiResponse> => {
 
 getSingleUser: async (): Promise<ApiResponse> => {
    try {
-      const response = await vendorAxiosInstance.get("/get-user-data");
+      const response = await vendorAxiosInstance.get("/users/me");
       return response.data
      } catch (error:unknown) {
       console.error('Error geting user data:', error);
@@ -103,7 +103,7 @@ getSingleUser: async (): Promise<ApiResponse> => {
 
 updateProfile: async (data: any): Promise<ApiResponse> => {
     try {
-      const response = await vendorAxiosInstance.patch("/update-profile", data);
+      const response = await vendorAxiosInstance.patch("/users/me", data);
       return response.data;
     } catch (error:unknown) {
       console.error('Error updating profile:', error);
@@ -116,7 +116,7 @@ updateProfile: async (data: any): Promise<ApiResponse> => {
 
 updatePassword: async (currentPassword: string, newPassword: string): Promise<ApiResponse> => {
     try {
-      const response = await vendorAxiosInstance.patch("/update-password", {
+      const response = await vendorAxiosInstance.patch("/users/password", {
         currentPassword,
         newPassword
       });
@@ -134,7 +134,7 @@ updatePassword: async (currentPassword: string, newPassword: string): Promise<Ap
 
 getRetrydata: async (token:string): Promise<ApiResponse>=>{
   try {
-     const response = await vendorAxiosInstance.get(`/get-retry-data?token=${token}`);
+     const response = await vendorAxiosInstance.get(`/users/retry?token=${token}`);
      console.log("Fetched retry data",response.data.data)
      return response.data;
   } catch (error:unknown) {
@@ -154,7 +154,7 @@ retryRegistration: async(data:{
     idProof: string;
 }): Promise<ApiResponse> =>{
    try {
-     const response = await vendorAxiosInstance.post("/retry-registration",data);
+     const response = await vendorAxiosInstance.post("/users/retry",data);
      return response.data;
    } catch (error:unknown) {
     console.error('Error retry registration:', error);
@@ -175,7 +175,7 @@ getAllBuildings: async ({
     status
 }: GetBuildingsParams): Promise<GetAllBuildingsResponse>=>{
      try {
-      const response = await vendorAxiosInstance.get("/get-all-buildings", {
+      const response = await vendorAxiosInstance.get("/buildings", {
         params: {
           page,
           limit,
@@ -200,7 +200,7 @@ getAllBuildings: async ({
 
 registerNewBuilding: async(data: BuildingRegistrationData): Promise<ApiResponse>=>{
    try {
-     const response = await vendorAxiosInstance.post('/register-building', data);
+     const response = await vendorAxiosInstance.post('/buildings', data);
      return response.data;
    } catch (error:unknown) {
      console.error('Register building error:', error);
@@ -214,7 +214,7 @@ registerNewBuilding: async(data: BuildingRegistrationData): Promise<ApiResponse>
 editBuildingData: async(data:Building):Promise<ApiResponse>=>{
   try {
     console.log(data)
-    const response = await vendorAxiosInstance.put("/edit-building",data);
+    const response = await vendorAxiosInstance.put("/buildings/edit",data);
     return response.data;
   } catch (error:unknown) {
      console.error('Register building error:', error);
@@ -227,7 +227,7 @@ editBuildingData: async(data:Building):Promise<ApiResponse>=>{
 
 getBuildingDetails:async(id: string):Promise<ApiResponse>=>{
     try {
-       const response = await vendorAxiosInstance.get(`/building/${id}`);
+       const response = await vendorAxiosInstance.get(`/buildings/${id}`);
        return response.data;
     } catch (error:unknown) {
        console.error('get  building  detail error:', error);
@@ -245,7 +245,7 @@ updateBuildingStatus: async (
       reason?: string
     ): Promise<ApiResponse> => {
       try {
-        const response = await vendorAxiosInstance.patch("/update-status", {
+        const response = await vendorAxiosInstance.patch("/entity/status", {
           entityType,
           entityId,
           status,
@@ -263,7 +263,7 @@ updateBuildingStatus: async (
 
 getBookings: async ({page = 1, limit = 5,status,buildingId,fromDate,toDate}:{page:number,limit:number,status?:string,buildingId?:string,fromDate?:string,toDate?:string}): Promise<GetBookingResponse> => {
      try {
-      const response = await vendorAxiosInstance.get('/get-bookings', {
+      const response = await vendorAxiosInstance.get('/bookings', {
         params: { page, limit, ...(status && { status }), buildingId,fromDate,toDate }
       })
       return response.data;
@@ -283,7 +283,7 @@ updateBookingStatus: async (
       reason?: string
     ): Promise<ApiResponse> =>{
      try {
-       const response = await vendorAxiosInstance.patch("/update-status", {
+       const response = await vendorAxiosInstance.patch("/entity/status", {
           entityType,
           entityId,
           status,
@@ -301,9 +301,8 @@ updateBookingStatus: async (
 
 cancelBooking: async (bookingId: string, reason: string): Promise<ApiResponse> => {
      try {
-      const response = await vendorAxiosInstance.patch(`/cancel-booking`, { 
-        reason,
-        bookingId
+      const response = await vendorAxiosInstance.patch(`/bookings/${bookingId}/cancel`, { 
+        reason
        });
       return response.data;
      } catch (error:unknown) {
@@ -317,7 +316,7 @@ cancelBooking: async (bookingId: string, reason: string): Promise<ApiResponse> =
 
 getWalletDetails: async ({page,limit}:{page:number,limit:number}): Promise<ApiResponse> => {
   try {
-      const response = await vendorAxiosInstance.get('/get-wallet-details',{
+      const response = await vendorAxiosInstance.get('/wallet',{
       params:{page,limit}
       });
       return response.data;
@@ -332,7 +331,7 @@ getWalletDetails: async ({page,limit}:{page:number,limit:number}): Promise<ApiRe
 
 getHomeData: async ()=>{
   try {
-    const response = await vendorAxiosInstance.get("/get-vendor-home-data");
+    const response = await vendorAxiosInstance.get("/users/home-data");
     return response.data;
   } catch (error:unknown) {
     console.error('Error fetching vendor home details:', error);
@@ -449,7 +448,7 @@ downloadPdf: (
 
 getRevenueReport: async(buildingId?:string,filterParams?: DownloadReportFilterParams):Promise<ApiResponse>=>{
   try {
-    const response = await vendorAxiosInstance.get('/revenue-report',{
+    const response = await vendorAxiosInstance.get('/bookings/revenue-report',{
       params:{
         buildingId,
         ...filterParams,
@@ -471,7 +470,7 @@ getRevenueChartData: async (filterParams: {
   month?: string;
   year: string;
 }):Promise<ApiResponse> => {
-  const response = await vendorAxiosInstance.get('/revenue-chart', { 
+  const response = await vendorAxiosInstance.get('/bookings/revenue-chart', { 
     params: filterParams 
   });
   return response.data;
@@ -479,7 +478,7 @@ getRevenueChartData: async (filterParams: {
 
 fetchBuildingsForVendor: async():Promise<ApiResponse>=>{
   try {
-    const response = await vendorAxiosInstance.get("/buildings-for-vendor");
+    const response = await vendorAxiosInstance.get("/buildings/vendor");
     return response.data;
   } catch (error:unknown) {
     console.error('Error fetching buildings for vendor:', error);
@@ -492,7 +491,7 @@ fetchBuildingsForVendor: async():Promise<ApiResponse>=>{
 
 fetchSpacesForBuildings: async(buildingId:string):Promise<ApiResponse>=>{
   try {
-     const response = await vendorAxiosInstance.get(`/spaces-for-buildings/${buildingId}`);
+     const response = await vendorAxiosInstance.get(`/buildings/${buildingId}/spaces`);
      return response.data;
   } catch (error:unknown) {
      console.error('Error fetching spaces for building:', error);
@@ -505,7 +504,7 @@ fetchSpacesForBuildings: async(buildingId:string):Promise<ApiResponse>=>{
 
 fetchOffers: async({page=1,limit=5}:{page:number,limit:number})=>{
   try {
-    const response = await vendorAxiosInstance.get("/get-offers",{
+    const response = await vendorAxiosInstance.get("/offers",{
       params:{page,limit}
     });
     return response.data;
@@ -520,7 +519,7 @@ fetchOffers: async({page=1,limit=5}:{page:number,limit:number})=>{
 
 createOffer: async(data: NewOfferForm):Promise<ApiResponse>=>{
    try {
-     const response = await vendorAxiosInstance.post("/create-offer",data);
+     const response = await vendorAxiosInstance.post("/offers",data);
      return response.data;
    } catch (error:unknown) {
      console.error('Error creating offer:', error);
@@ -533,7 +532,7 @@ createOffer: async(data: NewOfferForm):Promise<ApiResponse>=>{
 
 deleteOffer: async(offerId:string):Promise<ApiResponse>=>{
    try {
-     const response = await vendorAxiosInstance.delete("/delete-offer",{
+     const response = await vendorAxiosInstance.delete("/offers",{
       params:{
         entityType: 'offer',
         entityId: offerId
@@ -551,7 +550,7 @@ deleteOffer: async(offerId:string):Promise<ApiResponse>=>{
 
 getNotifications: async(page:number,limit:number,filter: "unread" | "all"):Promise<{ success: boolean, data?: NotificationResponse, message?: string}>=>{
     try {
-      const response = await vendorAxiosInstance.get("/get-notifications",{
+      const response = await vendorAxiosInstance.get("/notifications",{
         params:{
           page,
           limit,
@@ -579,7 +578,7 @@ getNotifications: async(page:number,limit:number,filter: "unread" | "all"):Promi
 
 markAsRead: async(id:string | undefined):Promise<ApiResponse>=>{
   try {
-     const endpoint = id ? `/mark-as-read/${id}` : `/mark-as-read`;
+     const endpoint = id ? `/notifications/${id}/read` : `/notifications`;
      const response = await vendorAxiosInstance.patch(endpoint);
      return response.data;
   } catch (error:unknown) {
@@ -593,7 +592,7 @@ markAsRead: async(id:string | undefined):Promise<ApiResponse>=>{
 
 getChats: async(buildingId:string):Promise<ApiResponse>=>{
  try {
-   const response = await vendorAxiosInstance.get('/getChats',{
+   const response = await vendorAxiosInstance.get('/chats',{
     params: { buildingId }
    });
    return response.data;
@@ -608,11 +607,7 @@ getChats: async(buildingId:string):Promise<ApiResponse>=>{
 
 getChatMessages: async(sessionId:string):Promise<ApiResponse>=>{
   try {
-    const response = await vendorAxiosInstance.get('/messages',{
-      params:{
-        sessionId
-      }
-    })
+    const response = await vendorAxiosInstance.get(`/chats/${sessionId}/messages`)
     return response.data;
   } catch (error:unknown) {
     console.error('Error getting notifiactions:', error);
@@ -625,7 +620,7 @@ getChatMessages: async(sessionId:string):Promise<ApiResponse>=>{
 
 clearChat: async(sessionId: string):Promise<ApiResponse>=>{
   try {
-    const response = await vendorAxiosInstance.patch('/clear-chat',{sessionId});
+    const response = await vendorAxiosInstance.patch(`/chats/${sessionId}/clear`);
     return response.data;
   } catch (error:unknown) {
     return {
@@ -637,7 +632,7 @@ clearChat: async(sessionId: string):Promise<ApiResponse>=>{
 
 clearNotifications: async():Promise<ApiResponse>=>{
   try {
-    const response = await vendorAxiosInstance.delete('/clear-notifications');
+    const response = await vendorAxiosInstance.delete('/notifications');
     return response.data;
   } catch (error:unknown) {
       return {
@@ -649,7 +644,7 @@ clearNotifications: async():Promise<ApiResponse>=>{
 
 getAllAmenities: async(page?:number,limit?:number,search?:string,status?: string): Promise<ApiResponse>=>{
     try {
-      const response = await vendorAxiosInstance.get('/get-amenities',{
+      const response = await vendorAxiosInstance.get('/amenities',{
         params:{page,limit,search,status}
       })
       return response.data;
@@ -664,7 +659,7 @@ getAllAmenities: async(page?:number,limit?:number,search?:string,status?: string
 
   getBuildingByToken: async(token: string):Promise<ApiResponse>=>{
     try {
-      const response = await vendorAxiosInstance.get("/retry-building",{
+      const response = await vendorAxiosInstance.get("/buildings/retry",{
         params:{token}
       });
       return response.data
@@ -679,7 +674,7 @@ getAllAmenities: async(page?:number,limit?:number,search?:string,status?: string
 
   retryBuilding: async(buildingData:Building):Promise<ApiResponse>=>{
     try {
-      const response = await vendorAxiosInstance.post("/retry-building",buildingData);
+      const response = await vendorAxiosInstance.post("/buildings/retry",buildingData);
       return response.data;
     } catch (error:unknown) {
       console.error('Error in retry building application:', error);
@@ -692,7 +687,7 @@ getAllAmenities: async(page?:number,limit?:number,search?:string,status?: string
 
   requestAmenity: async(amenityData: { name: string; description: string }): Promise<ApiResponse>=>{
     try {
-      const response = await vendorAxiosInstance.post("/request-amenity",amenityData);
+      const response = await vendorAxiosInstance.post("/amenities",amenityData);
       return response.data;
     } catch (error) {
       console.error('Error in lrequesting amenity:', error);

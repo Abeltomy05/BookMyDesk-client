@@ -20,7 +20,7 @@ export const clientService = {
 
   sendOtp: async (email: string): Promise<ApiResponse> => {
     try {
-       const response = await authAxiosInstance.post('/send-otp', { email });
+       const response = await authAxiosInstance.post('/otp/send', { email });
        return response.data;
     } catch (error:unknown) {
        return {
@@ -32,7 +32,7 @@ export const clientService = {
 
   verifyOtp: async (email: string, otp: string): Promise<ApiResponse> => {
     try {
-       const response = await authAxiosInstance.post('/verify-otp', { email, otp });
+       const response = await authAxiosInstance.post('/otp/verify', { email, otp });
        return response.data;
     } catch (error:unknown) {
       return {
@@ -69,7 +69,7 @@ export const clientService = {
 
   forgotPassword: async (email: string): Promise<ApiResponse> => {
     try {
-      const response = await authAxiosInstance.post('/forgot-password', { 
+      const response = await authAxiosInstance.post('/password/forgot', { 
         email
       });
       return response.data;
@@ -83,7 +83,7 @@ export const clientService = {
 
   resetPassword: async (token: string, password: string): Promise<ApiResponse> => {
     try {
-      const response = await authAxiosInstance.post('/reset-password', {
+      const response = await authAxiosInstance.post('/password/reset', {
         token,
         password
       });
@@ -115,7 +115,7 @@ export const clientService = {
 
   getSingleUser: async (): Promise<ApiResponse> => {
    try {
-      const response = await clientAxiosInstance.get("/get-user-data");
+      const response = await clientAxiosInstance.get("/users/me");
       return response.data
      } catch (error:unknown) {
       return {
@@ -127,7 +127,7 @@ export const clientService = {
 
   updateProfile: async (data: UserProfile): Promise<ApiResponse> => {
     try {
-      const response = await clientAxiosInstance.patch("/update-profile", data);
+      const response = await clientAxiosInstance.patch("/users/me", data);
       return response.data;
     } catch (error:unknown) {
        return {
@@ -139,7 +139,7 @@ export const clientService = {
 
   updatePassword: async (currentPassword: string, newPassword: string): Promise<ApiResponse> => {
     try {
-      const response = await clientAxiosInstance.patch("/update-password", {
+      const response = await clientAxiosInstance.patch("/users/me/password", {
         currentPassword,
         newPassword
       });
@@ -167,7 +167,7 @@ export const clientService = {
   }
   ): Promise<ApiResponseWithPagination>=>{
     try {
-      const response = await clientAxiosInstance.get("/list-buildings",{
+      const response = await clientAxiosInstance.get("/buildings",{
          params: { 
           page, limit, locationName: filters.locationName,  
           type: filters.type,  priceRange: filters.priceRange, 
@@ -187,7 +187,7 @@ export const clientService = {
 
   fetchFilters: async(): Promise<ApiResponse> => {
   try {
-    const response = await clientAxiosInstance.get("/fetch-filters");
+    const response = await clientAxiosInstance.get("/buildings/filters");
     return response.data;
   } catch (error:unknown) {
     return {
@@ -202,7 +202,7 @@ export const clientService = {
   getBuildingDetails: async(buildingId:string): Promise<ApiResponse>=>{
      try {
       const id = buildingId;
-      const response = await clientAxiosInstance.get(`/building/${id}`);
+      const response = await clientAxiosInstance.get(`/buildings/${id}`);
       return response.data;
      } catch (error:unknown) {
       return {
@@ -216,7 +216,7 @@ export const clientService = {
 
   getBookingPageData: async(spaceId:string): Promise<ApiResponse>=>{
     try {
-      const response = await clientAxiosInstance.get(`/get-booking-page-data/${spaceId}`);
+      const response = await clientAxiosInstance.get(`/bookings/page-data/${spaceId}`);
       return response.data;
     } catch (error:unknown) {
        return {
@@ -238,7 +238,7 @@ export const clientService = {
     bookingId?: string
   }):Promise<ApiResponse> => {
     try {
-      const response = await clientAxiosInstance.post('/create-payment-intent', data);
+      const response = await clientAxiosInstance.post('/bookings/payment-intent', data);
       return response.data;
     } catch (error:unknown) {
        return {
@@ -252,7 +252,7 @@ export const clientService = {
     paymentIntentId: string
   }):Promise<ApiResponse> => {
       try {
-        const response = await clientAxiosInstance.post('/confirm-payment', data);
+        const response = await clientAxiosInstance.post('/bookings/confirm-payment', data);
         return response.data;
       } catch (error:unknown) {
          return {
@@ -266,7 +266,7 @@ export const clientService = {
 
   getBookings: async ({page = 1, limit = 5, status,fromDate,toDate}:{page:number,limit:number,status?:string,fromDate?:string,toDate?:string}): Promise<GetBookingResponse> => {
      try {
-      const response = await clientAxiosInstance.get('/get-bookings', {
+      const response = await clientAxiosInstance.get('/bookings', {
         params: { page, limit, ...(status && { status }),fromDate,toDate }
       })
       return response.data;
@@ -280,7 +280,7 @@ export const clientService = {
 
   getBookingDetails: async (bookingId: string): Promise<ApiResponse> => {
     try {
-      const response = await clientAxiosInstance.get(`/get-booking-details/${bookingId}`);
+      const response = await clientAxiosInstance.get(`/bookings/${bookingId}`);
       return response.data;
     } catch (error:unknown) {
       return {
@@ -292,9 +292,8 @@ export const clientService = {
 
   cancelBooking: async (bookingId: string, reason: string): Promise<ApiResponse> => {
      try {
-      const response = await clientAxiosInstance.patch(`/cancel-booking`, { 
-        reason,
-        bookingId
+      const response = await clientAxiosInstance.patch(`/bookings/${bookingId}/cancel`, { 
+        reason
        });
       return response.data;
      } catch (error:unknown) {
@@ -309,7 +308,7 @@ export const clientService = {
 
   getWalletDetails: async ({page,limit}:{page:number,limit:number}): Promise<ApiResponse> => {
     try {
-       const response = await clientAxiosInstance.get('/get-wallet-details',{
+       const response = await clientAxiosInstance.get('/wallet',{
         params:{page,limit}
        });
        return response.data;
@@ -323,7 +322,7 @@ export const clientService = {
 
   payWithWallet:async ({spaceId,bookingDates,numberOfDesks,totalPrice,discountAmount}:{spaceId: string,bookingDates:Date[],numberOfDesks:number,totalPrice:number,discountAmount?:number})=>{
     try {
-      const response = await clientAxiosInstance.post("/pay-with-wallet",{
+      const response = await clientAxiosInstance.post("/wallet/pay",{
         spaceId,
         bookingDates,
         numberOfDesks,
@@ -343,7 +342,7 @@ export const clientService = {
 
   createTopUpPaymentIntent:async({amount,currency}:{amount:number,currency:string}): Promise<ApiResponse>=>{
     try {
-      const response = await clientAxiosInstance.post('/create-topup-payment-intent',{amount,currency});
+      const response = await clientAxiosInstance.post('/wallet/topup-intent',{amount,currency});
       return response.data;
     } catch (error:unknown) {
         return {
@@ -355,7 +354,7 @@ export const clientService = {
 
   confirmTopUpPayment: async(paymentIntentId: string):Promise<ApiResponse>=>{
     try {
-       const response = await clientAxiosInstance.post("/confirm-topup-payment",{ paymentIntentId });
+       const response = await clientAxiosInstance.post("/wallet/topup",{ paymentIntentId });
        return response.data;
     } catch (error:unknown) {
         return {
@@ -367,7 +366,7 @@ export const clientService = {
 
   getNotifications: async(page:number,limit:number,filter: "unread" | "all"):Promise<{ success: boolean, data?: NotificationResponse, message?: string}>=>{
     try {
-      const response = await clientAxiosInstance.get("/get-notifications",{
+      const response = await clientAxiosInstance.get("/notifications",{
         params:{
           page,
           limit,
@@ -394,7 +393,7 @@ export const clientService = {
 
 markAsRead: async(id:string | undefined):Promise<ApiResponse>=>{
   try {
-    const endpoint = id ? `/mark-as-read/${id}` : `/mark-as-read`;
+    const endpoint = id ? `/notifications/${id}/read` : `/notifications`;
      const response = await clientAxiosInstance.patch(endpoint);
      return response.data;
   } catch (error:unknown) {
@@ -408,7 +407,7 @@ markAsRead: async(id:string | undefined):Promise<ApiResponse>=>{
 //chat related
 createSession: async({buildingId}:{buildingId:string}):Promise<ApiResponse>=>{
  try {
-    const response = await clientAxiosInstance.post('/create-session',{
+    const response = await clientAxiosInstance.post('/chats/sessions',{
       buildingId,
     });
     return response.data;
@@ -573,7 +572,7 @@ handleDownloadInvoice : async(booking:BookingData, user?:{username?:string,email
 
 getChats: async():Promise<ApiResponse>=>{
  try {
-   const response = await clientAxiosInstance.get('/getChats');
+   const response = await clientAxiosInstance.get('/chats');
    return response.data;
  } catch (error:unknown) {
    return {
@@ -583,13 +582,9 @@ getChats: async():Promise<ApiResponse>=>{
  }
 },
 
-getChatMessages: async(sessionId:string):Promise<ApiResponse>=>{
+getChatMessages: async(chatId:string):Promise<ApiResponse>=>{
   try {
-    const response = await clientAxiosInstance.get('/messages',{
-      params:{
-        sessionId
-      }
-    })
+    const response = await clientAxiosInstance.get(`/chats/${chatId}/messages`)
     return response.data;
   } catch (error:unknown) {
      return {
@@ -599,9 +594,10 @@ getChatMessages: async(sessionId:string):Promise<ApiResponse>=>{
   }
 },
 
-clearChat: async(sessionId: string):Promise<ApiResponse>=>{
+
+clearChat: async(chatId: string):Promise<ApiResponse>=>{
   try {
-    const response = await clientAxiosInstance.patch('/clear-chat',{sessionId});
+    const response = await clientAxiosInstance.patch(`/chats/${chatId}/clear`);
     return response.data;
   } catch (error:unknown) {
       return {
@@ -613,7 +609,7 @@ clearChat: async(sessionId: string):Promise<ApiResponse>=>{
 
 clearNotifications: async():Promise<ApiResponse>=>{
   try {
-    const response = await clientAxiosInstance.delete('/clear-notifications');
+    const response = await clientAxiosInstance.delete('/notifications');
     return response.data;
   } catch (error:unknown) {
       return {
@@ -625,7 +621,7 @@ clearNotifications: async():Promise<ApiResponse>=>{
 
 getAllAmenities: async(page?:number,limit?:number,search?:string,status?:string): Promise<ApiResponse>=>{
     try {
-      const response = await clientAxiosInstance.get('/get-amenities',{
+      const response = await clientAxiosInstance.get('/amenities',{
         params:{page,limit,search,status}
       })
       return response.data;

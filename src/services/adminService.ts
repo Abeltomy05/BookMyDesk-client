@@ -45,7 +45,7 @@ export const adminService = {
       excludeStatus
     }:GetUsersParams): Promise<GetAllUsersResponse>=>{
         try {
-          const response = await adminAxiosInstance.get("/getAllUsers", {
+          const response = await adminAxiosInstance.get("/users", {
                           params: {
                             role,
                             page,
@@ -70,7 +70,7 @@ export const adminService = {
 
     getPendingBuildings: async({page=1,limit=5,})=>{
       try {
-        const response = await adminAxiosInstance.get("/get-pending-buildings", {
+        const response = await adminAxiosInstance.get("/buildings/verification/pending", {
           params: { page, limit },
        });
         return response.data;
@@ -94,7 +94,7 @@ export const adminService = {
       email?: string,
     ): Promise<ApiResponse> => {
       try {
-        const response = await adminAxiosInstance.patch("/update-status", {
+        const response = await adminAxiosInstance.patch("/status", {
           entityType,
           entityId,
           status,
@@ -113,7 +113,7 @@ export const adminService = {
 
    getUserCount: async():Promise<ApiResponse>=>{
     try{
-      const response = await adminAxiosInstance.get('/get-user-count');
+      const response = await adminAxiosInstance.get('/users/count');
       return response.data;
     }catch(error:unknown){
       console.error("Error fetching user count:", error);
@@ -126,7 +126,7 @@ export const adminService = {
 
    getWalletDetails: async ({page,limit}:{page:number,limit:number}): Promise<ApiResponse> => {
      try {
-         const response = await adminAxiosInstance.get('/get-wallet-details',{
+         const response = await adminAxiosInstance.get('/wallet',{
          params:{page,limit}
          });
          return response.data;
@@ -141,7 +141,7 @@ export const adminService = {
 
    getVendorsAndBuildings:async():Promise<ApiResponse>=>{
     try {
-       const response = await adminAxiosInstance.get("/get-vendor-buildings");
+       const response = await adminAxiosInstance.get("/vendors/buildings");
        return response.data;
     } catch (error:unknown) {
      console.error('Error fetching wallet details:', error);
@@ -154,7 +154,7 @@ export const adminService = {
 
    getBookingsForAdmin:async(params:{ page: number; limit: number; vendorId?: string; buildingId?: string; status?: string,fromDate?:string,toDate?:string }):Promise<ApiResponse>=>{
     try {
-       const response = await adminAxiosInstance.get("/get-bookings",{
+       const response = await adminAxiosInstance.get("/bookings",{
         params: {
         page: params.page,
         limit: params.limit,
@@ -177,7 +177,7 @@ export const adminService = {
 
    getSingleVendorData: async(vendorId:string):Promise<ApiResponse>=>{
     try {
-      const response = await adminAxiosInstance.get(`/get-single-vendor/${vendorId}`);
+      const response = await adminAxiosInstance.get(`/vendors/${vendorId}`);
       return response.data;
     } catch (error:unknown) {
        console.error("Error fetching vendor data:", error);
@@ -190,7 +190,7 @@ export const adminService = {
 
   getNotifications: async(page:number,limit:number,filter: "unread" | "all"):Promise<{ success: boolean, data?: NotificationResponse, message?: string}>=>{
       try {
-        const response = await adminAxiosInstance.get("/get-notifications",{
+        const response = await adminAxiosInstance.get("/notifications",{
           params:{
             page,
             limit,
@@ -218,7 +218,7 @@ export const adminService = {
 
     markAsRead: async(id:string | undefined):Promise<ApiResponse>=>{
       try {
-        const endpoint = id ? `/mark-as-read/${id}` : `/mark-as-read`;
+        const endpoint = id ? `/notifications/${id}/read` : `/notifications`;
         const response = await adminAxiosInstance.patch(endpoint);
         return response.data;
       } catch (error:unknown) {
@@ -232,7 +232,7 @@ export const adminService = {
 
   getAllBuildings: async(params:{ page?: number; limit?: number; search?: string; status?:string}):Promise<GetAllBuildingResponse>=>{
     try {
-      const response = await adminAxiosInstance.get("/get-every-building",{
+      const response = await adminAxiosInstance.get("/buildings",{
         params: {
           page: params.page,
           limit: params.limit,
@@ -242,7 +242,7 @@ export const adminService = {
       })
       return response.data;
     } catch (error:unknown) {
-      console.error('Error getting monthly stats:', error);
+      console.error('Error getting all buildings:', error);
         return {
             success: false,
             message: getErrorMessage(error),
@@ -261,7 +261,7 @@ export const adminService = {
     year: string;
   }):Promise<ApiResponse> => {
      try {
-    const response = await adminAxiosInstance.get('/revenue-chart', { 
+    const response = await adminAxiosInstance.get('/reports/revenue-chart', { 
       params: filterParams 
     });
     return response.data;
@@ -281,12 +281,12 @@ export const adminService = {
     year: string;
   }):Promise<ApiResponse> =>{
     try {
-    const response = await adminAxiosInstance.get('/revenue-report', { 
+    const response = await adminAxiosInstance.get('/reports/revenue', { 
       params: filterParams 
     });
      return response.data;
     } catch (error:unknown) {
-        console.error('Error getting chart data:', error);
+        console.error('Error getting revenue report data:', error);
         return {
             success: false,
             message: getErrorMessage(error),
@@ -363,7 +363,7 @@ export const adminService = {
 
   clearNotifications: async():Promise<ApiResponse>=>{
     try {
-      const response = await adminAxiosInstance.delete('/clear-notifications');
+      const response = await adminAxiosInstance.delete('/notifications');
       return response.data;
     } catch (error:unknown) {
         return {
@@ -375,7 +375,7 @@ export const adminService = {
 
   getAllAmenities: async(page?:number,limit?:number,search?:string,status?:string): Promise<PaginatedResponse<Amenities>>=>{
     try {
-      const response = await adminAxiosInstance.get('/get-amenities',{
+      const response = await adminAxiosInstance.get('/amenities',{
         params: { page, limit, search, status }
       })
       return response.data;
@@ -393,7 +393,7 @@ export const adminService = {
 
   createAmenity: async (name:string):Promise<ApiResponse>=>{
     try {
-      const response = await adminAxiosInstance.post('/create-amenity',{name});
+      const response = await adminAxiosInstance.post('/amenities',{name});
       return response.data;
     } catch (error:unknown) {
         return {
@@ -405,7 +405,7 @@ export const adminService = {
 
   editAmenity: async (name:string,id:string):Promise<ApiResponse>=>{
     try {
-      const response = await adminAxiosInstance.patch('/edit-amenity',{name,id});
+      const response = await adminAxiosInstance.patch(`/amenities/${id}`,{name});
       return response.data;
     } catch (error:unknown) {
         return {
@@ -417,9 +417,7 @@ export const adminService = {
   
   deleteAmenity: async (id:string):Promise<ApiResponse>=>{
     try {
-      const response = await adminAxiosInstance.delete('/delete-amenity',{
-        params:{id}
-      });
+      const response = await adminAxiosInstance.delete(`/amenities/${id}`);
       return response.data;
     } catch (error:unknown) {
         return {
@@ -431,7 +429,7 @@ export const adminService = {
 
   getAmenityRequests: async (page?:number,limit?:number):Promise<PaginatedResponse<AmenityRequest>>=>{
     try {
-      const response = await adminAxiosInstance.get('/pending-amenity', {
+      const response = await adminAxiosInstance.get('/amenities/pending', {
         params: { page, limit }
       });
       return response.data;
