@@ -127,7 +127,7 @@ return (
         </h2>
 
         <div 
-        className="grid grid-cols-2 md:grid-cols-4 gap-4"
+        className="grid grid-cols-2 md:grid-cols-4 gap-4 auto-rows-[200px] md:auto-rows-[250px]"
         onClick={handleCardClick}
         >
           <PickCard title="Coliving" image="https://res.cloudinary.com/dnivctodr/image/upload/v1748162545/coliving_boaois.avif" size="large" delay={0} />
