@@ -35,8 +35,10 @@ const VendorNavbar: React.FC<VendorNavbarProps> = ({
 
   notificationSocketService.connect(user._id, 'vendor'); 
 
-  notificationSocketService.onNotification(() => {
-    setUnreadCount((prev) => prev + 1);
+  notificationSocketService.onNotification((payload) => {
+    if (payload?.type !== "chat") {
+      setUnreadCount((prev) => prev + 1);
+    }  
   });
 
   const fetchInitialUnreadCount = async () => {

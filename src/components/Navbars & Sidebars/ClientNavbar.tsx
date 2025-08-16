@@ -60,8 +60,10 @@ useEffect(() => {
   socketService.connect(user._id, "client");
   socketService.getSocket()?.emit("requestOnlineUsers");
 
-  socketService.onNotification(() => {
+  socketService.onNotification((payload) => {
+     if (payload?.type !== "chat") {
     setUnreadCount((prev) => prev + 1);
+     }
   });
 
   const fetchInitialUnreadCount = async () => {
