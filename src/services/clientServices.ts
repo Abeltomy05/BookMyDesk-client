@@ -264,10 +264,10 @@ export const clientService = {
 
   //bookings
 
-  getBookings: async ({page = 1, limit = 5, status,fromDate,toDate}:{page:number,limit:number,status?:string,fromDate?:string,toDate?:string}): Promise<GetBookingResponse> => {
+  getBookings: async ({page = 1, limit = 5, status,fromDate,toDate,buildingId}:{page:number,limit:number,status?:string,fromDate?:string,toDate?:string,buildingId?:string}): Promise<GetBookingResponse> => {
      try {
       const response = await clientAxiosInstance.get('/bookings', {
-        params: { page, limit, ...(status && { status }),fromDate,toDate }
+        params: { page, limit, ...(status && { status }),fromDate,toDate,buildingId }
       })
       return response.data;
      } catch (error:unknown) {
@@ -631,6 +631,19 @@ getAllAmenities: async(page?:number,limit?:number,search?:string,status?:string)
         message: getErrorMessage(error),
         data: [],
       };
+    }
+  },
+
+  fetchBuildingsForClient: async():Promise<ApiResponse>=>{
+    try {
+      const response = await clientAxiosInstance.get("/buildings/client");
+      return response.data;
+    } catch (error:unknown) {
+      console.error('Error fetching buildings for vendor:', error);
+      return {
+          success: false,
+          message: getErrorMessage(error),
+        };
     }
   },
 

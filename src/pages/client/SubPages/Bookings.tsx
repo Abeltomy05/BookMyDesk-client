@@ -7,12 +7,15 @@ import type { TableColumn } from '@/types/table.type';
 import type { BookingData } from '@/types/booking.type';
 import type { FetchParams } from '@/types/api.type';
 import { formatBookingDates } from '@/utils/formatters/date';
+import { getStatusColor } from '@/utils/constants/reasons';
 
 const ClientBookings = () => {
   const tableRef = useRef(null);
   const navigate = useNavigate();
   const [currentFilter, setCurrentFilter] = useState<string>("all");
   const [dateRange, setDateRange] = useState<{ from: string; to: string }>({ from: '', to: '' });
+
+  const [selectedBuildingId, setSelectedBuildingId] = useState<string>('');
 
   const fetchBookings = async (params:FetchParams) => {
     try {
@@ -21,7 +24,8 @@ const ClientBookings = () => {
         limit: params.limit || 4,
         status: currentFilter  !== 'all' ? currentFilter  : undefined,
         fromDate: dateRange.from || undefined,
-        toDate: dateRange.to || undefined
+        toDate: dateRange.to || undefined,
+        buildingId: selectedBuildingId || undefined,
       });
       console.log(response.data)
       if (response.success) {
@@ -55,21 +59,23 @@ const ClientBookings = () => {
     }
   };
 
-  const getStatusColor = (status:string) => {
-    switch (status) {
-      case 'confirmed':
-      case 'upcoming':
-        return 'bg-blue-100 text-blue-800';
-      case 'completed':
-        return 'bg-green-100 text-green-800';
-      case 'cancelled':
-        return 'bg-gray-100 text-gray-800';
-      case 'failed':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+  const fetchBuildings = async (): Promise<{ id: string; name: string }[]> => {
+    try {
+      const response = await clientService.fetchBuildingsForClient();
+      console.log(response)
+      if (response.success) {
+        const buildingOptions = response.data.map((building: {buildingName: string, _id:string}) => ({
+          id: building._id,
+          name: building.buildingName
+        }));
+         return buildingOptions;
+      }
+    } catch (error) {
+      console.error('Error fetching buildings:', error);
     }
+    return [];
   };
+
 
   const handleFilterChange = (filterValue: string) => {
   setCurrentFilter(filterValue);
@@ -78,6 +84,10 @@ const ClientBookings = () => {
 const handleDateFilterChange = (fromDate: string, toDate: string) => {
  setDateRange({ from: fromDate, to: toDate });
 };
+
+  const handleBuildingFilterChange = (buildingId: string) => {
+  setSelectedBuildingId(buildingId);
+  };
 
   const tableColumns:TableColumn<BookingData>[] = [
     {
@@ -174,6 +184,9 @@ const handleDateFilterChange = (fromDate: string, toDate: string) => {
         onFilterChange={handleFilterChange}
         enableDateFilter={true}
         onDateFilterChange={handleDateFilterChange}
+        enableBuildingFilter={true}
+        fetchBuildings={fetchBuildings} 
+        onBuildingFilterChange={handleBuildingFilterChange}
       />
 
     </div>

@@ -1,4 +1,4 @@
-import  { useState, useRef, useEffect } from 'react';
+import  { useState, useRef } from 'react';
 import {  MapPin, Calendar, Users, CheckCircle, XCircle, Phone, Mail, User } from 'lucide-react';
 import { LightGenericTable, type TableRef } from '@/components/ReusableComponents/LightGenericTable';
 import { vendorService } from '@/services/vendorServices';
@@ -10,6 +10,7 @@ import toast from 'react-hot-toast';
 import { formatBookingDates } from '@/utils/formatters/date';
 import ConfirmModal from '@/components/ReusableComponents/ConfirmModal';
 import CancelBookingModal from '@/components/BookingDetailsComponents/CancelConfirmModal';
+import { getStatusColor } from '@/utils/constants/reasons';
 
 const VendorManageBookings = () => {
   const tableRef = useRef<TableRef<BookingData> | null>(null);
@@ -19,8 +20,6 @@ const VendorManageBookings = () => {
   const [cancelLoading, setCancelLoading] = useState(false);
   const [showCompleteModal, setShowCompleteModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<BookingData | null>(null);
-
-  const [buildings, setBuildings] = useState<{ id: string; name: string }[]>([]);
   const [selectedBuildingId, setSelectedBuildingId] = useState<string>('');
   const [dateRange, setDateRange] = useState<{ from: string; to: string }>({ from: '', to: '' });
 
@@ -68,37 +67,23 @@ const VendorManageBookings = () => {
     }
   };
 
-  const fetchBuildings = async () => {
+  const fetchBuildings = async (): Promise<{ id: string; name: string }[]> => {
   try {
     const response = await vendorService.fetchBuildingsForVendor();
+    console.log(response)
     if (response.success) {
       const buildingOptions = response.data.map((building: {buildingName: string, _id:string}) => ({
         id: building._id,
         name: building.buildingName
       }));
-      setBuildings(buildingOptions);
+      return buildingOptions;
     }
   } catch (error) {
     console.error('Error fetching buildings:', error);
   }
+   return [];
 };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'confirmed':
-      case 'upcoming':
-        return 'bg-blue-100 text-blue-800';
-      case 'completed':
-        return 'bg-green-100 text-green-800';
-      case 'cancelled':
-        return 'bg-gray-100 text-gray-800';
-      case 'failed':
-        return 'bg-red-100 text-red-800';
-
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
 
   const handleFilterChange = (filterValue: string) => {
     setCurrentFilter(filterValue);
@@ -111,10 +96,6 @@ const VendorManageBookings = () => {
   const handleDateFilterChange = (fromDate: string, toDate: string) => {
   setDateRange({ from: fromDate, to: toDate });
   };
-
-  useEffect(() => {
-    fetchBuildings();
-  }, []);
 
   const handleCancelBooking = async (reason: string) => {
        if (!selectedBooking) return;
@@ -325,7 +306,7 @@ const VendorManageBookings = () => {
           onFilterChange={handleFilterChange}
           enableBuildingFilter={true} 
           enableDateFilter={true}       
-          buildings={buildings}    
+          fetchBuildings={fetchBuildings}     
           onBuildingFilterChange={handleBuildingFilterChange}
           onDateFilterChange={handleDateFilterChange}
         />

@@ -13,7 +13,7 @@ interface GenericTableProps<T extends BaseItem> extends TableConfiguration<T> {
 
   enableDateFilter?: boolean
   enableBuildingFilter?: boolean
-  buildings?: { id: string; name: string }[]
+  fetchBuildings?: () => Promise<{ id: string; name: string }[]>
   onDateFilterChange?: (fromDate: string, toDate: string) => void
   onBuildingFilterChange?: (buildingId: string) => void
   dateFilterLabel?: string
@@ -45,7 +45,7 @@ function LightGenericTableInner<T extends BaseItem>(
 
     enableDateFilter = false,
     enableBuildingFilter = false,
-    buildings = [],
+    fetchBuildings,
     onDateFilterChange,
     onBuildingFilterChange,
     dateFilterLabel = "Date Range",
@@ -64,6 +64,9 @@ function LightGenericTableInner<T extends BaseItem>(
   const [fromDate, setFromDate] = useState("")
   const [toDate, setToDate] = useState("")
   const [selectedBuilding, setSelectedBuilding] = useState("")
+
+  const [buildingOptions, setBuildingOptions] = useState<{ id: string; name: string }[]>([])
+  const [buildingsLoaded, setBuildingsLoaded] = useState(false)
   
   const [pagination, setPagination] = useState<PaginationInfo>({
     currentPage: 1,
@@ -126,6 +129,18 @@ function LightGenericTableInner<T extends BaseItem>(
       setLoading(false)
     }
   }
+
+  const loadBuildings = async () => {
+  if (!buildingsLoaded && fetchBuildings) {
+    try {
+      const options = await fetchBuildings()
+      setBuildingOptions(options)
+      setBuildingsLoaded(true)
+    } catch (err) {
+      console.error("Error loading buildings:", err)
+    }
+  }
+}
 
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
@@ -328,11 +343,12 @@ function LightGenericTableInner<T extends BaseItem>(
                 <div className="flex gap-2 items-center">
                   <select
                     value={selectedBuilding}
+                    onClick={loadBuildings}  
                     onChange={(e) => handleBuildingChange(e.target.value)}
                     className="bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#f69938] focus:border-transparent min-w-[150px]"
                   >
                     <option value="">All Buildings</option>
-                    {buildings.map((building) => (
+                    {buildingOptions.map((building) => (
                       <option key={building.id} value={building.id}>
                         {building.name}
                       </option>
