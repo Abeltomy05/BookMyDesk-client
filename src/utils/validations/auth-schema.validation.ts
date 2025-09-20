@@ -88,9 +88,9 @@ export const validateVendorField = (
           return "Username must be at least 2 characters long";
         }
 
-         if (!/^[a-zA-Z\s]+$/.test(value.trim())) {
-            return "Username must contain only alphabetic characters and spaces";
-          }
+         if (!/^(?=.*[a-zA-Z])[a-zA-Z_]+$/.test(value.trim())) {
+          return "Username must contain letters and may include underscores";
+        }
 
         return undefined; 
     case "email":
@@ -122,11 +122,21 @@ export const validateVendorField = (
           : undefined
           
     case "phone":
-      return !value || typeof value !== 'string' || !value.trim()
-        ? "Phone number is required"
-        : !/^\d{10}$/.test(value.replace(/\D/g, ''))
-          ? "Phone number must be exactly 10 digits"
-          : undefined;
+         if (!value || typeof value !== "string" || !value.trim()) {
+            return "Phone number is required";
+          }
+
+          const digits = value.replace(/\D/g, "");
+          
+           if (!/^\d{10}$/.test(digits)) {
+          return "Phone number must be exactly 10 digits";
+        }
+
+        if (/^0+$/.test(digits)) {
+          return "Phone number cannot be all zeros";
+        }
+
+          return undefined;
           
     case "companyName":
       return !value || typeof value !== 'string' || !value.trim() ? "Company name is required" : undefined
@@ -245,7 +255,19 @@ export const validateClientField = (
 ): string | undefined => {
   switch (name as keyof FormData) {
     case "username":
-      return !value || typeof value !== 'string' || !value.trim() ? "Username is required" : undefined
+        if (!value || typeof value !== "string" || !value.trim()) {
+          return "Username is required";
+        }   
+        
+        if (value.trim().length < 2) {
+          return "Username must be at least 2 characters long";
+        }
+
+         if (!/^(?=.*[a-zA-Z])[a-zA-Z_]+$/.test(value.trim())) {
+          return "Username must contain letters and may include underscores";
+        }
+
+        return undefined;
       
     case "email":
       return !value || typeof value !== 'string' || !value.trim() 
@@ -275,12 +297,22 @@ export const validateClientField = (
           ? "Passwords do not match" 
           : undefined
           
-    case "phone":
-      return !value || typeof value !== 'string' || !value.trim()
-        ? "Phone number is required"
-        : !/^\d{10}$/.test(value.replace(/\D/g, ''))
-          ? "Phone number must be exactly 10 digits"
-          : undefined;
+     case "phone":
+         if (!value || typeof value !== "string" || !value.trim()) {
+            return "Phone number is required";
+          }
+
+          const digits = value.replace(/\D/g, "");
+          
+           if (!/^\d{10}$/.test(digits)) {
+          return "Phone number must be exactly 10 digits";
+        }
+
+        if (/^0+$/.test(digits)) {
+          return "Phone number cannot be all zeros";
+        }
+
+          return undefined;
           
     default:
       return undefined
